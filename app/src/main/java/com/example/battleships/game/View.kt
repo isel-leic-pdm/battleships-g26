@@ -16,13 +16,10 @@ import androidx.compose.ui.unit.sp
 import com.example.battleships.game.domain.board.Board
 import com.example.battleships.game.domain.board.Coordinate
 import com.example.battleships.game.domain.board.Panel
-import com.example.battleships.game.domain.state.BattlePhase
-import com.example.battleships.game.domain.state.Configuration
-import com.example.battleships.game.domain.state.Game
-import com.example.battleships.game.domain.state.SinglePhase
 import com.example.battleships.game.domain.state.single.PlayerPreparationPhase
 import com.example.battleships.game.domain.state.single.Single
 import com.example.battleships.game.domain.ship.ShipType
+import com.example.battleships.game.domain.state.*
 
 val PLAY_SIDE = 30.dp
 val GRID_WIDTH = 5.dp
@@ -36,16 +33,24 @@ fun GameView(
     onShotPlaced: (Coordinate) -> Unit,
     onConfirmLayout: () -> Unit
 ) {
-    Column(Modifier.fillMaxWidth()) {
-        when(game) {
-            is SinglePhase -> {
-                if (game.player1Game is PlayerPreparationPhase)
-                    PreparationPhase(game.player1Game, game.configuration, onShipPlaced, onShipClick, onConfirmLayout)
-                else
-                    PreparationPhase(game.player1Game, game.configuration, null, null, null)
+    game?.let { game ->
+        Column(Modifier.fillMaxWidth()) {
+            when (game) {
+                is SinglePhase -> {
+                    if (game.player1Game is PlayerPreparationPhase)
+                        PreparationPhase(
+                            game.player1Game,
+                            game.configuration,
+                            onShipPlaced,
+                            onShipClick,
+                            onConfirmLayout
+                        )
+                    else
+                        PreparationPhase(game.player1Game, game.configuration, null, null, null)
+                }
+                is BattlePhase -> Battle(game, onShotPlaced)
+                is EndPhase -> End(game)
             }
-            is BattlePhase -> Battle(game, onShotPlaced)
-            else -> Text("Game is null")
         }
     }
 }
@@ -82,7 +87,16 @@ private fun PreparationPhase(
 
 @Composable
 private fun Battle(game: BattlePhase, onShot: (Coordinate) -> Unit) {
-    BoardView(game.player1Board, onShot)
+    if (game.playersTurn == game.player1)
+        BoardView(game.player2Board, onShot)
+    else
+        BoardView(game.player1Board, null)
+}
+
+@Composable
+private fun End(game: EndPhase) {
+    Text("Game over")
+    Text(text = "Winner: ${game.winner}")
 }
 
 @Composable
@@ -125,6 +139,13 @@ private fun PlayView(coordinate: Coordinate, panel: Panel, onClick: (() -> Unit)
         )
         .background(color)
     Box(m.clickable { onClick?.invoke() })
+    if (panel.isHit) {
+        Box(
+            modifier = m
+                .background(Color.Red)
+                .padding(5.dp)
+        )
+    }
 }
 
 @Composable

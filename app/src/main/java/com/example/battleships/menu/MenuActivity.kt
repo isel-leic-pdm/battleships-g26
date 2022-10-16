@@ -9,8 +9,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.battleships.DependenciesContainer
 import com.example.battleships.menu.views.LoadingState
 
-// TODO: see: https://www.exceptionnotfound.net/modeling-battleship-in-csharp-introduction-and-strategies/
-
 class MenuActivity : ComponentActivity() {
     private val service by lazy {
         (application as DependenciesContainer).userService

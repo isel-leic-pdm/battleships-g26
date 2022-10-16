@@ -11,6 +11,8 @@ import com.example.battleships.game.domain.state.SinglePhase
 import com.example.battleships.game.domain.state.single.PlayerPreparationPhase
 import com.example.battleships.game.domain.ship.Orientation
 import com.example.battleships.game.domain.ship.ShipType
+import com.example.battleships.game.domain.state.BattlePhase
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -74,7 +76,7 @@ class GameViewModel(
                     ?: return // tests if the action is valid
                 viewModelScope.launch {
                     gameService.rotateShip(position)
-                    _game.value = gameService.getGameState()
+                    _game.value = gameService.getGameState() ?: _game.value
                 }
             }
         }
@@ -88,13 +90,32 @@ class GameViewModel(
                 playerGame.confirmFleet()
                 viewModelScope.launch {
                     gameService.confirmFleet()
-                    _game.value = gameService.getGameState()
+                    _game.value = gameService.getGameState() ?: _game.value
                 }
             }
         }
     }
 
     fun placeShot(coordinate: Coordinate) {
-        TODO("Not yet implemented")
+        val gameInternal = game.value ?: return
+        if (gameInternal is BattlePhase) {
+            gameInternal.tryPlaceShot(gameInternal.player1, coordinate)
+                ?: return // tests if the action is valid
+            viewModelScope.launch {
+                gameService.placeShot(coordinate)
+                _game.value = gameService.getGameState() ?: _game.value
+                delay(3000)
+                gameService.letOpponentPlaceShotOnMe()
+                while (true) {
+                    val gameState = gameService.getGameState()
+                    if (gameState is BattlePhase) {
+                        if (gameState.player1 == gameInternal.player1) {
+                            _game.value = gameState
+                            break
+                        }
+                    }
+                }
+            }
+        }
     }
 }

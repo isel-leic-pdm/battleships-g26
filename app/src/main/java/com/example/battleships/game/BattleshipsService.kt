@@ -1,5 +1,6 @@
 package com.example.battleships.game
 
+import androidx.compose.runtime.rememberCoroutineScope
 import com.example.battleships.game.domain.board.Coordinate
 import com.example.battleships.game.domain.state.Configuration
 import com.example.battleships.game.domain.state.Game
@@ -9,22 +10,24 @@ import com.example.battleships.game.domain.ship.Orientation
 import com.example.battleships.game.domain.ship.ShipType
 import com.example.battleships.game.domain.state.BattlePhase
 import com.example.battleships.game.domain.state.single.PlayerWaitingPhase
+import kotlinx.coroutines.CoroutineScope
 
 
 interface BattleshipsService {
-    fun startNewGame()
+    suspend fun startNewGame()
 
-    fun placeShip(shipType: ShipType, coordinate: Coordinate, orientation: Orientation)
+    suspend fun placeShip(shipType: ShipType, coordinate: Coordinate, orientation: Orientation)
 
-    fun moveShip(origin: Coordinate, destination: Coordinate)
+    suspend fun moveShip(origin: Coordinate, destination: Coordinate)
 
-    fun rotateShip(position: Coordinate)
+    suspend fun rotateShip(position: Coordinate)
 
-    fun placeShot(coordinate: Coordinate)
+    suspend fun placeShot(coordinate: Coordinate)
 
-    fun confirmFleet()
+    suspend fun confirmFleet()
 
-    fun getGameState(): Game?
+    suspend fun getGameState(): Game?
+    suspend fun letOpponentPlaceShotOnMe()
 }
 
 class FakeBattleshipService : BattleshipsService {
@@ -43,31 +46,32 @@ class FakeBattleshipService : BattleshipsService {
         roundTimeout = 10
     )
 
-    override fun startNewGame() {
-        val gameId = 111
-        val player1Id = 222
-        val player2Id = 333
+    override suspend fun startNewGame() {
+        val gameId = 555
+        val player1Id = 111
+        val player2Id = 222
         game = Game.newGame(gameId, player1Id, player2Id, configuration)
         placeOpponentShips()
     }
 
-    private fun placeOpponentShips() {
+    private suspend fun placeOpponentShips() {
         val localGame = game ?: return
         if (localGame is SinglePhase) {
             val opponentGame = localGame.player2Game
             if (opponentGame is PlayerPreparationPhase) {
-                opponentGame.tryPlaceShip(ShipType.CARRIER, Coordinate(1, 1), Orientation.HORIZONTAL)
-                opponentGame.tryPlaceShip(ShipType.BATTLESHIP, Coordinate(3, 1), Orientation.HORIZONTAL)
-                opponentGame.tryPlaceShip(ShipType.CRUISER, Coordinate(5, 2), Orientation.HORIZONTAL)
-                opponentGame.tryPlaceShip(ShipType.SUBMARINE, Coordinate(7, 3), Orientation.HORIZONTAL)
-                opponentGame.tryPlaceShip(ShipType.DESTROYER, Coordinate(9, 4), Orientation.HORIZONTAL)
-                val newOpponentGame = opponentGame.confirmFleet()
+                val newOpponentGame = opponentGame.tryPlaceShip(ShipType.CARRIER, Coordinate(1, 1), Orientation.HORIZONTAL)
+                    ?.tryPlaceShip(ShipType.BATTLESHIP, Coordinate(3, 1), Orientation.HORIZONTAL)
+                    ?.tryPlaceShip(ShipType.CRUISER, Coordinate(5, 2), Orientation.HORIZONTAL)
+                    ?.tryPlaceShip(ShipType.SUBMARINE, Coordinate(7, 3), Orientation.HORIZONTAL)
+                    ?.tryPlaceShip(ShipType.DESTROYER, Coordinate(9, 4), Orientation.HORIZONTAL)
+                    ?.confirmFleet() ?: throw IllegalStateException("Opponent fleet not placed")
+
                 game = localGame.copy(player2Game = newOpponentGame)
             }
         }
     }
 
-    override fun placeShip(shipType: ShipType, coordinate: Coordinate, orientation: Orientation) {
+    override suspend fun placeShip(shipType: ShipType, coordinate: Coordinate, orientation: Orientation) {
         val localGame = game
         if (localGame is SinglePhase) {
             val playerGame = localGame.player1Game
@@ -81,7 +85,7 @@ class FakeBattleshipService : BattleshipsService {
         }
     }
 
-    override fun moveShip(origin: Coordinate, destination: Coordinate) {
+    override suspend fun moveShip(origin: Coordinate, destination: Coordinate) {
         val localGame = game
         if (localGame is SinglePhase) {
             val playerGame = localGame.player1Game
@@ -95,7 +99,7 @@ class FakeBattleshipService : BattleshipsService {
         }
     }
 
-    override fun rotateShip(position: Coordinate) {
+    override suspend fun rotateShip(position: Coordinate) {
         val localGame = game
         if (localGame is SinglePhase) {
             val playerGame = localGame.player1Game
@@ -109,11 +113,32 @@ class FakeBattleshipService : BattleshipsService {
         }
     }
 
-    override fun placeShot(coordinate: Coordinate) {
-        TODO("Not yet implemented")
+    /**
+     * Places a shot in enemy fleet, in case is player 1 turn.
+     * After that, it places a shot in player 1 fleet, just for test purposes.
+     */
+    override suspend fun placeShot(coordinate: Coordinate) {
+        val localGame = game
+        if (localGame is BattlePhase) {
+            val newGame = localGame.tryPlaceShot(localGame.player1, coordinate)
+            if (newGame != null)
+                game = newGame
+        }
     }
 
-    override fun confirmFleet() {
+    override suspend fun letOpponentPlaceShotOnMe() {
+        val localGame = game
+        if (localGame is BattlePhase) {
+            val randomCoordinate = Coordinate((1..configuration.boardSize).random(), (1..configuration.boardSize).random())
+            val newGame = localGame.tryPlaceShot(localGame.player2, randomCoordinate)
+            if (newGame != null)
+                game = newGame
+            else
+                throw IllegalStateException("Opponent shot not placed")
+        }
+    }
+
+    override suspend fun confirmFleet() {
         val localGame = game
         if (localGame is SinglePhase) {
             val playerGame = localGame.player1Game
@@ -135,7 +160,5 @@ class FakeBattleshipService : BattleshipsService {
         }
     }
 
-    override fun getGameState(): Game? {
-        return game
-    }
+    override suspend fun getGameState() = game
 }
