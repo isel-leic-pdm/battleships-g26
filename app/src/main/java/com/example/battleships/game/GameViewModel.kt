@@ -5,11 +5,13 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.battleships.game.BattleshipsService
-import com.example.fleetbattletemp.game.domain.board.Coordinate
-import com.example.fleetbattletemp.game.domain.game.Game
-import com.example.fleetbattletemp.game.domain.ship.Orientation
-import com.example.fleetbattletemp.game.domain.ship.ShipType
+import com.example.battleships.game.domain.board.Coordinate
+import com.example.battleships.game.domain.game.BattlePhase
+import com.example.battleships.game.domain.game.Game
+import com.example.battleships.game.domain.game.SinglePhase
+import com.example.battleships.game.domain.game.single.PlayerPreparationPhase
+import com.example.battleships.game.domain.ship.Orientation
+import com.example.battleships.game.domain.ship.ShipType
 import kotlinx.coroutines.launch
 
 /**
@@ -20,7 +22,7 @@ import kotlinx.coroutines.launch
  * will return the new state of the game. This new state will be used to update the local state.
  */
 class GameViewModel(
-    private val dataService: BattleshipsService
+    private val gameService: BattleshipsService
 ) : ViewModel() {
 
     private val _game: MutableState<Game?> = mutableStateOf(null)
@@ -29,44 +31,71 @@ class GameViewModel(
 
     fun startGame() {
         viewModelScope.launch {
-            _game.value = dataService.getNewGame() ?: game.value
+            gameService.startNewGame()
+            _game.value = gameService.getGameState()
         }
     }
 
     fun placeShip(shipType: ShipType, coordinate: Coordinate, orientation: Orientation) {
-        _game.value?.tryPlaceShip(shipType, coordinate, orientation)
-            ?: return // tests if the action is valid
-        viewModelScope.launch {
-            _game.value = dataService.placeShip(_game.value!!, shipType, coordinate, orientation)
-                ?: game.value
+        val gameInternal = game.value ?: return
+        if (gameInternal is SinglePhase) {
+            val playerGame = gameInternal.player1Game
+            if (playerGame is PlayerPreparationPhase) {
+                playerGame.tryPlaceShip(shipType, coordinate, orientation)
+                    ?: return // tests if the action is valid
+                viewModelScope.launch {
+                    gameService.placeShip(shipType, coordinate, orientation)
+                    _game.value = gameService.getGameState()
+                }
+            }
         }
     }
 
     fun moveShip(origin: Coordinate, destination: Coordinate) {
-        _game.value?.tryMoveShip(origin, destination) ?: return
-        viewModelScope.launch {
-            _game.value = dataService.moveShip(_game.value!!, origin, destination) ?: game.value
+        val gameInternal = game.value ?: return
+        if (gameInternal is SinglePhase) {
+            val playerGame = gameInternal.player1Game
+            if (playerGame is PlayerPreparationPhase) {
+                playerGame.tryMoveShip(origin, destination)
+                    ?: return // tests if the action is valid
+                viewModelScope.launch {
+                    gameService.moveShip(origin, destination)
+                    _game.value = gameService.getGameState()
+                }
+            }
         }
     }
 
     fun rotateShip(position: Coordinate) {
-        _game.value?.tryRotateShip(position) ?: return
-        viewModelScope.launch {
-            _game.value = dataService.rotateShip(_game.value!!, position) ?: game.value
+        val gameInternal = game.value ?: return
+        if (gameInternal is SinglePhase) {
+            val playerGame = gameInternal.player1Game
+            if (playerGame is PlayerPreparationPhase) {
+                playerGame.tryRotateShip(position)
+                    ?: return // tests if the action is valid
+                viewModelScope.launch {
+                    gameService.rotateShip(position)
+                    _game.value = gameService.getGameState()
+                }
+            }
         }
     }
 
     fun confirmFleet() {
-        _game.value?.tryConfirmFleet() ?: return
-        viewModelScope.launch {
-            _game.value = dataService.confirmFleet(_game.value!!) ?: game.value
+        val gameInternal = game.value ?: return
+        if (gameInternal is SinglePhase) {
+            val playerGame = gameInternal.player1Game
+            if (playerGame is PlayerPreparationPhase) {
+                playerGame.confirmFleet()
+                viewModelScope.launch {
+                    gameService.confirmFleet()
+                    _game.value = gameService.getGameState()
+                }
+            }
         }
     }
 
     fun placeShot(coordinate: Coordinate) {
-        _game.value?.tryPlaceShot(coordinate) ?: return
-        viewModelScope.launch {
-            _game.value = dataService.placeShot(_game.value!!, coordinate) ?: game.value
-        }
+        TODO("Not yet implemented")
     }
 }

@@ -1,4 +1,4 @@
-package com.example.fleetbattletemp.start.info
+package com.example.battleships.start.info
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

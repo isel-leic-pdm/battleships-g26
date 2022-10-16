@@ -9,12 +9,12 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.example.battleships.game.domain.board.Coordinate
+import com.example.battleships.game.domain.game.Game
+import com.example.battleships.game.domain.ship.Orientation
+import com.example.battleships.game.domain.ship.ShipType
 import com.example.battleships.ui.TopBar
-import com.example.fleetbattletemp.game.domain.board.Coordinate
-import com.example.fleetbattletemp.game.domain.game.Game
-import com.example.fleetbattletemp.game.domain.ship.Orientation
-import com.example.fleetbattletemp.game.domain.ship.ShipType
-import com.example.fleetbattletemp.ui.theme.FleetBattleTempTheme
+import com.example.battleships.ui.theme.BattleshipsTheme
 
 internal open class Selection
 internal class ShipOption(val shipType: ShipType) : Selection()
@@ -24,7 +24,7 @@ internal class Square(val coordinate: Coordinate) : Selection()
 internal fun GameScreen(
     activity: GameActivity
 ) {
-    FleetBattleTempTheme {
+    BattleshipsTheme {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             backgroundColor = MaterialTheme.colors.background,
@@ -69,7 +69,7 @@ private fun placeShip(
     activity: GameActivity,
     coordinate: Coordinate
 ): Selection? {
-    if (selected == null && curGame.isShip(coordinate)) {
+    if (selected == null /*&& curGame.isShip(coordinate)*/) {
         return Square(coordinate)
     } else {
         if (selected is ShipOption) {

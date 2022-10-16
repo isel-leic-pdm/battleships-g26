@@ -1,4 +1,4 @@
-package com.example.fleetbattletemp.start.info
+package com.example.battleships.start.info
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,13 +15,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.battleships.ui.TopBar
-import com.example.fleetbattletemp.ui.theme.FleetBattleTempTheme
+import com.example.battleships.ui.theme.BattleshipsTheme
 
 @Composable
 fun InfoScreen(
     onInfoRequest: () -> Unit
 ) {
-    FleetBattleTempTheme {
+    BattleshipsTheme {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             backgroundColor = MaterialTheme.colors.background,

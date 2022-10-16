@@ -1,7 +1,5 @@
 package com.example.battleships.game.domain.game
 
-import com.example.battleships.game.domain.game.Configuration
-import com.example.battleships.game.domain.game.Game
 import com.example.battleships.game.domain.game.single.Single
 
 data class SinglePhase(

@@ -2,11 +2,11 @@ package com.example.battleships.game.domain.game.single
 
 import com.example.battleships.game.domain.board.*
 import com.example.battleships.game.domain.game.Configuration
-import kotlin.collections.first
 import com.example.battleships.game.domain.ship.Orientation
 import com.example.battleships.game.domain.ship.ShipType
 import com.example.battleships.game.domain.ship.getOrientation
 import com.example.battleships.game.domain.ship.getShip
+import kotlin.collections.first
 
 
 class PlayerPreparationPhase: Single {

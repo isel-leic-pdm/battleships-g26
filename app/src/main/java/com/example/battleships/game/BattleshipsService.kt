@@ -1,32 +1,33 @@
 package com.example.battleships.game
 
-import com.example.fleetbattletemp.game.domain.board.Coordinate
-import com.example.fleetbattletemp.game.domain.game.Configuration
-import com.example.fleetbattletemp.game.domain.game.Game
-import com.example.fleetbattletemp.game.domain.ship.Orientation
-import com.example.fleetbattletemp.game.domain.ship.ShipType
+import com.example.battleships.game.domain.board.Coordinate
+import com.example.battleships.game.domain.game.Configuration
+import com.example.battleships.game.domain.game.Game
+import com.example.battleships.game.domain.game.SinglePhase
+import com.example.battleships.game.domain.game.single.PlayerPreparationPhase
+import com.example.battleships.game.domain.ship.Orientation
+import com.example.battleships.game.domain.ship.ShipType
 
 
 interface BattleshipsService {
-    fun getNewGame(): Game?
+    fun startNewGame()
 
-    fun placeShip(
-        game: Game,
-        shipType: ShipType,
-        coordinate: Coordinate,
-        orientation: Orientation
-    ): Game?
+    fun placeShip(shipType: ShipType, coordinate: Coordinate, orientation: Orientation)
 
-    fun moveShip(game: Game, origin: Coordinate, destination: Coordinate): Game?
+    fun moveShip(origin: Coordinate, destination: Coordinate)
 
-    fun rotateShip(game: Game, position: Coordinate): Game?
+    fun rotateShip(position: Coordinate)
 
-    fun placeShot(game: Game, coordinate: Coordinate): Game?
+    fun placeShot(coordinate: Coordinate)
 
-    fun confirmFleet(game: Game): Game?
+    fun confirmFleet()
+
+    fun getGameState(): Game?
 }
 
-class FakeDataService : BattleshipsService {
+class FakeBattleshipService : BattleshipsService {
+    var game: Game? = null
+
     private val configuration = Configuration(
         boardSize = 10,
         fleet = setOf(
@@ -40,32 +41,64 @@ class FakeDataService : BattleshipsService {
         roundTimeout = 10
     )
 
-    override fun getNewGame(): Game {
-        return Game.newGame(configuration)
+    override fun startNewGame() {
+        val gameId = 111
+        val player1Id = 222
+        val player2Id = 333
+        game = Game.newGame(gameId, player1Id, player2Id, configuration)
     }
 
-    override fun placeShip(
-        game: Game,
-        shipType: ShipType,
-        coordinate: Coordinate,
-        orientation: Orientation
-    ): Game? {
-        return game.tryPlaceShip(shipType, coordinate, orientation)
+    override fun placeShip(shipType: ShipType, coordinate: Coordinate, orientation: Orientation) {
+        val localGame = game
+        if (localGame is SinglePhase) {
+            val playerGame = localGame.player1Game
+            if (playerGame is PlayerPreparationPhase) {
+                val newPlayerGame = playerGame.tryPlaceShip(shipType, coordinate, orientation)
+                if (newPlayerGame != null) {
+                    val newGame = localGame.copy(player1Game = newPlayerGame)
+                    game = newGame
+                }
+            }
+        }
     }
 
-    override fun moveShip(game: Game, origin: Coordinate, destination: Coordinate): Game? {
-        return game.tryMoveShip(origin, destination)
+    override fun moveShip(origin: Coordinate, destination: Coordinate) {
+        val localGame = game
+        if (localGame is SinglePhase) {
+            val playerGame = localGame.player1Game
+            if (playerGame is PlayerPreparationPhase) {
+                val newPlayerGame = playerGame.tryMoveShip(origin, destination)
+                if (newPlayerGame != null) {
+                    val newGame = localGame.copy(player1Game = newPlayerGame)
+                    game = newGame
+                }
+            }
+        }
     }
 
-    override fun rotateShip(game: Game, position: Coordinate): Game? {
-        return game.tryRotateShip(position)
+    override fun rotateShip(position: Coordinate) {
+        val localGame = game
+        if (localGame is SinglePhase) {
+            val playerGame = localGame.player1Game
+            if (playerGame is PlayerPreparationPhase) {
+                val newPlayerGame = playerGame.tryRotateShip(position)
+                if (newPlayerGame != null) {
+                    val newGame = localGame.copy(player1Game = newPlayerGame)
+                    game = newGame
+                }
+            }
+        }
     }
 
-    override fun placeShot(game: Game, coordinate: Coordinate): Game? {
-        return game.tryPlaceShot(coordinate)
+    override fun placeShot(coordinate: Coordinate) {
+        TODO("Not yet implemented")
     }
 
-    override fun confirmFleet(game: Game): Game? {
-        return game.tryConfirmFleet()
+    override fun confirmFleet() {
+        TODO("Not yet implemented")
+    }
+
+    override fun getGameState(): Game? {
+        return game
     }
 }

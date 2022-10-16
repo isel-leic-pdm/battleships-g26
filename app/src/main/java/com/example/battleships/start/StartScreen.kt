@@ -15,14 +15,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.battleships.ui.TopBar
-import com.example.fleetbattletemp.ui.theme.FleetBattleTempTheme
-import com.example.battleships.R
+import com.example.battleships.ui.theme.BattleshipsTheme
+import pt.isel.battleships.R
+
 
 @Composable
 fun StartScreen(
     onInfoRequest: () -> Unit
 ) {
-    FleetBattleTempTheme {
+    BattleshipsTheme {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             backgroundColor = Color.Black,
