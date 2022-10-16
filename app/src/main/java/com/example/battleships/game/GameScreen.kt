@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.battleships.game.domain.board.Coordinate
-import com.example.battleships.game.domain.game.Game
+import com.example.battleships.game.domain.state.Game
 import com.example.battleships.game.domain.ship.Orientation
 import com.example.battleships.game.domain.ship.ShipType
 import com.example.battleships.ui.TopBar

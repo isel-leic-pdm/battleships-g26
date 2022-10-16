@@ -1,4 +1,4 @@
-package com.example.battleships.game.domain.game
+package com.example.battleships.game.domain.state
 
 import com.example.battleships.game.domain.board.Board
 

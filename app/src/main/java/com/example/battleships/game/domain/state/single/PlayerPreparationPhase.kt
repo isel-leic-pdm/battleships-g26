@@ -1,7 +1,7 @@
-package com.example.battleships.game.domain.game.single
+package com.example.battleships.game.domain.state.single
 
 import com.example.battleships.game.domain.board.*
-import com.example.battleships.game.domain.game.Configuration
+import com.example.battleships.game.domain.state.Configuration
 import com.example.battleships.game.domain.ship.Orientation
 import com.example.battleships.game.domain.ship.ShipType
 import com.example.battleships.game.domain.ship.getOrientation

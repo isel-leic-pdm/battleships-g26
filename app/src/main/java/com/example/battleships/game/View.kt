@@ -13,12 +13,16 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.fleetbattletemp.game.domain.board.Coordinate
-import com.example.fleetbattletemp.game.domain.board.Panel
-import com.example.fleetbattletemp.game.domain.board.ShipPanel
-import com.example.fleetbattletemp.game.domain.game.Game
-import com.example.fleetbattletemp.game.domain.game.State
-import com.example.fleetbattletemp.game.domain.ship.ShipType
+import com.example.battleships.game.domain.board.Board
+import com.example.battleships.game.domain.board.Coordinate
+import com.example.battleships.game.domain.board.Panel
+import com.example.battleships.game.domain.state.BattlePhase
+import com.example.battleships.game.domain.state.Configuration
+import com.example.battleships.game.domain.state.Game
+import com.example.battleships.game.domain.state.SinglePhase
+import com.example.battleships.game.domain.state.single.PlayerPreparationPhase
+import com.example.battleships.game.domain.state.single.Single
+import com.example.battleships.game.domain.ship.ShipType
 
 val PLAY_SIDE = 30.dp
 val GRID_WIDTH = 5.dp
@@ -33,11 +37,14 @@ fun GameView(
     onConfirmLayout: () -> Unit
 ) {
     Column(Modifier.fillMaxWidth()) {
-        val gameState = game?.state
-        when {
-            gameState === State.WARMUP -> Warmup(game, onShipPlaced, onShipClick, onConfirmLayout)
-            gameState === State.WAITING -> Warmup(game, null, null, null)
-            gameState === State.BATTLE -> Battle(game, onShotPlaced)
+        when(game) {
+            is SinglePhase -> {
+                if (game.player1Game is PlayerPreparationPhase)
+                    PreparationPhase(game.player1Game, game.configuration, onShipPlaced, onShipClick, onConfirmLayout)
+                else
+                    PreparationPhase(game.player1Game, game.configuration, null, null, null)
+            }
+            is BattlePhase -> Battle(game, onShotPlaced)
             else -> Text("Game is null")
         }
     }
@@ -47,17 +54,18 @@ fun GameView(
  * Displays the board.
  */
 @Composable
-private fun Warmup(
-    game: Game,
+private fun PreparationPhase(
+    game: Single,
+    configuration: Configuration,
     onPanelClick: ((Coordinate) -> Unit)?,
     onShipClick: ((ShipType) -> Unit)?,
     onConfirmLayout: (() -> Unit)?
 ) {
     val isClickable = onConfirmLayout != null
-    BoardView(game, if (isClickable) onPanelClick else null)
+    BoardView(game.board, if (isClickable) onPanelClick else null)
     Row {
         Box(modifier = Modifier.weight(1f)) {
-            ShipOptionView(game, if (isClickable) onShipClick else null)
+            ShipOptionView(configuration, if (isClickable) onShipClick else null)
         }
         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
             if (isClickable) {
@@ -73,32 +81,30 @@ private fun Warmup(
 }
 
 @Composable
-private fun Battle(game: Game, onShot: (Coordinate) -> Unit) {
-    BoardView(game, onShot)
+private fun Battle(game: BattlePhase, onShot: (Coordinate) -> Unit) {
+    BoardView(game.player1Board, onShot)
 }
 
 @Composable
-private fun BoardView(game: Game, onPanelClick: ((Coordinate) -> Unit)?) {
-    game.let { _game ->
-        val gameSize = _game.configuration.boardSize
-        val boardSide = PLAY_SIDE * gameSize + GRID_WIDTH * (gameSize - 1)
-        Column(
+private fun BoardView(board: Board, onPanelClick: ((Coordinate) -> Unit)?) {
+    val gameSize = board.dimension
+    val boardSide = PLAY_SIDE * gameSize + GRID_WIDTH * (gameSize - 1)
+    Column(
+        modifier = Modifier
+            .background(Color.Black)
+            .fillMaxWidth()
+            .height(boardSide),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Box(
             modifier = Modifier
                 .background(Color.Black)
-                .fillMaxWidth()
-                .height(boardSide),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .size(boardSide),
         ) {
-            Box(
-                modifier = Modifier
-                    .background(Color.Black)
-                    .size(boardSide),
-            ) {
-                _game.boardCoordinates.forEach { pos ->
-                    PlayView(pos, _game[pos]) {
-                        onPanelClick?.invoke(pos)
-                    }
+            board.board.forEach { panel ->
+                PlayView(panel.coordinate, panel) {
+                    onPanelClick?.invoke(panel.coordinate)
                 }
             }
         }
@@ -110,7 +116,7 @@ private fun BoardView(game: Game, onPanelClick: ((Coordinate) -> Unit)?) {
  */
 @Composable
 private fun PlayView(coordinate: Coordinate, panel: Panel, onClick: (() -> Unit)?) {
-    val color = if (panel is ShipPanel) Color.Gray else Color.Blue
+    val color = if (panel.shipType != null) Color.Gray else Color.Blue
     val m = Modifier
         .size(PLAY_SIDE)
         .offset(
@@ -122,10 +128,10 @@ private fun PlayView(coordinate: Coordinate, panel: Panel, onClick: (() -> Unit)
 }
 
 @Composable
-private fun PlayView(game: Game, ship: ShipType, onClick: () -> Unit) {
+private fun PlayView(configuration: Configuration, ship: ShipType, onClick: () -> Unit) {
     Row {
         Spacer(Modifier.size(GRID_WIDTH))
-        repeat(game.configuration.getShipLength(ship)) {
+        repeat(configuration.getShipLength(ship)) {
             val m = Modifier
                 .size(PLAY_SIDE)
                 .background(Color.Gray)
@@ -139,7 +145,7 @@ private fun PlayView(game: Game, ship: ShipType, onClick: () -> Unit) {
  * Draws all ships in the option menu.
  */
 @Composable
-private fun ShipOptionView(game: Game, onShipClick: ((ShipType) -> Unit)?) {
+private fun ShipOptionView(configuration: Configuration, onShipClick: ((ShipType) -> Unit)?) {
     Column(
         modifier = Modifier
             .width(200.dp)
@@ -155,7 +161,7 @@ private fun ShipOptionView(game: Game, onShipClick: ((ShipType) -> Unit)?) {
                 )
             )
             Spacer(modifier = Modifier.size(10.dp))
-            PlayView(game, ship) { if (onShipClick != null) onShipClick(ship) }
+            PlayView(configuration, ship) { if (onShipClick != null) onShipClick(ship) }
         }
     }
 }

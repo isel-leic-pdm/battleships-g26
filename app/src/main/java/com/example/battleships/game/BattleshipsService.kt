@@ -1,10 +1,10 @@
 package com.example.battleships.game
 
 import com.example.battleships.game.domain.board.Coordinate
-import com.example.battleships.game.domain.game.Configuration
-import com.example.battleships.game.domain.game.Game
-import com.example.battleships.game.domain.game.SinglePhase
-import com.example.battleships.game.domain.game.single.PlayerPreparationPhase
+import com.example.battleships.game.domain.state.Configuration
+import com.example.battleships.game.domain.state.Game
+import com.example.battleships.game.domain.state.SinglePhase
+import com.example.battleships.game.domain.state.single.PlayerPreparationPhase
 import com.example.battleships.game.domain.ship.Orientation
 import com.example.battleships.game.domain.ship.ShipType
 

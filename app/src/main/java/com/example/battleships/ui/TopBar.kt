@@ -9,7 +9,8 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import com.example.battleships.R
+import pt.isel.battleships.R
+
 
 @Composable
 fun TopBar(

@@ -6,10 +6,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.battleships.game.domain.board.Coordinate
-import com.example.battleships.game.domain.game.BattlePhase
-import com.example.battleships.game.domain.game.Game
-import com.example.battleships.game.domain.game.SinglePhase
-import com.example.battleships.game.domain.game.single.PlayerPreparationPhase
+import com.example.battleships.game.domain.state.Game
+import com.example.battleships.game.domain.state.SinglePhase
+import com.example.battleships.game.domain.state.single.PlayerPreparationPhase
 import com.example.battleships.game.domain.ship.Orientation
 import com.example.battleships.game.domain.ship.ShipType
 import kotlinx.coroutines.launch

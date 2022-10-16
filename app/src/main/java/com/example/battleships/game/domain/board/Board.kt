@@ -5,7 +5,7 @@ import com.example.battleships.game.domain.ship.ShipType
 import kotlin.math.sqrt
 
 class Board {
-    private val dimension : Int
+    val dimension : Int
     val board : List<Panel>
 
     /**
@@ -21,7 +21,7 @@ class Board {
         this.board = board
     }
 
-    internal operator fun List<Panel>.get(c: Coordinate): Panel {
+    operator fun List<Panel>.get(c: Coordinate): Panel {
         return board[getIdx(c)]
     }
 
@@ -44,6 +44,7 @@ class Board {
 
     private operator fun List<Panel>.get(shipType: ShipType) =
         board.filter { it.shipType == shipType }
+
     operator fun get(coordinate: Coordinate) =
         coordinate.checkValid(dimension)
         .let { board[coordinate] }

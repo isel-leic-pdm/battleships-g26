@@ -1,4 +1,4 @@
-package com.example.battleships.game.domain.game
+package com.example.battleships.game.domain.state
 
 import com.example.battleships.game.domain.ship.ShipType
 
@@ -13,4 +13,7 @@ data class Configuration(
 ) {
     fun isShipValid(shipType: ShipType) =
         fleet.firstOrNull { it.first == shipType } != null
+
+    fun getShipLength(shipType: ShipType) =
+        fleet.firstOrNull { it.first == shipType }?.second ?: 0
 }

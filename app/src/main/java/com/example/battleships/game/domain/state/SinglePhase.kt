@@ -1,6 +1,6 @@
-package com.example.battleships.game.domain.game
+package com.example.battleships.game.domain.state
 
-import com.example.battleships.game.domain.game.single.Single
+import com.example.battleships.game.domain.state.single.Single
 
 data class SinglePhase(
     override val gameId: Int,

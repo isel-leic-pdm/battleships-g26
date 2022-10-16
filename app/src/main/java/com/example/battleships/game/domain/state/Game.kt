@@ -1,6 +1,6 @@
-package com.example.battleships.game.domain.game
+package com.example.battleships.game.domain.state
 
-import com.example.battleships.game.domain.game.single.PlayerPreparationPhase
+import com.example.battleships.game.domain.state.single.PlayerPreparationPhase
 
 enum class State { WARMUP, WAITING, BATTLE, END }
 
