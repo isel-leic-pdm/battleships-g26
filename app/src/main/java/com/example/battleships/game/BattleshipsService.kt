@@ -7,6 +7,8 @@ import com.example.battleships.game.domain.state.SinglePhase
 import com.example.battleships.game.domain.state.single.PlayerPreparationPhase
 import com.example.battleships.game.domain.ship.Orientation
 import com.example.battleships.game.domain.ship.ShipType
+import com.example.battleships.game.domain.state.BattlePhase
+import com.example.battleships.game.domain.state.single.PlayerWaitingPhase
 
 
 interface BattleshipsService {
@@ -46,6 +48,23 @@ class FakeBattleshipService : BattleshipsService {
         val player1Id = 222
         val player2Id = 333
         game = Game.newGame(gameId, player1Id, player2Id, configuration)
+        placeOpponentShips()
+    }
+
+    private fun placeOpponentShips() {
+        val localGame = game ?: return
+        if (localGame is SinglePhase) {
+            val opponentGame = localGame.player2Game
+            if (opponentGame is PlayerPreparationPhase) {
+                opponentGame.tryPlaceShip(ShipType.CARRIER, Coordinate(1, 1), Orientation.HORIZONTAL)
+                opponentGame.tryPlaceShip(ShipType.BATTLESHIP, Coordinate(3, 1), Orientation.HORIZONTAL)
+                opponentGame.tryPlaceShip(ShipType.CRUISER, Coordinate(5, 2), Orientation.HORIZONTAL)
+                opponentGame.tryPlaceShip(ShipType.SUBMARINE, Coordinate(7, 3), Orientation.HORIZONTAL)
+                opponentGame.tryPlaceShip(ShipType.DESTROYER, Coordinate(9, 4), Orientation.HORIZONTAL)
+                val newOpponentGame = opponentGame.confirmFleet()
+                game = localGame.copy(player2Game = newOpponentGame)
+            }
+        }
     }
 
     override fun placeShip(shipType: ShipType, coordinate: Coordinate, orientation: Orientation) {
@@ -95,7 +114,25 @@ class FakeBattleshipService : BattleshipsService {
     }
 
     override fun confirmFleet() {
-        TODO("Not yet implemented")
+        val localGame = game
+        if (localGame is SinglePhase) {
+            val playerGame = localGame.player1Game
+            val opponentGame = localGame.player2Game
+            if (playerGame is PlayerPreparationPhase) {
+                val newPlayerGame = playerGame.confirmFleet()
+                game = if (opponentGame is PlayerWaitingPhase) {
+                    BattlePhase(
+                        configuration,
+                        localGame.gameId,
+                        localGame.player1,
+                        localGame.player2,
+                        localGame.player1Game.board,
+                        localGame.player2Game.board
+                    )
+                } else
+                    localGame.copy(player1Game = newPlayerGame)
+            }
+        }
     }
 
     override fun getGameState(): Game? {
