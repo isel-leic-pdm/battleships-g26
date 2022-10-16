@@ -1,19 +1,18 @@
-package com.example.fleetbattletemp.game.domain.ship
+package com.example.battleships.game.domain.ship
 
-import com.example.fleetbattletemp.game.domain.board.Coordinate
-import com.example.fleetbattletemp.game.domain.ship.types.Ship
+import com.example.battleships.game.domain.board.Coordinate
 
 typealias ShipSet = Set<Ship>
 
 fun ShipSet.getShipByType(shipType: ShipType) = this.firstOrNull { it.type == shipType }
 
 fun ShipSet.getShip(position: Coordinate) =
-    this.firstOrNull { it.coordinates.any { c -> c == position } }
+    this.first { it.coordinates.any { c -> c == position}}
 
-fun ShipSet.addOrReplaceShip(ship: Ship): ShipSet {
+fun ShipSet.addOrReplaceShip(ship : Ship): ShipSet {
     val auxMutableSet = this.toMutableSet()
     val entry = auxMutableSet.getShipByType(ship.type)
-    if (entry != null) auxMutableSet.remove(entry)
+    if(entry != null) auxMutableSet.remove(entry)
     auxMutableSet.add(ship)
     return auxMutableSet
 }

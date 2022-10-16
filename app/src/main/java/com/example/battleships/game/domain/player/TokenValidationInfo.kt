@@ -1,4 +1,4 @@
-package com.example.fleetbattletemp.game.domain.player
+package com.example.battleships.game.domain.player
 
 class TokenValidationInfo(
     val validationInfo: String

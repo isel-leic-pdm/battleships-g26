@@ -1,13 +1,8 @@
-package com.example.fleetbattletemp.game.domain.ship.types
+package com.example.battleships.game.domain.ship
 
-import com.example.fleetbattletemp.game.domain.board.CoordinateSet
-import com.example.fleetbattletemp.game.domain.ship.Orientation
-import com.example.fleetbattletemp.game.domain.ship.ShipType
+import com.example.battleships.game.domain.board.CoordinateSet
 
-sealed class Ship {
-    abstract val coordinates: CoordinateSet
-    abstract val type: ShipType
-}
+data class Ship(val coordinates : CoordinateSet, val type : ShipType, val isSunk : Boolean)
 
 fun Ship.getOrientation(): Orientation {
     if (coordinates.isEmpty()) {

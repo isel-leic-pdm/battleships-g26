@@ -1,9 +1,31 @@
-package com.example.fleetbattletemp.game.domain.ship
+package com.example.battleships.game.domain.ship
 
 enum class ShipType {
     CARRIER,
     BATTLESHIP,
     CRUISER,
     SUBMARINE,
-    DESTROYER
+    DESTROYER;
+}
+
+fun String.toShipType(): ShipType {
+    return when (this.lowercase()) {
+        "carrier" -> ShipType.CARRIER
+        "battleship" -> ShipType.BATTLESHIP
+        "cruiser" -> ShipType.CRUISER
+        "submarine" -> ShipType.SUBMARINE
+        "destroyer" -> ShipType.DESTROYER
+        else -> throw IllegalArgumentException("Invalid ship type")
+    }
+}
+
+fun String.toShipTypeOrNull(): ShipType? {
+    return when (this.lowercase()) {
+        "carrier" -> ShipType.CARRIER
+        "battleship" -> ShipType.BATTLESHIP
+        "cruiser" -> ShipType.CRUISER
+        "submarine" -> ShipType.SUBMARINE
+        "destroyer" -> ShipType.DESTROYER
+        else -> null
+    }
 }

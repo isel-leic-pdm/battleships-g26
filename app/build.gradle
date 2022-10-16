@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    namespace 'com.example.battleships'
-    compileSdk 33
+    namespace 'pt.isel.battleships'
+    compileSdk 32
 
     defaultConfig {
-        applicationId "com.example.battleships"
-        minSdk 26
-        targetSdk 33
+        applicationId "pt.isel.battleships"
+        minSdk 27
+        targetSdk 32
         versionCode 1
         versionName "1.0"
 
@@ -27,7 +27,7 @@ android {
         }
     }
     compileOptions {
-            sourceCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
     kotlinOptions {

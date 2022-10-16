@@ -1,4 +1,6 @@
-package com.example.fleetbattletemp.game.domain.player
+package pt.isel.daw.dawbattleshipgame.domain.player
+
+import com.example.battleships.game.domain.player.PasswordValidationInfo
 
 data class User(
     val id: Int,

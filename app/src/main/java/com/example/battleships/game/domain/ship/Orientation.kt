@@ -1,10 +1,10 @@
-package com.example.fleetbattletemp.game.domain.ship
+package com.example.battleships.game.domain.ship
 
 enum class Orientation {
     HORIZONTAL,
     VERTICAL;
 
-    companion object {
+    companion object{
         fun random() = Orientation.values()[
                 (0 until Orientation.values().size).random()
         ]

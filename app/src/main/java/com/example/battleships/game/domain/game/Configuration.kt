@@ -1,11 +1,11 @@
-package com.example.fleetbattletemp.game.domain.game
+package com.example.battleships.game.domain.game
 
-import com.example.fleetbattletemp.game.domain.ship.ShipType
+import com.example.battleships.game.domain.ship.ShipType
 
 /**
  * Represents the game configuration
  */
-class Configuration(
+data class Configuration(
     val boardSize: Int,
     val fleet: Set<Pair<ShipType, Int>>, // List<Ship:Occupation>
     val nShotsPerRound: Int,
@@ -13,10 +13,4 @@ class Configuration(
 ) {
     fun isShipValid(shipType: ShipType) =
         fleet.firstOrNull { it.first == shipType } != null
-
-    /**
-     * Retrieves the ship length according to class game configuration.
-     */
-    fun getShipLength(shipType: ShipType) =
-        fleet.first { it.first === shipType }.second
 }

@@ -1,41 +1,28 @@
-package com.example.fleetbattletemp.game.domain.board
+package com.example.battleships.game.domain.board
 
-enum class PanelType { WaterPanel, ShipPane }
+import com.example.battleships.game.domain.ship.ShipType
 
-sealed class Panel(internal val isHit: Boolean) {
-    abstract fun getPanelHit(): Panel
-}
+class Panel(
+    val coordinate: Coordinate,
+    val shipType: ShipType? = null,
+    val isHit: Boolean = false,
+){
+    fun hit() = if(!isHit) Panel(coordinate, shipType, true) else this
 
-class WaterPanel(isHit: Boolean = false) : Panel(isHit) {
-    override fun getPanelHit() = WaterPanel(true)
+    fun isShip() = shipType != null
 
     override fun toString(): String {
-        return if (isHit) "x" else "  "
+        return if (isShip()) if (isHit) "X" else "[]"
+        else if (isHit) "x" else "  "
     }
-}
 
-sealed class ShipPanel(isHit: Boolean = false) : Panel(isHit) {
-    override fun toString(): String {
-        return if (isHit) "X" else "[]"
-    }
-}
+    fun getType() = when(shipType){
+            ShipType.CRUISER -> "cruiser"
+            ShipType.CARRIER -> "carrier"
+            ShipType.BATTLESHIP -> "battleship"
+            ShipType.SUBMARINE -> "submarine"
+            ShipType.DESTROYER -> "destroyer"
+            else -> "water"
+        }
 
-class BattleshipPanel(isHit: Boolean = false) : ShipPanel() {
-    override fun getPanelHit() = BattleshipPanel(true)
-}
-
-class CarrierPanel(isHit: Boolean = false) : ShipPanel() {
-    override fun getPanelHit() = CarrierPanel(true)
-}
-
-class CruiserPanel(isHit: Boolean = false) : ShipPanel() {
-    override fun getPanelHit() = CruiserPanel(true)
-}
-
-class DestroyerPanel(isHit: Boolean = false) : ShipPanel() {
-    override fun getPanelHit() = DestroyerPanel(true)
-}
-
-class SubmarinePanel(isHit: Boolean = false) : ShipPanel() {
-    override fun getPanelHit() = SubmarinePanel(true)
 }
