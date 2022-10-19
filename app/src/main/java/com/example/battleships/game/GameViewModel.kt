@@ -26,6 +26,9 @@ class GameViewModel(
     private val gameService: BattleshipsService,
     private val token: String
 ) : ViewModel() {
+    private val _userId: MutableState<Int?> = mutableStateOf(null)
+    val userId: State<Int?>
+        get() = _userId
     private val _game: MutableState<Game?> = mutableStateOf(null)
     val game: State<Game?>
         get() = _game
@@ -33,6 +36,7 @@ class GameViewModel(
     fun startGame() {
         viewModelScope.launch {
             gameService.startNewGame(token)
+            _userId.value = gameService.getUserId(token)
             _game.value = gameService.getGameState(token)
         }
     }

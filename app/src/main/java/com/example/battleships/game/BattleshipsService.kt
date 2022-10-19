@@ -1,21 +1,21 @@
 package com.example.battleships.game
 
-import androidx.compose.runtime.rememberCoroutineScope
 import com.example.battleships.game.domain.board.Coordinate
+import com.example.battleships.game.domain.ship.Orientation
+import com.example.battleships.game.domain.ship.ShipType
+import com.example.battleships.game.domain.state.BattlePhase
 import com.example.battleships.game.domain.state.Configuration
 import com.example.battleships.game.domain.state.Game
 import com.example.battleships.game.domain.state.SinglePhase
 import com.example.battleships.game.domain.state.single.PlayerPreparationPhase
-import com.example.battleships.game.domain.ship.Orientation
-import com.example.battleships.game.domain.ship.ShipType
-import com.example.battleships.game.domain.state.BattlePhase
 import com.example.battleships.game.domain.state.single.PlayerWaitingPhase
-import kotlinx.coroutines.CoroutineScope
 
 /**
  * This interface is responsible for providing the options that interact with the game.
  */
 interface BattleshipsService {
+    suspend fun getUserId(token: String): Int?
+
     suspend fun startNewGame(token: String)
 
     suspend fun placeShip(token: String, shipType: ShipType, coordinate: Coordinate, orientation: Orientation)
@@ -49,13 +49,18 @@ class FakeBattleshipService : BattleshipsService {
         roundTimeout = 10
     )
 
+    override suspend fun getUserId(token: String): Int? {
+        val (token1, token2, game) = getGameAndTokens(token) ?: return null
+        return game.player1 // according to startGame, its the player is always player1
+    }
+
     override suspend fun startNewGame(token: String) {
         val gameId = 555
         val player1Id = 111
         val player2Id = 222
         val opponentToken = "opponentToken"
         val game = Game.newGame(gameId, player1Id, player2Id, configuration)
-        games.plus(Pair(token, opponentToken) to game)
+        games[token to opponentToken] = game
         placeOpponentShips(opponentToken)
     }
 
@@ -129,21 +134,20 @@ class FakeBattleshipService : BattleshipsService {
             if (newGame != null)
                 games[token1 to token2] = newGame
         }
+        letOpponentPlaceShotOnMe(token2)
     }
 
-    /*
-    override suspend fun letOpponentPlaceShotOnMe(token: String) {
-        val localGame = game
-        if (localGame is BattlePhase) {
+    private suspend fun letOpponentPlaceShotOnMe(token: String) {
+        val (token1, token2, game) = getGameAndTokens(token) ?: return
+        if (game is BattlePhase) {
             val randomCoordinate = Coordinate((1..configuration.boardSize).random(), (1..configuration.boardSize).random())
-            val newGame = localGame.tryPlaceShot(localGame.player2, randomCoordinate)
+            val newGame = game.tryPlaceShot(game.player2, randomCoordinate)
             if (newGame != null)
-                game = newGame
+                games[token1 to token2] = newGame
             else
                 throw IllegalStateException("Opponent shot not placed")
         }
     }
-     */
 
     override suspend fun confirmFleet(token: String) {
         val (token1, token2, game) = getGameAndTokens(token) ?: return

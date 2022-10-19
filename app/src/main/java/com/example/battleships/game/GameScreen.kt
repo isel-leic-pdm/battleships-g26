@@ -39,10 +39,12 @@ internal fun GameScreen(
             ) {
                 var selected: Selection? = null
                 val curGame = activity.vm.game.value
+                val userId = activity.vm.userId.value
 
-                if (curGame != null) {
+                if (curGame != null && userId != null) {
                     GameView(
-                        curGame,
+                        userId = userId,
+                        game = curGame,
                         onShipClick = {
                             selected = ShipOption(it)
                         },

@@ -3,9 +3,13 @@ package com.example.battleships.game
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,6 +31,7 @@ val GRID_WIDTH = 5.dp
 
 @Composable
 fun GameView(
+    userId: Int,
     game: Game?,
     onShipClick: (ShipType) -> Unit,
     onShipPlaced: (Coordinate) -> Unit,
@@ -48,8 +53,8 @@ fun GameView(
                     else
                         PreparationPhase(game.player1Game, game.configuration, null, null, null)
                 }
-                is BattlePhase -> Battle(game, onShotPlaced)
-                is EndPhase -> End(game)
+                is BattlePhase -> Battle(userId, game, onShotPlaced)
+                is EndPhase -> End(userId, game)
             }
         }
     }
@@ -86,15 +91,36 @@ private fun PreparationPhase(
 }
 
 @Composable
-private fun Battle(game: BattlePhase, onShot: (Coordinate) -> Unit) {
-    if (game.playersTurn == game.player1)
-        BoardView(game.player2Board, onShot)
-    else
-        BoardView(game.player1Board, null)
+private fun Battle(
+    userId: Int,
+    game: BattlePhase,
+    onShot: (Coordinate) -> Unit
+) {
+    val boardToDisplay = remember { mutableStateOf(
+        if (game.player1 == userId) game.player2Board else game.player1Board)
+    }
+    val clickAction = remember { mutableStateOf<((Coordinate) -> Unit)?>(onShot) }
+    Column(
+        Modifier.verticalScroll(rememberScrollState())
+    ) {
+        val isMyBoardDisplayed = clickAction.value != null
+        Text(
+            text = if (isMyBoardDisplayed) "Place Shot" else "Your Board",
+            fontSize = 40.sp,
+            modifier = Modifier.padding(16.dp)
+        )
+        BoardView(boardToDisplay.value, clickAction.value)
+        TextButton(onClick = {
+            boardToDisplay.value = if (boardToDisplay.value == game.player1Board) game.player2Board else game.player1Board
+            clickAction.value = if (clickAction.value == null) onShot else null
+        }) {
+            Text("Switch board")
+        }
+    }
 }
 
 @Composable
-private fun End(game: EndPhase) {
+private fun End(userId: Int, game: EndPhase) {
     Text("Game over")
     Text(text = "Winner: ${game.winner}")
 }
