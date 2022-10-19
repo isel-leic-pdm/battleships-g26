@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.battleships.DependenciesContainer
 import com.example.battleships.menu.views.LoadingState
+import com.example.battleships.start.StartGameActivity
 
 class MenuActivity : ComponentActivity() {
     private val service by lazy {
@@ -41,8 +42,9 @@ class MenuActivity : ComponentActivity() {
                 onCreateUser = { username, password -> vm.createUser(username, password) },
                 onLoginUser = { username, password -> vm.login(username, password) },
             )
-            if (vm.user.value != null) {
-                navigateToGameScreen(this)
+            val token = vm.token.value
+            if (token != null) {
+                StartGameActivity.navigate(this, token)
             }
         }
     }

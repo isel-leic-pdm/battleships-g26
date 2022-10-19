@@ -21,6 +21,7 @@ import pt.isel.battleships.R
 
 @Composable
 fun StartScreen(
+    onStartGame: () -> Unit,
     onInfoRequest: () -> Unit
 ) {
     BattleshipsTheme {
@@ -50,7 +51,7 @@ fun StartScreen(
                         .height(200.dp)
                 ) {
                     Button(
-                        onClick = {},
+                        onClick = onStartGame,
                         modifier = Modifier.height(60.dp)
                     ) {
                         Text(text = "Start Game")
@@ -82,5 +83,5 @@ fun Img() {
 @Preview
 @Composable
 fun StartScreenPreview() {
-    StartScreen {}
+    StartScreen({}, {})
 }

@@ -12,26 +12,29 @@ import com.example.battleships.game.domain.state.BattlePhase
 import com.example.battleships.game.domain.state.single.PlayerWaitingPhase
 import kotlinx.coroutines.CoroutineScope
 
-
+/**
+ * This interface is responsible for providing the options that interact with the game.
+ */
 interface BattleshipsService {
-    suspend fun startNewGame()
+    suspend fun startNewGame(token: String)
 
-    suspend fun placeShip(shipType: ShipType, coordinate: Coordinate, orientation: Orientation)
+    suspend fun placeShip(token: String, shipType: ShipType, coordinate: Coordinate, orientation: Orientation)
 
-    suspend fun moveShip(origin: Coordinate, destination: Coordinate)
+    suspend fun moveShip(token: String, origin: Coordinate, destination: Coordinate)
 
-    suspend fun rotateShip(position: Coordinate)
+    suspend fun rotateShip(token: String, position: Coordinate)
 
-    suspend fun placeShot(coordinate: Coordinate)
+    suspend fun placeShot(token: String, coordinate: Coordinate)
 
-    suspend fun confirmFleet()
+    suspend fun confirmFleet(token: String)
 
-    suspend fun getGameState(): Game?
-    suspend fun letOpponentPlaceShotOnMe()
+    suspend fun getGameState(token: String): Game?
+
+    // suspend fun letOpponentPlaceShotOnMe(token: String)
 }
 
 class FakeBattleshipService : BattleshipsService {
-    var game: Game? = null
+    private val games = mutableMapOf<Pair<String, String>, Game>()
 
     private val configuration = Configuration(
         boardSize = 10,
@@ -46,18 +49,20 @@ class FakeBattleshipService : BattleshipsService {
         roundTimeout = 10
     )
 
-    override suspend fun startNewGame() {
+    override suspend fun startNewGame(token: String) {
         val gameId = 555
         val player1Id = 111
         val player2Id = 222
-        game = Game.newGame(gameId, player1Id, player2Id, configuration)
-        placeOpponentShips()
+        val opponentToken = "opponentToken"
+        val game = Game.newGame(gameId, player1Id, player2Id, configuration)
+        games.plus(Pair(token, opponentToken) to game)
+        placeOpponentShips(opponentToken)
     }
 
-    private suspend fun placeOpponentShips() {
-        val localGame = game ?: return
-        if (localGame is SinglePhase) {
-            val opponentGame = localGame.player2Game
+    private suspend fun placeOpponentShips(token: String) {
+        val (token1, token2, game) = getGameAndTokens(token) ?: return
+        if (game is SinglePhase) {
+            val opponentGame = game.player2Game
             if (opponentGame is PlayerPreparationPhase) {
                 val newOpponentGame = opponentGame.tryPlaceShip(ShipType.CARRIER, Coordinate(1, 1), Orientation.HORIZONTAL)
                     ?.tryPlaceShip(ShipType.BATTLESHIP, Coordinate(3, 1), Orientation.HORIZONTAL)
@@ -66,48 +71,48 @@ class FakeBattleshipService : BattleshipsService {
                     ?.tryPlaceShip(ShipType.DESTROYER, Coordinate(9, 4), Orientation.HORIZONTAL)
                     ?.confirmFleet() ?: throw IllegalStateException("Opponent fleet not placed")
 
-                game = localGame.copy(player2Game = newOpponentGame)
+                games[token1 to token2] = game.copy(player2Game = newOpponentGame)
             }
         }
     }
 
-    override suspend fun placeShip(shipType: ShipType, coordinate: Coordinate, orientation: Orientation) {
-        val localGame = game
-        if (localGame is SinglePhase) {
-            val playerGame = localGame.player1Game
+    override suspend fun placeShip(token: String, shipType: ShipType, coordinate: Coordinate, orientation: Orientation) {
+        val (token1, token2, game) = getGameAndTokens(token) ?: return
+        if (game is SinglePhase) {
+            val playerGame = game.player1Game
             if (playerGame is PlayerPreparationPhase) {
                 val newPlayerGame = playerGame.tryPlaceShip(shipType, coordinate, orientation)
                 if (newPlayerGame != null) {
-                    val newGame = localGame.copy(player1Game = newPlayerGame)
-                    game = newGame
+                    val newGame = game.copy(player1Game = newPlayerGame)
+                    games[token1 to token2] = newGame
                 }
             }
         }
     }
 
-    override suspend fun moveShip(origin: Coordinate, destination: Coordinate) {
-        val localGame = game
-        if (localGame is SinglePhase) {
-            val playerGame = localGame.player1Game
+    override suspend fun moveShip(token: String, origin: Coordinate, destination: Coordinate) {
+        val (token1, token2, game) = getGameAndTokens(token) ?: return
+        if (game is SinglePhase) {
+            val playerGame = game.player1Game
             if (playerGame is PlayerPreparationPhase) {
                 val newPlayerGame = playerGame.tryMoveShip(origin, destination)
                 if (newPlayerGame != null) {
-                    val newGame = localGame.copy(player1Game = newPlayerGame)
-                    game = newGame
+                    val newGame = game.copy(player1Game = newPlayerGame)
+                    games[token1 to token2] = newGame
                 }
             }
         }
     }
 
-    override suspend fun rotateShip(position: Coordinate) {
-        val localGame = game
-        if (localGame is SinglePhase) {
-            val playerGame = localGame.player1Game
+    override suspend fun rotateShip(token: String, position: Coordinate) {
+        val (token1, token2, game) = getGameAndTokens(token) ?: return
+        if (game is SinglePhase) {
+            val playerGame = game.player1Game
             if (playerGame is PlayerPreparationPhase) {
                 val newPlayerGame = playerGame.tryRotateShip(position)
                 if (newPlayerGame != null) {
-                    val newGame = localGame.copy(player1Game = newPlayerGame)
-                    game = newGame
+                    val newGame = game.copy(player1Game = newPlayerGame)
+                    games[token1 to token2] = newGame
                 }
             }
         }
@@ -117,16 +122,17 @@ class FakeBattleshipService : BattleshipsService {
      * Places a shot in enemy fleet, in case is player 1 turn.
      * After that, it places a shot in player 1 fleet, just for test purposes.
      */
-    override suspend fun placeShot(coordinate: Coordinate) {
-        val localGame = game
-        if (localGame is BattlePhase) {
-            val newGame = localGame.tryPlaceShot(localGame.player1, coordinate)
+    override suspend fun placeShot(token: String, coordinate: Coordinate) {
+        val (token1, token2, game) = getGameAndTokens(token) ?: return
+        if (game is BattlePhase) {
+            val newGame = game.tryPlaceShot(game.player1, coordinate)
             if (newGame != null)
-                game = newGame
+                games[token1 to token2] = newGame
         }
     }
 
-    override suspend fun letOpponentPlaceShotOnMe() {
+    /*
+    override suspend fun letOpponentPlaceShotOnMe(token: String) {
         val localGame = game
         if (localGame is BattlePhase) {
             val randomCoordinate = Coordinate((1..configuration.boardSize).random(), (1..configuration.boardSize).random())
@@ -137,28 +143,38 @@ class FakeBattleshipService : BattleshipsService {
                 throw IllegalStateException("Opponent shot not placed")
         }
     }
+     */
 
-    override suspend fun confirmFleet() {
-        val localGame = game
-        if (localGame is SinglePhase) {
-            val playerGame = localGame.player1Game
-            val opponentGame = localGame.player2Game
+    override suspend fun confirmFleet(token: String) {
+        val (token1, token2, game) = getGameAndTokens(token) ?: return
+        if (game is SinglePhase) {
+            val playerGame = game.player1Game
+            val opponentGame = game.player2Game
             if (playerGame is PlayerPreparationPhase) {
                 val newPlayerGame = playerGame.confirmFleet()
-                game = if (opponentGame is PlayerWaitingPhase) {
+                val newGame = if (opponentGame is PlayerWaitingPhase) {
                     BattlePhase(
                         configuration,
-                        localGame.gameId,
-                        localGame.player1,
-                        localGame.player2,
-                        localGame.player1Game.board,
-                        localGame.player2Game.board
+                        game.gameId,
+                        game.player1,
+                        game.player2,
+                        game.player1Game.board,
+                        game.player2Game.board
                     )
                 } else
-                    localGame.copy(player1Game = newPlayerGame)
+                    game.copy(player1Game = newPlayerGame)
+                games[token1 to token2] = newGame
             }
         }
     }
 
-    override suspend fun getGameState() = game
+    override suspend fun getGameState(token: String) = getGameAndTokens(token)?.third
+
+    private fun getGameAndTokens(token: String): Triple<String, String, Game>? {
+        val (token1, token2) = games
+            .filterKeys { it.first == token || it.second == token }
+            .keys.firstOrNull() ?: return null
+        val localGame = games[token1 to token2] ?: return null
+        return Triple(token1, token2, localGame)
+    }
 }

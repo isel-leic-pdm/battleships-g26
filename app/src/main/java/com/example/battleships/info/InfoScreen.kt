@@ -1,4 +1,4 @@
-package com.example.battleships.start.info
+package com.example.battleships.info
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

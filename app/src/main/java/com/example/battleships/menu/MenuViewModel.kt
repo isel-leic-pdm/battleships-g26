@@ -11,9 +11,9 @@ import kotlinx.coroutines.launch
 class MenuViewModel(
     private val dataService: UserService
 ) : ViewModel() {
-    private val _user: MutableState<String?> = mutableStateOf(null)
-    val user: State<String?>
-        get() = _user
+    private val _token: MutableState<String?> = mutableStateOf(null)
+    val token: State<String?>
+        get() = _token
 
     private val _isCreateUserLoading: MutableState<Boolean> = mutableStateOf(false)
     val isCreateUserLoading: State<Boolean>
@@ -34,9 +34,7 @@ class MenuViewModel(
     fun login(username: String, password: String) {
         viewModelScope.launch {
             _isLoginLoading.value = true
-            if (dataService.login(username, password)) {
-                _user.value = username
-            }
+            _token.value = dataService.login(username, password)
             _isLoginLoading.value = false
         }
     }

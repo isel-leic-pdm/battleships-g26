@@ -1,4 +1,4 @@
-package com.example.battleships.game
+package com.example.battleships.start
 
 import android.app.Activity
 import android.content.Intent
@@ -9,30 +9,28 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.battleships.DependenciesContainer
-import com.example.battleships.start.StartGameActivity
+import com.example.battleships.game.GameActivity
+import com.example.battleships.info.InfoActivity
+import com.example.battleships.menu.MenuViewModel
 
-class GameActivity : ComponentActivity() {
+class StartGameActivity : ComponentActivity() {
+
     companion object {
-        private const val TOKEN_EXTRA = "GAME_TOKEN_EXTRA"
+        private const val TOKEN_EXTRA = "START_GAME_TOKEN_EXTRA"
         fun navigate(origin: Activity, token: String) {
             with(origin) {
-                val intent = Intent(this, GameActivity::class.java)
+                val intent = Intent(this, StartGameActivity::class.java)
                 intent.putExtra(TOKEN_EXTRA, token)
                 startActivity(intent)
             }
         }
     }
 
-    private val service by lazy {
-        (application as DependenciesContainer).battleshipsService
-    }
-
     @Suppress("UNCHECKED_CAST")
-    internal val vm by viewModels<GameViewModel> {
+    val vm by viewModels<StartGameViewModel> {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return GameViewModel(service, token) as T
+                return StartGameViewModel(token) as T
             }
         }
     }
@@ -40,8 +38,10 @@ class GameActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            vm.startGame()
-            GameScreen(this)
+            StartScreen(
+                onStartGame = { GameActivity.navigate(this, vm.token) },
+                onInfoRequest = { InfoActivity.navigate(this) }
+            )
         }
     }
 

@@ -23,17 +23,17 @@ import kotlinx.coroutines.launch
  * will return the new state of the game. This new state will be used to update the local state.
  */
 class GameViewModel(
-    private val gameService: BattleshipsService
+    private val gameService: BattleshipsService,
+    private val token: String
 ) : ViewModel() {
-
     private val _game: MutableState<Game?> = mutableStateOf(null)
     val game: State<Game?>
         get() = _game
 
     fun startGame() {
         viewModelScope.launch {
-            gameService.startNewGame()
-            _game.value = gameService.getGameState()
+            gameService.startNewGame(token)
+            _game.value = gameService.getGameState(token)
         }
     }
 
@@ -45,8 +45,8 @@ class GameViewModel(
                 playerGame.tryPlaceShip(shipType, coordinate, orientation)
                     ?: return // tests if the action is valid
                 viewModelScope.launch {
-                    gameService.placeShip(shipType, coordinate, orientation)
-                    _game.value = gameService.getGameState()
+                    gameService.placeShip(token, shipType, coordinate, orientation)
+                    _game.value = gameService.getGameState(token)
                 }
             }
         }
@@ -60,8 +60,8 @@ class GameViewModel(
                 playerGame.tryMoveShip(origin, destination)
                     ?: return // tests if the action is valid
                 viewModelScope.launch {
-                    gameService.moveShip(origin, destination)
-                    _game.value = gameService.getGameState()
+                    gameService.moveShip(token, origin, destination)
+                    _game.value = gameService.getGameState(token)
                 }
             }
         }
@@ -75,8 +75,8 @@ class GameViewModel(
                 playerGame.tryRotateShip(position)
                     ?: return // tests if the action is valid
                 viewModelScope.launch {
-                    gameService.rotateShip(position)
-                    _game.value = gameService.getGameState() ?: _game.value
+                    gameService.rotateShip(token, position)
+                    _game.value = gameService.getGameState(token) ?: _game.value
                 }
             }
         }
@@ -89,8 +89,8 @@ class GameViewModel(
             if (playerGame is PlayerPreparationPhase) {
                 playerGame.confirmFleet()
                 viewModelScope.launch {
-                    gameService.confirmFleet()
-                    _game.value = gameService.getGameState() ?: _game.value
+                    gameService.confirmFleet(token)
+                    _game.value = gameService.getGameState(token) ?: _game.value
                 }
             }
         }
@@ -102,12 +102,11 @@ class GameViewModel(
             gameInternal.tryPlaceShot(gameInternal.player1, coordinate)
                 ?: return // tests if the action is valid
             viewModelScope.launch {
-                gameService.placeShot(coordinate)
-                _game.value = gameService.getGameState() ?: _game.value
+                gameService.placeShot(token, coordinate)
+                _game.value = gameService.getGameState(token) ?: _game.value
                 delay(3000)
-                gameService.letOpponentPlaceShotOnMe()
                 while (true) {
-                    val gameState = gameService.getGameState()
+                    val gameState = gameService.getGameState(token)
                     if (gameState is BattlePhase) {
                         if (gameState.player1 == gameInternal.player1) {
                             _game.value = gameState
