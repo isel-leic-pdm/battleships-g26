@@ -90,6 +90,8 @@ private fun PreparationPhase(
     }
 }
 
+enum class Player { PLAYER1, PLAYER2 }
+
 @Composable
 private fun Battle(
     userId: Int,
@@ -97,9 +99,10 @@ private fun Battle(
     onShot: (Coordinate) -> Unit
 ) {
     val boardToDisplay = remember { mutableStateOf(
-        if (game.player1 == userId) game.player2Board else game.player1Board)
-    }
+        if (game.player1 == userId) Player.PLAYER2 else Player.PLAYER1
+    )}
     val clickAction = remember { mutableStateOf<((Coordinate) -> Unit)?>(onShot) }
+
     Column(
         Modifier.verticalScroll(rememberScrollState())
     ) {
@@ -109,9 +112,12 @@ private fun Battle(
             fontSize = 40.sp,
             modifier = Modifier.padding(16.dp)
         )
-        BoardView(boardToDisplay.value, clickAction.value)
+        BoardView(
+            if (boardToDisplay.value === Player.PLAYER1) game.player1Board else game.player2Board,
+            clickAction.value
+        )
         TextButton(onClick = {
-            boardToDisplay.value = if (boardToDisplay.value == game.player1Board) game.player2Board else game.player1Board
+            boardToDisplay.value = if (boardToDisplay.value === Player.PLAYER1) Player.PLAYER2 else Player.PLAYER1
             clickAction.value = if (clickAction.value == null) onShot else null
         }) {
             Text("Switch board")

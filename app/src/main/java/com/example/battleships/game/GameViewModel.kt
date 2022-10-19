@@ -32,6 +32,9 @@ class GameViewModel(
     private val _game: MutableState<Game?> = mutableStateOf(null)
     val game: State<Game?>
         get() = _game
+    private val _myBoardDisplayed: MutableState<Boolean> = mutableStateOf(true)
+    val myBoardDisplayed: State<Boolean>
+        get() = _myBoardDisplayed
 
     fun startGame() {
         viewModelScope.launch {
@@ -103,19 +106,19 @@ class GameViewModel(
     fun placeShot(coordinate: Coordinate) {
         val gameInternal = game.value ?: return
         if (gameInternal is BattlePhase) {
-            gameInternal.tryPlaceShot(gameInternal.player1, coordinate)
-                ?: return // tests if the action is valid
+            gameInternal.tryPlaceShot(gameInternal.player1, coordinate) // tests if the action is valid
+                ?: return
             viewModelScope.launch {
-                gameService.placeShot(token, coordinate)
-                _game.value = gameService.getGameState(token) ?: _game.value
-                delay(3000)
+                gameService.placeShot(token, coordinate) // does the action
+                _game.value = gameService.getGameState(token) ?: _game.value // updates the game
                 while (true) {
-                    val gameState = gameService.getGameState(token)
-                    if (gameState is BattlePhase) {
-                        if (gameState.player1 == gameInternal.player1) {
-                            _game.value = gameState
-                            break
-                        }
+                    delay(1000)
+                    val gameFromServices = gameService.getGameState(token) ?: throw Exception("Game not found")
+                    gameFromServices as? BattlePhase ?: throw Exception("Game is not in battle phase")
+                    userId.value ?: throw Exception("User not found")
+                    if (gameFromServices.playersTurn == userId.value) {
+                        _game.value = gameFromServices
+                        break
                     }
                 }
             }
