@@ -10,7 +10,6 @@ import androidx.activity.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.battleships.DependenciesContainer
-import com.example.battleships.start.StartGameActivity
 
 class GameActivity : ComponentActivity() {
     companion object {

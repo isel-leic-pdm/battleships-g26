@@ -1,7 +1,6 @@
-package com.example.battleships.game.domain.ship
+package pt.isel.daw.dawbattleshipgame.domain.ship
 
-import com.example.battleships.game.domain.board.CoordinateSet
-
+import pt.isel.daw.dawbattleshipgame.domain.board.CoordinateSet
 data class Ship(val coordinates : CoordinateSet, val type : ShipType, val isSunk : Boolean)
 
 fun Ship.getOrientation(): Orientation {

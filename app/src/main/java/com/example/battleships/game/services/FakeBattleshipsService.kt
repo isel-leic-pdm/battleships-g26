@@ -26,7 +26,7 @@ class FakeBattleshipService : BattleshipsService {
         roundTimeout = 10
     )
 
-    override suspend fun getUserId(token: String): Int? {
+    override suspend fun getGameId(token: String): Int? {
         val (token1, token2, game) = getGameAndTokens(token) ?: return null
         return game.player1 // according to startGame, its the player is always player1
     }

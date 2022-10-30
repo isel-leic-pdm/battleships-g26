@@ -5,16 +5,18 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.battleships.game.domain.board.Coordinate
+import com.example.battleships.game.domain.state.BattlePhase
 import com.example.battleships.game.domain.state.Game
+import com.example.battleships.game.domain.state.GameState
 import com.example.battleships.game.domain.state.SinglePhase
 import com.example.battleships.game.domain.state.single.PlayerPreparationPhase
-import com.example.battleships.game.domain.ship.Orientation
-import com.example.battleships.game.domain.ship.ShipType
-import com.example.battleships.game.domain.state.BattlePhase
 import com.example.battleships.game.services.BattleshipsService
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
+import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
+import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
+import pt.isel.daw.dawbattleshipgame.domain.state.placeShip
 
 /**
  * The ViewModel for BattleshipActivity.
@@ -30,26 +32,57 @@ class GameViewModel(
     private val _userId: MutableState<Int?> = mutableStateOf(null)
     val userId: State<Int?>
         get() = _userId
-    private val _game: MutableState<Game?> = mutableStateOf(null)
+
+    private var _gameId: MutableState<Int?> = mutableStateOf(null)
+    val gameId: State<Int?>
+        get() = _gameId
+
+    private var _game: MutableState<Game?> = mutableStateOf(null)
     val game: State<Game?>
         get() = _game
+
     private val _myBoardDisplayed: MutableState<Boolean> = mutableStateOf(true)
     val myBoardDisplayed: State<Boolean>
         get() = _myBoardDisplayed
 
+    private var _player: MutableState<Player?> = mutableStateOf(null)
+    var player: State<Player?>
+        get() = _player
+
     fun startGame() {
         viewModelScope.launch {
-            gameService.startNewGame(token)
-            _userId.value = gameService.getUserId(token)
-            _game.value = gameService.getGameState(token)
+            gameService.startNewGame(token) // requests to start a new game
+            _gameId.value = gameService.getGameId(token) // asserts gameId
+            assertGame() // asserts game
         }
+    }
+
+    fun assertGame() {
+        val gameId = _gameId.value
+        if (gameId != null) {
+            viewModelScope.launch {
+                _game.value = gameService.getGame(token, gameId)
+                assertPlayer() // asserts player
+            }
+        }
+    }
+
+    private fun assertPlayer() {
+        val gameInternal = game.value ?: return
+        val userId = _userId.value ?: return
+        if (gameInternal.player1 == userId) {
+            _player.value = Player.PLAYER1
+        }
+        _player.value = Player.PLAYER2
     }
 
     fun placeShip(shipType: ShipType, coordinate: Coordinate, orientation: Orientation) {
         val gameInternal = game.value ?: return
-        if (gameInternal is SinglePhase) {
-            val playerGame = gameInternal.player1Game
-            if (playerGame is PlayerPreparationPhase) {
+        val player = player.value ?: return
+        if (gameInternal.state === GameState.FLEET_SETUP) {
+            val playerBoard = getMyBoard(gameInternal)
+            if (!playerBoard.isConfirmed()) {
+                gameInternal.placeShip(shipType, coordinate, orientation, player)
                 playerGame.tryPlaceShip(shipType, coordinate, orientation)
                     ?: return // tests if the action is valid
                 viewModelScope.launch {
@@ -62,7 +95,8 @@ class GameViewModel(
 
     fun moveShip(origin: Coordinate, destination: Coordinate) {
         val gameInternal = game.value ?: return
-        if (gameInternal is SinglePhase) {
+        val playerBoard = getMyBoard(gameInternal)
+        if (gameInternal.state === GameState.FLEET_SETUP) {
             val playerGame = gameInternal.player1Game
             if (playerGame is PlayerPreparationPhase) {
                 playerGame.tryMoveShip(origin, destination)
@@ -125,4 +159,6 @@ class GameViewModel(
             }
         }
     }
+
+    private fun getMyBoard(game: Game) = if (myBoardDisplayed.value) game.board1 else game.board2
 }

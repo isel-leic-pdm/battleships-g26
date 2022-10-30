@@ -1,12 +1,35 @@
-package com.example.battleships.game.domain.board
+package pt.isel.daw.dawbattleshipgame.domain.board
 
-import com.example.battleships.game.domain.ship.ShipType
+import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
+
 
 class Panel(
     val coordinate: Coordinate,
     val shipType: ShipType? = null,
     val isHit: Boolean = false,
 ){
+    /**
+     * Gets panel database representation conforming to this table:
+     * |----------------------------------|
+     * |-TYPE-     -IS_NOT_HIT-   -I_SHIT-|
+     * | null           ' '         'x'   |
+     * | CARRIER        'C'         'c'   |
+     * | BATTLESHIP     'B'         'b'   |
+     * | KRUISER        'K'         'k'   |
+     * | SUBMARINE      'S'         's'   |
+     * | DESTROYER      'D'         'd'   |
+     * |----------------------------------|
+     */
+    fun getDbIcon(): Char {
+        return shipType?.getIcon(isHit) ?:
+        if(isHit) HIT else WATER
+    }
+
+    companion object{
+        const val HIT = 'x'
+        const val WATER = ' '
+    }
+
     fun hit() = if(!isHit) Panel(coordinate, shipType, true) else this
 
     fun isShip() = shipType != null
@@ -15,14 +38,5 @@ class Panel(
         return if (isShip()) if (isHit) "X" else "[]"
         else if (isHit) "x" else "  "
     }
-
-    fun getType() = when(shipType){
-            ShipType.CRUISER -> "cruiser"
-            ShipType.CARRIER -> "carrier"
-            ShipType.BATTLESHIP -> "battleship"
-            ShipType.SUBMARINE -> "submarine"
-            ShipType.DESTROYER -> "destroyer"
-            else -> "water"
-        }
 
 }

@@ -1,24 +1,101 @@
 package com.example.battleships.game.domain.state
 
-import com.example.battleships.game.domain.state.single.PlayerPreparationPhase
+import com.example.battleships.game.domain.state.GameState.*
+import pt.isel.daw.dawbattleshipgame.domain.board.Board
+import pt.isel.daw.dawbattleshipgame.domain.player.Player
+import pt.isel.daw.dawbattleshipgame.domain.state.Configuration
+import pt.isel.daw.dawbattleshipgame.domain.state.requireNull
+import java.util.*
 
-enum class State { WARMUP, WAITING, BATTLE, END }
+enum class GameState {
+    NOT_STARTED,
+    FLEET_SETUP,
+    WAITING,
+    BATTLE,
+    FINISHED;
+    val dbName = this.name.lowercase(Locale.getDefault())
+}
 
-sealed class Game {
-    abstract val gameId: Int
-    abstract val configuration: Configuration
-    abstract val player1: Int
-    abstract val player2: Int
+
+fun String.getDbState() =
+    GameState.values().first { it.dbName == this }
+
+class Game(
+    val gameId: Int,
+    val configuration: Configuration,
+    val player1: Int,
+    val player2: Int,
+    val board1: Board,
+    val board2: Board,
+    val state: GameState,
+
+    val playerTurn: Int? =
+        if(state == NOT_STARTED || state == FLEET_SETUP)
+            null else player1,
+
+    val winner : Int? = null
+){
+    init {
+        when(state){
+            NOT_STARTED -> {
+                requireNull(playerTurn); requireNull(winner)
+            }
+            FLEET_SETUP -> {
+                requireNull(playerTurn); requireNull(winner)
+            }
+            WAITING -> {
+                requireNull(playerTurn); requireNull(winner)
+            }
+            BATTLE -> {
+                pt.isel.daw.dawbattleshipgame.domain.state.requireNotNull(playerTurn); requireNull(winner)
+            }
+            FINISHED -> {
+                pt.isel.daw.dawbattleshipgame.domain.state.requireNotNull(playerTurn); pt.isel.daw.dawbattleshipgame.domain.state.requireNotNull(
+                    winner
+                )
+            }
+        }
+    }
+
+    internal fun updateBoard(board: Board, player: Player, state: GameState = FLEET_SETUP) =
+        require(state == FLEET_SETUP || state == BATTLE).let {
+            when(player) {
+                Player.ONE -> Game(gameId, configuration, player1, player2, board, board2, state)
+                Player.TWO -> Game(gameId, configuration, player1, player2, board1, board, state)
+            }
+        }
+
+    internal fun switchTurn() = Game(gameId, configuration,
+        player1, player2, board1, board2, state,
+        changePlayersTurn()
+    )
+
+    private fun changePlayersTurn() =
+        when (playerTurn) {
+            player1 -> player2
+            player2 -> player1
+            else -> throw IllegalStateException("Illegal game state")
+        }
+
+    fun getBoard(player: Player = Player.ONE) =
+        when(player) {
+            Player.ONE -> board1
+            Player.TWO -> board2
+        }
 
     companion object {
         fun newGame(gameId: Int, player1: Int, player2: Int, configuration: Configuration) =
-            SinglePhase(
+            Game(
                 gameId,
                 configuration,
                 player1,
                 player2,
-                PlayerPreparationPhase(gameId, configuration, player1),
-                PlayerPreparationPhase(gameId, configuration, player2)
+                Board(configuration.boardSize),
+                Board(configuration.boardSize),
+                FLEET_SETUP
             )
     }
+
+    //TODO() to be changed, its like this because of the tests
+    override fun toString(): String = board1.toString()
 }

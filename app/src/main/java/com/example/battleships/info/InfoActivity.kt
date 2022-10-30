@@ -4,8 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import com.example.battleships.game.GameActivity
 
 class InfoActivity : ComponentActivity() {
     companion object {

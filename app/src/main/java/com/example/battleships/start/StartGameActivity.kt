@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.battleships.game.GameActivity
 import com.example.battleships.info.InfoActivity
-import com.example.battleships.menu.MenuViewModel
 
 class StartGameActivity : ComponentActivity() {
 

@@ -1,29 +1,67 @@
-package com.example.battleships.game.domain.board
+package pt.isel.daw.dawbattleshipgame.domain.board
 
-import com.example.battleships.game.domain.ship.Ship
-import com.example.battleships.game.domain.ship.ShipType
+import pt.isel.daw.dawbattleshipgame.domain.ship.Ship
+import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
+import pt.isel.daw.dawbattleshipgame.domain.ship.getPanel
 import kotlin.math.sqrt
 
 class Board {
-    val dimension : Int
+    private val dimension : Int
     val board : List<Panel>
+    val coordinates : Coordinates
+    private val confirmed : Boolean
 
     /**
      * Initiates the board with empty panels (Water Panels)
      */
     constructor(dim: Int) {
         dimension = dim
-        board = Coordinates(dim).values().map { Panel(it) }
+        coordinates = Coordinates(dimension)
+        board = coordinates.values().map { Panel(it) }
+        confirmed = false
     }
 
-    constructor(board: List<Panel>) {
+    /**
+     * Return new board confirmed
+     */
+    internal fun confirm() = Board(board, true)
+
+    /**
+     * Check whether board is confirmed or not (Player is waiting or Not)
+     */
+    fun isConfirmed() = confirmed
+
+    /**
+     * Returns a string for the database representation
+     */
+    fun getDbString() = board.joinToString("") {
+        it.getDbIcon().toString()
+    }
+
+    private constructor(board: List<Panel>, confirm: Boolean) {
         dimension = sqrt(board.size.toDouble()).toInt()
+        coordinates = Coordinates(dimension)
         this.board = board
+        this.confirmed = confirm
     }
 
-    operator fun List<Panel>.get(c: Coordinate): Panel {
+    /**
+     * Initialize a board with a string from DB
+     */
+    constructor(string: String, confirm : Boolean = false){
+        dimension = sqrt(string.length.toDouble()).toInt()
+        coordinates = Coordinates(dimension)
+        this.board = string.mapIndexed{ idx, char ->
+            char.getPanel(coordinates.values()[idx])
+        }
+        this.confirmed =  confirm
+    }
+
+    private operator fun List<Panel>.get(c: Coordinate): Panel {
         return board[getIdx(c)]
     }
+
+    operator fun get(i : Int) = board[i]
 
     private fun getIdx(c: Coordinate) = c.checkValid(dimension).let {
         (c.row - 1) * dimension + (c.column - 1)
@@ -47,8 +85,7 @@ class Board {
 
     operator fun get(coordinate: Coordinate) =
         coordinate.checkValid(dimension)
-        .let { board[coordinate] }
-
+        .let { board[getIdx(coordinate)] }
 
 
     /**
@@ -66,7 +103,7 @@ class Board {
             cs.forEach {
                 this[getIdx(it)] = Panel(it, shipType)
             }
-        })
+        }, confirmed)
 
     /**
      * Places a list of panels in the board
@@ -77,7 +114,7 @@ class Board {
             panel.forEach {
                 this[getIdx(it.coordinate)] = it
             }
-        })
+        }, confirmed)
 
     /**
      * Places a set of coordinates as water panels
@@ -88,7 +125,7 @@ class Board {
             cs.forEach {
                 this[getIdx(it)] = Panel(it, null, this[it].isHit)
             }
-        })
+        }, confirmed)
 
     /**
      * Check if coordinate is a ship
@@ -102,7 +139,13 @@ class Board {
     fun placeShot(c : Coordinate) =
         Board(board.toMutableList().apply {
             this[getIdx(c)] = this[c].hit()
-        })
+        }, confirmed)
+
+
+    /**
+     * Check if all ships are sunk
+     */
+    fun allShipsSunk() = this.getShips().all { it.isSunk }
 
 
     /**
@@ -129,7 +172,7 @@ class Board {
      * @return a Ship
      * @throws IllegalArgumentException if no ship is found
      */
-    fun getShipFromCoordinate(c : Coordinate) : Ship {
+    fun getShipFromCoordinate(c : Coordinate) : Ship{
         val type = board[c].shipType ?: throw IllegalArgumentException("No ship found")
         return getShipFromBoard(type) ?: throw IllegalArgumentException("No ship found")
     }

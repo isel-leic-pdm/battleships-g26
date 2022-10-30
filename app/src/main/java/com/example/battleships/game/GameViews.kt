@@ -20,10 +20,10 @@ import androidx.compose.ui.unit.sp
 import com.example.battleships.game.domain.board.Board
 import com.example.battleships.game.domain.board.Coordinate
 import com.example.battleships.game.domain.board.Panel
-import com.example.battleships.game.domain.state.single.PlayerPreparationPhase
-import com.example.battleships.game.domain.state.single.Single
 import com.example.battleships.game.domain.ship.ShipType
 import com.example.battleships.game.domain.state.*
+import com.example.battleships.game.domain.state.single.PlayerPreparationPhase
+import com.example.battleships.game.domain.state.single.Single
 
 val PLAY_SIDE = 30.dp
 val GRID_WIDTH = 5.dp
