@@ -49,21 +49,24 @@ class GameViewModel(
         viewModelScope.launch {
             gameService.startNewGame(token) // requests to start a new game
             _gameId.value = gameService.getGameId(token) // asserts gameId
-            assertGame() // asserts game
+            setGame() // asserts game
         }
     }
 
-    fun assertGame() {
+    private fun setGame() {
         val gameId = _gameId.value
         if (gameId != null) {
             viewModelScope.launch {
-                _game.value = gameService.getGame(token, gameId)
-                assertPlayer() // asserts player
+                while (game.value == null) {
+                    delay(1000)
+                    _game.value = gameService.getGame(token, gameId)
+                }
+                setPlayer() // asserts player
             }
         }
     }
 
-    private fun assertPlayer() {
+    private fun setPlayer() {
         val gameInternal = game.value ?: return
         val userId = _userId.value ?: return
         if (gameInternal.player1 == userId) {

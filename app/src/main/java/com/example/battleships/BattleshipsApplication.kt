@@ -26,10 +26,12 @@ class BattleshipsApplication : DependenciesContainer, Application() {
 
     override val battleshipsService: BattleshipsService by lazy {
         FakeBattleshipService()
+        /*
         RealBattleshipsService(
             httpClient = httpClient,
             jsonEncoder = jsonEncoder,
         )
+         */
     }
 
     override val userService: UserService
