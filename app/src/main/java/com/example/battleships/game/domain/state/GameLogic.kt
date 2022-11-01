@@ -1,14 +1,12 @@
-package pt.isel.daw.dawbattleshipgame.domain.state
+package com.example.battleships.game.domain.state
 
-import com.example.battleships.game.domain.state.Game
-import com.example.battleships.game.domain.state.GameState
-import pt.isel.daw.dawbattleshipgame.domain.board.Board
+import com.example.battleships.game.domain.player.Player
+import com.example.battleships.game.domain.board.Board
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.board.CoordinateSet
 import pt.isel.daw.dawbattleshipgame.domain.board.moveFromTo
-import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
-import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
+import com.example.battleships.game.domain.ship.ShipType
 import pt.isel.daw.dawbattleshipgame.domain.ship.getOrientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.getShip
 

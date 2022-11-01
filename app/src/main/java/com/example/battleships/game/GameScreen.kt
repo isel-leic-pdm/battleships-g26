@@ -9,14 +9,12 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.battleships.game.domain.board.Coordinate
-import com.example.battleships.game.domain.ship.Orientation
-import com.example.battleships.game.domain.ship.ShipType
 import com.example.battleships.game.domain.state.Game
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
-import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
+import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
+import com.example.battleships.game.domain.ship.ShipType
 
 internal open class Selection
 internal class ShipOption(val shipType: ShipType) : Selection()
@@ -42,11 +40,12 @@ internal fun GameScreen(
                 var selected: Selection? = null
                 val curGame = activity.vm.game.value
                 val userId = activity.vm.userId.value
+                val player = activity.vm.player.value
 
-                if (curGame != null && userId != null) {
+                if (curGame != null && userId != null && player != null) {
                     GameView(
-                        userId = userId,
                         game = curGame,
+                        player = player,
                         onShipClick = {
                             selected = ShipOption(it)
                         },

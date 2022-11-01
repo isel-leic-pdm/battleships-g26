@@ -1,5 +1,6 @@
 package pt.isel.daw.dawbattleshipgame.domain.ship
 
+import com.example.battleships.game.domain.ship.ShipType
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 
 typealias ShipSet = Set<Ship>

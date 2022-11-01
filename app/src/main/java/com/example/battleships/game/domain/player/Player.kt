@@ -1,4 +1,4 @@
-package pt.isel.daw.dawbattleshipgame.domain.player
+package com.example.battleships.game.domain.player
 
 enum class Player {
     ONE, TWO;

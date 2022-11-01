@@ -1,10 +1,11 @@
-package pt.isel.daw.dawbattleshipgame.domain
+package com.example.battleships.game.domain
 
-import org.springframework.stereotype.Component
+import android.os.Build
+import androidx.annotation.RequiresApi
 import java.security.SecureRandom
 import java.util.*
 
-@Component
+@RequiresApi(Build.VERSION_CODES.O)
 class UserLogic {
 
     fun generateToken(): String =

@@ -29,7 +29,6 @@ class BattleshipsApplication : DependenciesContainer, Application() {
         RealBattleshipsService(
             httpClient = httpClient,
             jsonEncoder = jsonEncoder,
-            battleshipsHome = battleshipsAPIHome
         )
     }
 

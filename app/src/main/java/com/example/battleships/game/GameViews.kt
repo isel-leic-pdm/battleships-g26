@@ -17,13 +17,13 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.battleships.game.domain.board.Board
-import com.example.battleships.game.domain.board.Coordinate
-import com.example.battleships.game.domain.board.Panel
-import com.example.battleships.game.domain.ship.ShipType
+import com.example.battleships.game.domain.player.Player
 import com.example.battleships.game.domain.state.*
-import com.example.battleships.game.domain.state.single.PlayerPreparationPhase
-import com.example.battleships.game.domain.state.single.Single
+import com.example.battleships.game.domain.board.Board
+import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
+import pt.isel.daw.dawbattleshipgame.domain.board.Panel
+import com.example.battleships.game.domain.ship.ShipType
+import com.example.battleships.game.domain.state.Configuration
 
 val PLAY_SIDE = 30.dp
 val GRID_WIDTH = 5.dp
@@ -31,31 +31,30 @@ val GRID_WIDTH = 5.dp
 
 @Composable
 fun GameView(
-    userId: Int,
-    game: Game?,
+    game: Game,
+    player: Player,
     onShipClick: (ShipType) -> Unit,
     onShipPlaced: (Coordinate) -> Unit,
     onShotPlaced: (Coordinate) -> Unit,
     onConfirmLayout: () -> Unit
 ) {
-    game?.let { game ->
-        Column(Modifier.fillMaxWidth()) {
-            when (game) {
-                is SinglePhase -> {
-                    if (game.player1Game is PlayerPreparationPhase)
-                        PreparationPhase(
-                            game.player1Game,
-                            game.configuration,
-                            onShipPlaced,
-                            onShipClick,
-                            onConfirmLayout
-                        )
-                    else
-                        PreparationPhase(game.player1Game, game.configuration, null, null, null)
-                }
-                is BattlePhase -> Battle(userId, game, onShotPlaced)
-                is EndPhase -> End(userId, game)
+    Column(Modifier.fillMaxWidth()) {
+        val board = getBoard(game, player)
+        when {
+            game.state === GameState.FLEET_SETUP -> {
+                if (!board.isConfirmed())
+                    PreparationPhase(
+                        board,
+                        game.configuration,
+                        onShipPlaced,
+                        onShipClick,
+                        onConfirmLayout
+                    )
+                else
+                    PreparationPhase(board, game.configuration, null, null, null)
             }
+            game.state === GameState.BATTLE -> Battle(player, game.board1, game.board2, onShotPlaced)
+            game.state === GameState.FINISHED -> End(game)
         }
     }
 }
@@ -65,14 +64,14 @@ fun GameView(
  */
 @Composable
 private fun PreparationPhase(
-    game: Single,
+    board: Board,
     configuration: Configuration,
     onPanelClick: ((Coordinate) -> Unit)?,
     onShipClick: ((ShipType) -> Unit)?,
     onConfirmLayout: (() -> Unit)?
 ) {
     val isClickable = onConfirmLayout != null
-    BoardView(game.board, if (isClickable) onPanelClick else null)
+    BoardView(board, if (isClickable) onPanelClick else null)
     Row {
         Box(modifier = Modifier.weight(1f)) {
             ShipOptionView(configuration, if (isClickable) onShipClick else null)
@@ -90,17 +89,14 @@ private fun PreparationPhase(
     }
 }
 
-enum class Player { PLAYER1, PLAYER2 }
-
 @Composable
 private fun Battle(
-    userId: Int,
-    game: BattlePhase,
+    player: Player,
+    player1Board: Board,
+    player2Board: Board,
     onShot: (Coordinate) -> Unit
 ) {
-    val boardToDisplay = remember { mutableStateOf(
-        if (game.player1 == userId) Player.PLAYER2 else Player.PLAYER1
-    )}
+    val boardToDisplay = remember { mutableStateOf(player)}
     val clickAction = remember { mutableStateOf<((Coordinate) -> Unit)?>(onShot) }
 
     Column(
@@ -113,11 +109,11 @@ private fun Battle(
             modifier = Modifier.padding(16.dp)
         )
         BoardView(
-            if (boardToDisplay.value === Player.PLAYER1) game.player1Board else game.player2Board,
+            if (boardToDisplay.value === Player.ONE) player1Board else player2Board,
             clickAction.value
         )
         TextButton(onClick = {
-            boardToDisplay.value = if (boardToDisplay.value === Player.PLAYER1) Player.PLAYER2 else Player.PLAYER1
+            boardToDisplay.value = if (boardToDisplay.value === Player.ONE) Player.TWO else Player.ONE
             clickAction.value = if (clickAction.value == null) onShot else null
         }) {
             Text("Switch board")
@@ -126,9 +122,11 @@ private fun Battle(
 }
 
 @Composable
-private fun End(userId: Int, game: EndPhase) {
+private fun End(game: Game) {
+    val winner = game.winner
+    require(winner != null)
     Text("Game over")
-    Text(text = "Winner: ${game.winner}")
+    Text(text = "Winner: $winner")
 }
 
 @Composable
@@ -184,7 +182,9 @@ private fun PlayView(coordinate: Coordinate, panel: Panel, onClick: (() -> Unit)
 private fun PlayView(configuration: Configuration, ship: ShipType, onClick: () -> Unit) {
     Row {
         Spacer(Modifier.size(GRID_WIDTH))
-        repeat(configuration.getShipLength(ship)) {
+        val shipLength = configuration.getShipLength(ship)
+        require(shipLength != null)
+        repeat(shipLength) {
             val m = Modifier
                 .size(PLAY_SIDE)
                 .background(Color.Gray)
@@ -216,5 +216,12 @@ private fun ShipOptionView(configuration: Configuration, onShipClick: ((ShipType
             Spacer(modifier = Modifier.size(10.dp))
             PlayView(configuration, ship) { if (onShipClick != null) onShipClick(ship) }
         }
+    }
+}
+
+private fun getBoard(game: Game, player: Player): Board {
+    return when (player) {
+        Player.ONE -> game.board1
+        Player.TWO -> game.board2
     }
 }

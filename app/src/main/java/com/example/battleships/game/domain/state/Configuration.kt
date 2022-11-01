@@ -1,6 +1,6 @@
-package pt.isel.daw.dawbattleshipgame.domain.state
+package com.example.battleships.game.domain.state
 
-import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
+import com.example.battleships.game.domain.ship.ShipType
 
 /**
  * Represents the game configuration
@@ -13,4 +13,7 @@ data class Configuration(
 ) {
     fun isShipValid(shipType: ShipType) =
         fleet.firstOrNull { it.first == shipType } != null
+
+    fun getShipLength(shipType: ShipType) =
+        fleet.firstOrNull { it.first == shipType }?.second
 }

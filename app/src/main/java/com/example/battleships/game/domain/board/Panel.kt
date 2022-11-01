@@ -1,6 +1,6 @@
 package pt.isel.daw.dawbattleshipgame.domain.board
 
-import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
+import com.example.battleships.game.domain.ship.ShipType
 
 
 class Panel(

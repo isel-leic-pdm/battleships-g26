@@ -1,12 +1,16 @@
-package pt.isel.daw.dawbattleshipgame.domain.board
+package com.example.battleships.game.domain.board
 
+import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
+import pt.isel.daw.dawbattleshipgame.domain.board.CoordinateSet
+import pt.isel.daw.dawbattleshipgame.domain.board.Coordinates
+import pt.isel.daw.dawbattleshipgame.domain.board.Panel
 import pt.isel.daw.dawbattleshipgame.domain.ship.Ship
-import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
-import pt.isel.daw.dawbattleshipgame.domain.ship.getPanel
+import com.example.battleships.game.domain.ship.ShipType
+import com.example.battleships.game.domain.ship.getPanel
 import kotlin.math.sqrt
 
 class Board {
-    private val dimension : Int
+    val dimension : Int
     val board : List<Panel>
     val coordinates : Coordinates
     private val confirmed : Boolean

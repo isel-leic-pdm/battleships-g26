@@ -3,8 +3,8 @@ package com.example.battleships.game
 import com.example.battleships.game.domain.state.Game
 import com.example.battleships.game.domain.state.GameState
 import com.example.battleships.utils.hypermedia.SirenEntity
-import pt.isel.daw.dawbattleshipgame.domain.board.Board
-import pt.isel.daw.dawbattleshipgame.domain.state.Configuration
+import com.example.battleships.game.domain.board.Board
+import com.example.battleships.game.domain.state.Configuration
 
 data class GameIdDtoProperties(val gameId: Int)
 
@@ -36,8 +36,9 @@ fun GameDtoProperties.toGame() =
     )
 
 data class BoardDtoProperties(
-    val cells: Map<CoordinateDto, CoordinateContentDto>,
-    val nCells: Int
+    val cells: String,
+    val nCells: Int,
+    val confirmed: Boolean
 )
 
 data class CoordinateDto(
@@ -50,5 +51,5 @@ typealias BoardDto = SirenEntity<BoardDtoProperties>
 val BoardDtoType = SirenEntity.getType<BoardDtoProperties>()
 
 fun BoardDtoProperties.toBoard(): Board {
-    TODO("Not yet implemented")
+    return Board(cells, confirmed)
 }

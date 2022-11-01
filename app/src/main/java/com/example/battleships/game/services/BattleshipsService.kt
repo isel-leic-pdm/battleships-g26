@@ -3,7 +3,7 @@ package com.example.battleships.game.services
 import com.example.battleships.game.domain.state.Game
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
-import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
+import com.example.battleships.game.domain.ship.ShipType
 
 /**
  * This interface is responsible for providing the options that interact with the game.

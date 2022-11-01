@@ -9,10 +9,10 @@ import com.example.battleships.utils.send
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import pt.isel.daw.dawbattleshipgame.domain.board.Board
+import com.example.battleships.game.domain.board.Board
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
-import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
+import com.example.battleships.game.domain.ship.ShipType
 import java.net.URL
 
 class RealBattleshipsService(
