@@ -1,4 +1,4 @@
-package com.example.battleships.menu.views
+package com.example.battleships.home
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.battleships.menu.views.LoadingButton
+import com.example.battleships.menu.views.LoadingState
 
 @Composable
 fun Menu(
@@ -27,6 +29,10 @@ fun Menu(
         CredentialsView(loginLoading, onLogin, "Login")
     }
 }
+
+// Test tags for the TopBar navigation elements
+const val CreateUserButtonTestTag = "CreateUserButton"
+const val LoginButtonTestTag = "LoginUserButton"
 
 @Composable
 fun CredentialsView(
@@ -53,14 +59,10 @@ fun CredentialsView(
         LoadingButton(
             value = title,
             state = createLoading,
+            tagName = if (title == "Create User") CreateUserButtonTestTag else LoginButtonTestTag,
             onClick = { onCreate(username.value, password.value) }
         )
     }
-}
-
-@Composable
-fun AppTitle() {
-    Text(text = "Battleships")
 }
 
 @Preview

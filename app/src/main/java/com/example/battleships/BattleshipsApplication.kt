@@ -1,9 +1,8 @@
 package com.example.battleships
 
 import android.app.Application
-import com.example.battleships.game.services.BattleshipsService
-import com.example.battleships.game.services.FakeBattleshipService
-import com.example.battleships.game.services.RealBattleshipsService
+import com.example.battleships.rankings.services.RankingsService
+import com.example.battleships.rankings.services.FakeRankingsService
 import com.example.battleships.menu.FakeUserService
 import com.example.battleships.menu.UserService
 import com.google.gson.Gson
@@ -14,7 +13,7 @@ import java.net.URL
 const val TAG = "BattleshipsApp"
 
 interface DependenciesContainer {
-    val battleshipsService: BattleshipsService
+    val battleshipsService: RankingsService
     val userService: UserService
 }
 
@@ -24,8 +23,8 @@ class BattleshipsApplication : DependenciesContainer, Application() {
     private val httpClient: OkHttpClient by lazy { OkHttpClient() }
     private val jsonEncoder: Gson by lazy { GsonBuilder().create() }
 
-    override val battleshipsService: BattleshipsService by lazy {
-        FakeBattleshipService()
+    override val battleshipsService: RankingsService by lazy {
+        FakeRankingsService()
         /*
         RealBattleshipsService(
             httpClient = httpClient,

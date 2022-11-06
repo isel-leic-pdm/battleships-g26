@@ -27,7 +27,7 @@
         </activity>
 
         <activity
-            android:name="com.example.battleships.start.StartGameActivity"
+            android:name="com.example.battleships.menu.MenuActivity"
             android:exported="true"
             android:theme="@style/Theme.Battleships">
 
@@ -37,7 +37,7 @@
         </activity>
 
         <activity
-            android:name="com.example.battleships.menu.MenuActivity"
+            android:name="com.example.battleships.home.HomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,4 +1,4 @@
-package com.example.battleships.start
+package com.example.battleships.rankings
 
 import android.app.Activity
 import android.content.Intent
@@ -12,13 +12,13 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.battleships.game.GameActivity
 import com.example.battleships.info.InfoActivity
 
-class StartGameActivity : ComponentActivity() {
+class RankingsActivity : ComponentActivity() {
 
     companion object {
         private const val TOKEN_EXTRA = "START_GAME_TOKEN_EXTRA"
         fun navigate(origin: Activity, token: String) {
             with(origin) {
-                val intent = Intent(this, StartGameActivity::class.java)
+                val intent = Intent(this, RankingsActivity::class.java)
                 intent.putExtra(TOKEN_EXTRA, token)
                 startActivity(intent)
             }
@@ -26,10 +26,10 @@ class StartGameActivity : ComponentActivity() {
     }
 
     @Suppress("UNCHECKED_CAST")
-    val vm by viewModels<StartGameViewModel> {
+    val vm by viewModels<RankingsViewModel> {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return StartGameViewModel(token) as T
+                return RankingsViewModel(token) as T
             }
         }
     }

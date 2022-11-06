@@ -1,7 +1,5 @@
 package com.example.battleships.menu
 
-import android.content.Intent
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,9 +9,8 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.battleships.game.GameActivity
 import com.example.battleships.menu.views.LoadingState
-import com.example.battleships.menu.views.Menu
+import com.example.battleships.home.Menu
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
 
@@ -47,9 +44,4 @@ internal fun MenuScreen(
             }
         }
     }
-}
-
-internal fun navigateToGameScreen(activity: ComponentActivity) {
-    val intent = Intent(activity, GameActivity::class.java)
-    activity.startActivity(intent)
 }

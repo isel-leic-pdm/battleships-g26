@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.battleships.DependenciesContainer
 import com.example.battleships.menu.views.LoadingState
-import com.example.battleships.start.StartGameActivity
+import com.example.battleships.home.HomeActivity
 
 class MenuActivity : ComponentActivity() {
     private val service by lazy {
@@ -44,7 +44,7 @@ class MenuActivity : ComponentActivity() {
             )
             val token = vm.token.value
             if (token != null) {
-                StartGameActivity.navigate(this, token)
+                HomeActivity.navigate(this, token)
             }
         }
     }

@@ -1,6 +1,5 @@
-package com.example.battleships.start
+package com.example.battleships.home
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Button
@@ -10,19 +9,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
-import pt.isel.battleships.R
 
+val NavigateToAuthenticationButtonTestTag = "NavigateToAuthenticationButton"
+val NavigateToRankingsButtonTestTag = "NavigateToRankingsButton"
 
 @Composable
 fun StartScreen(
-    onStartGame: () -> Unit,
-    onInfoRequest: () -> Unit
+    onAuthenticateRequested: () -> Unit,
+    onRankingsRequest: () -> Unit,
 ) {
     BattleshipsTheme {
         Scaffold(
@@ -35,7 +33,7 @@ fun StartScreen(
             },
             bottomBar = { BottomAppBar {} },
         ) { innerPadding ->
-            Img()
+            // Img()
             Column(
                 verticalArrangement = Arrangement.SpaceAround,
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -43,45 +41,26 @@ fun StartScreen(
                     .padding(innerPadding)
                     .fillMaxSize(),
             ) {
-                Column(
-                    verticalArrangement = Arrangement.Bottom,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                ) {
-                    Button(
-                        onClick = onStartGame,
-                        modifier = Modifier.height(60.dp)
-                    ) {
-                        Text(text = "Start Game")
-                    }
-                }
+                NavigationButton(title = "Authenticate", NavigateToAuthenticationButtonTestTag) { onAuthenticateRequested() }
+                NavigationButton(title = "Rankings", NavigateToRankingsButtonTestTag) { onRankingsRequest() }
+                NavigationButton(title = "Info", NavigateToInfoButtonTestTag) { onInfoRequest() }
             }
         }
     }
 }
 
 @Composable
-fun Img() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .offset(0.dp, (-100).dp),
+private fun NavigationButton(title: String, tagName: String, onClick: () -> Unit) {
+    Button(
+        modifier = Modifier.testTag(tagName),
+        onClick = onClick,
     ) {
-        Image(
-            painterResource(id = R.drawable.ship_w),
-            contentDescription = "",
-            contentScale = ContentScale.Fit,
-            modifier = Modifier.matchParentSize(),
-        )
+        Text(text = title)
     }
-
 }
 
 @Preview
 @Composable
 fun StartScreenPreview() {
-    StartScreen({}, {})
+    StartScreen({}, {}, {})
 }

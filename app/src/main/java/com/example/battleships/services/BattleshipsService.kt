@@ -4,11 +4,18 @@ import com.example.battleships.game.domain.state.Game
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import com.example.battleships.game.domain.ship.ShipType
+import com.example.battleships.home.Home
 
 /**
  * This interface is responsible for providing the options that interact with the game.
  */
 interface BattleshipsService {
+    suspend fun getHome(): Home
+
+    suspend fun getRankings(): List<Ranking>
+
+    suspend fun getServerInfo(): ServerInfo
+
     suspend fun getGameId(token: String): Int?
 
     suspend fun startNewGame(token: String)

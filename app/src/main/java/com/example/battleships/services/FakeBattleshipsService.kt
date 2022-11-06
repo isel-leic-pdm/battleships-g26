@@ -1,13 +1,14 @@
-package com.example.battleships.game.services
+package com.example.battleships.services
 
 import com.example.battleships.game.domain.player.Player
 import com.example.battleships.game.domain.state.*
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import com.example.battleships.game.domain.ship.ShipType
+import com.example.battleships.rankings.services.RankingsService
 
 
-class FakeBattleshipService : BattleshipsService {
+class FakeBattleshipService : RankingsService {
     private val games = mutableMapOf<Pair<String, String>, Game>()
 
     private val configuration = Configuration(

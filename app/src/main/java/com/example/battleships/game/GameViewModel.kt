@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.battleships.game.domain.player.Player
 import com.example.battleships.game.domain.state.*
-import com.example.battleships.game.services.BattleshipsService
+import com.example.battleships.rankings.services.RankingsService
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
@@ -22,7 +22,7 @@ import com.example.battleships.game.domain.ship.ShipType
  * will return the new state of the game. This new state will be used to update the local state.
  */
 class GameViewModel(
-    private val gameService: BattleshipsService,
+    private val gameService: RankingsService,
     private val token: String
 ) : ViewModel() {
     private val _userId: MutableState<Int?> = mutableStateOf(null)
