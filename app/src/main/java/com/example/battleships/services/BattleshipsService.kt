@@ -8,18 +8,28 @@ import com.example.battleships.home.Home
 import com.example.battleships.info.ServerInfo
 import com.example.battleships.rankings.GameRanking
 
-// TODO -> split into, at least, three files: Home / Users / Games
 /**
  * This interface is responsible for providing the options that interact with the game.
  */
 interface BattleshipsService {
+    /**
+     * Used to identify how implementations SHOULD behave:
+     * - [FORCE_REMOTE] is used to indicate that the operation MUST try to access
+     * the remote data source
+     * - [FORCE_LOCAL] is usd to indicate that the operation SHOULD only use the
+     * the local version of the data, if available
+     * - [AUTO] states that the selection of which data to use is left to the
+     * implementation.
+     */
+    enum class Mode { FORCE_REMOTE, FORCE_LOCAL, AUTO }
+
     suspend fun getRankings(): GameRanking
 
     suspend fun getServerInfo(): ServerInfo
 
     fun createUser(username: String, password: String): Boolean
 
-    fun login(username: String, password: String): String?
+    suspend fun login(username: String, password: String): String?
 
     suspend fun getGameId(token: String): Int?
 
