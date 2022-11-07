@@ -5,10 +5,12 @@ import com.example.battleships.game.domain.state.*
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import com.example.battleships.game.domain.ship.ShipType
-import com.example.battleships.rankings.services.RankingsService
+import com.example.battleships.home.Home
+import com.example.battleships.info.ServerAuthor
+import com.example.battleships.info.ServerInfo
 
 
-class FakeBattleshipService : RankingsService {
+class FakeBattleshipService : BattleshipsService {
     private val games = mutableMapOf<Pair<String, String>, Game>()
 
     private val configuration = Configuration(
@@ -23,6 +25,13 @@ class FakeBattleshipService : RankingsService {
         nShotsPerRound = 10,
         roundTimeout = 10
     )
+
+    override suspend fun getHome(): Home = Home("Welcome to the Battleships API")
+
+    override fun getServerInfo() = ServerInfo(listOf(
+        ServerAuthor("Miguel", "a47185@alunos.isel.pt"),
+        // TODO
+    ), "0.9")
 
     override suspend fun getGameId(token: String): Int? {
         val (token1, token2, game) = getGameAndTokens(token) ?: return null

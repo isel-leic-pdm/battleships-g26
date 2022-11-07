@@ -2,9 +2,13 @@ package com.example.battleships.services
 
 import android.util.Log
 import com.example.battleships.TAG
-import com.example.battleships.dtos.HomeDto
-import com.example.battleships.dtos.HomeDtoType
+import com.example.battleships.dtos.*
 import com.example.battleships.game.*
+import com.example.battleships.game.BoardDto
+import com.example.battleships.game.BoardDtoType
+import com.example.battleships.game.GameDto
+import com.example.battleships.game.GameDtoType
+import com.example.battleships.game.GameIdDto
 import com.example.battleships.game.domain.state.Game
 import com.example.battleships.utils.hypermedia.SirenMediaType
 import com.example.battleships.utils.send
@@ -15,8 +19,10 @@ import com.example.battleships.game.domain.board.Board
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import com.example.battleships.game.domain.ship.ShipType
-import com.example.battleships.game.services.BattleshipsService
 import com.example.battleships.home.Home
+import com.example.battleships.info.ServerInfo
+import com.example.battleships.info.serverInfo
+import com.example.battleships.rankings.GameRanking
 import com.example.battleships.utils.hypermedia.SirenLink
 import com.google.gson.JsonSyntaxException
 import okhttp3.CacheControl
@@ -32,7 +38,7 @@ class RealBattleshipsService(
 
     /* --------------------------------------- HOME ------------------------------------------------- */
 
-    override suspend fun fetchHome(mode: BattleshipsService.Mode): Home {
+    suspend fun getHome(mode: BattleshipsService.Mode): Home {
         val request = buildRequest(url = battleshipsHome, mode = mode)
 
         val homeDto = request.send(httpClient) { response ->
@@ -47,10 +53,11 @@ class RealBattleshipsService(
     }
 
     /**
-     * The link for the APIs resource bearing the week's quotes, or null if not
+     * Links for the APIs resource bearing the game ranking and server info, or null if not
      * yet discovered.
      */
     private var rankingsLink: SirenLink? = null
+    private var serverInfoLink: SirenLink? = null
 
     /**
      * Navigates [home] in search of the link for the APIs resource
@@ -59,6 +66,9 @@ class RealBattleshipsService(
      */
     private fun getRankingsLink(home: HomeDto) =
         home.links?.find { it.rel.contains("user-stats") }
+
+    private fun getServerInfoLink(home: HomeDto) =
+        home.links?.find { it.rel.contains("server-info") }
 
     /**
      * Makes sure we have the required link, if necessary, by navigating again
@@ -69,13 +79,81 @@ class RealBattleshipsService(
      */
     private suspend fun ensureRankingsLink(): URL {
         if (rankingsLink == null) {
-            fetchQuote()
+            getHome()
         }
-        val link = weekQuotesLink ?: throw UnresolvedLinkException()
+        val link = rankingsLink ?: throw UnresolvedLinkException()
         return link.href.toURL()
     }
 
-    /* --------------------------------------- HOME ------------------------------------------------- */
+    /**
+     * @see [ensureRankingsLink]
+     */
+    private suspend fun ensureServerInfoLink(): URL {
+        if (serverInfoLink == null) {
+            getHome()
+        }
+        val link = serverInfoLink ?: throw UnresolvedLinkException()
+        return link.href.toURL()
+    }
+
+    override fun getServerInfo(): ServerInfo {
+        val request = buildRequest(url = serverInfoLink, mode = mode)
+
+        val serverInfoDto = request.send(httpClient) { response ->
+            handleResponse<ServerInfoDto>(response, ServerInfoDtoType.type)
+        }
+        val serverInfoProperties = serverInfoDto.properties
+        require(serverInfoProperties != null) { "ServerInfoDto properties should not have been null" }
+        return serverInfo(serverInfoProperties)
+    }
+
+    override suspend fun getRankings(): GameRanking {
+        val request = buildRequest(url = rankingsLink, mode = mode)
+
+        val rankingsDto = request.send(httpClient) { response ->
+            handleResponse<RankingsDto>(response, RankingsDtoType.type)
+        }
+        val rankingsProperties = rankingsDto.properties
+        require(rankingsProperties != null) { "ServerInfoDto properties should not have been null" }
+        return rankings(rankingsProperties)
+    }
+
+    /* --------------------------------------- USERS ------------------------------------------------- */
+
+    /**
+     * @see rankingsLink
+     */
+    private var userCreateLink: SirenLink? = null
+    private var userLoginLink: SirenLink? = null
+    /**
+     * @see rankingsLink
+     */
+    private fun getRankingsLink(home: HomeDto) =
+        home.links?.find { it.rel.contains("user-stats") }
+
+    private fun getServerInfoLink(home: HomeDto) =
+        home.links?.find { it.rel.contains("server-info") }
+
+    override fun createUser(username: String, password: String): Boolean {
+
+    }
+
+    private suspend fun ensureUserCreateLink(): URL {
+        if (userCreateLink == null) {
+            getHome()
+        }
+        val link = userCreateLink ?: throw UnresolvedLinkException()
+        return link.href.toURL()
+    }
+    private suspend fun ensureUserLoginLink(): URL {
+        if (userLoginLink == null) {
+            getHome()
+        }
+        val link = userLoginLink ?: throw UnresolvedLinkException()
+        return link.href.toURL()
+    }
+
+    /* --------------------------------------- GAMES ------------------------------------------------- */
 
     override suspend fun startNewGame(token: String) {
         TODO("Not yet implemented")
