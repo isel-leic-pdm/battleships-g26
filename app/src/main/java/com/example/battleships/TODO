@@ -2,3 +2,5 @@ Ter use cases (agrupamento de funções), utilizadas pelo View Model, para a rea
 
 Cada use case, vai conhecer todos os Services. Caso  o Service_2 necessite de um link que já náo é conhecido, necessita de pedir ao Service_1 para fazer pedido necessario para obter o link pretendido.
 Os links sao guardados em cada Service.
+
+A activity é que deve primeiro verificar a validade da chamada e so depois chamar o view model.
