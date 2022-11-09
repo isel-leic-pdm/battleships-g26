@@ -4,30 +4,36 @@ import com.example.battleships.dtos.*
 import com.example.battleships.services.*
 import com.example.battleships.services.buildRequest
 import com.example.battleships.services.handleResponse
+import com.example.battleships.user_home.UserHome
 import com.example.battleships.utils.hypermedia.SirenAction
+import com.example.battleships.utils.hypermedia.SirenEntity
+import com.example.battleships.utils.hypermedia.SirenLink
 import com.example.battleships.utils.send
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
-import java.net.URL
 
 class RealUserDataServices(
     private val httpClient: OkHttpClient,
     private val jsonEncoder: Gson
-) {
+): UserDataServices {
     var userCreateAction: SirenAction? = null
-    var userLoginAction: SirenAction? = null
+    var createTokenAction: SirenAction? = null
+    var userHomeLink: SirenLink? = null
+    private var createGameAction: SirenAction? = null
+    private var getCurrentGameIdLink: SirenLink? = null
 
     /**
      * Creates a new user with the given username and password.
      * @return The id of the newly created user, or null if needs [userCreateAction].
      */
-    internal suspend fun createUser(
+    override suspend fun createUser(
         username: String,
         password: String,
         mode: Mode,
-        userCreateAction: SirenAction? = null,
+        newUserCreateAction: SirenAction?,
     ): Int? {
-        val userCreateAction: SirenAction = userCreateAction ?: this.userCreateAction ?: return null
+        val userCreateAction: SirenAction = newUserCreateAction.also { userCreateAction = it }
+            ?: this.userCreateAction ?: return null
         val url = userCreateAction.href.toURL()
 
         val request = buildRequest(
@@ -36,24 +42,26 @@ class RealUserDataServices(
                 "{\"username\": \"$username\", \"password\": \"$password\"}"
             ), mode
         )
-
-        return request.send(httpClient) { response ->
+        val createUserDto = request.send(httpClient) { response ->
             handleResponse<CreateUserDto>(
                 jsonEncoder,
                 response,
                 CreateUserDtoType.type
             )
-        }.toUserId()
+        }
+        createTokenAction = getCreateTokenAction(createUserDto) ?: throw UnresolvedLinkException()
+        return createUserDto.toUserId()
     }
 
-    internal suspend fun doLogin(
+    override suspend fun getToken(
         username: String,
         password: String,
         mode: Mode,
-        userLoginAction: SirenAction? = null
+        newCreateTokenAction: SirenAction?
     ): String? {
-        val userLoginAction = userLoginAction ?: this.userLoginAction ?: return null
-        val url = userLoginAction.href.toURL()
+        val createTokenAction = newCreateTokenAction.also { createTokenAction = it }
+            ?: this.createTokenAction ?: return null
+        val url = createTokenAction.href.toURL()
 
         val request = buildRequest(
             Post(
@@ -61,9 +69,39 @@ class RealUserDataServices(
                 "{\"username\": \"$username\", \"password\": \"$password\"}"
             ), mode
         )
-
-        return request.send(httpClient) { response ->
+        val createTokenDto = request.send(httpClient) { response ->
             handleResponse<UserLoginDto>(jsonEncoder, response, UserLoginDtoType.type)
-        }.toToken()
+        }
+        userHomeLink = getUserHomeLink(createTokenDto) ?: throw UnresolvedLinkException()
+        return createTokenDto.toToken()
     }
+
+    override suspend fun getHome(
+        token: String,
+        mode: Mode,
+        userHomeLink: SirenLink?
+    ): UserHome {
+        val userHomeLink = userHomeLink ?: this.userHomeLink ?: throw UnresolvedLinkException()
+        val url = userHomeLink.href.toURL()
+
+        val request = buildRequest(Get(url), mode)
+        val userHomeDto = request.send(httpClient) { response ->
+            handleResponse<UserHomeDto>(jsonEncoder, response, UserHomeDtoType.type)
+        }
+        createGameAction = getCreateGameAction(userHomeDto) ?: throw UnresolvedLinkException()
+        getCurrentGameIdLink = getCurrentGameIdLink(userHomeDto) ?: throw UnresolvedLinkException()
+        return userHomeDto.toUserHome()
+    }
+
+    private fun getUserHomeLink(createTokenDto: SirenEntity<UserLoginDtoProperties>) =
+        createTokenDto.links?.find { it.rel.contains("user-home") }
+
+    private fun getCreateTokenAction(dto: CreateUserDto) =
+        dto.actions?.find { it.title == "create-token" }
+
+    private fun getCreateGameAction(userHomeDto: SirenEntity<UserHomeDtoProperties>) =
+        userHomeDto.actions?.find { it.name == "create-game" }
+
+    private fun getCurrentGameIdLink(userHomeDto: SirenEntity<UserHomeDtoProperties>) =
+        userHomeDto.links?.find { it.rel.contains("game-id") }
 }

@@ -1,6 +1,6 @@
-
 package com.example.battleships.dtos
 
+import com.example.battleships.user_home.UserHome
 import com.example.battleships.utils.hypermedia.SirenEntity
 
 data class CreateUserDtoProperties(val userId: Int)
@@ -15,6 +15,12 @@ typealias UserLoginDto = SirenEntity<UserLoginDtoProperties>
 val UserLoginDtoType = SirenEntity.getType<UserLoginDtoProperties>()
 
 
+data class UserHomeDtoProperties(val userId: Int, val username: String)
+
+typealias UserHomeDto = SirenEntity<UserHomeDtoProperties>
+val UserHomeDtoType = SirenEntity.getType<UserHomeDtoProperties>()
+
+
 fun CreateUserDto.toUserId(): Int {
     val properties = this.properties
     require(properties != null) { "Properties are null" }
@@ -25,4 +31,10 @@ fun UserLoginDto.toToken(): String {
     val properties = this.properties
     require(properties != null) { "UserLoginDto properties are null" }
     return properties.token
+}
+
+fun UserHomeDto.toUserHome(): UserHome {
+    val properties = this.properties
+    require(properties != null) { "UserHomeDto properties are null" }
+    return UserHome(properties.userId, properties.username)
 }

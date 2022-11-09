@@ -29,14 +29,11 @@ class RealGamesDataServices(
     /**
      * @see rankingsLink
      */
-    internal var startNewGameAction: SirenAction? = null
+    private var createGameAction: SirenAction? = null
     private var getCurrentGameIdLink: SirenLink? = null
-    private var placeShipAction: SirenAction? = null
-    private var moveShipAction: SirenAction? = null
-    private var rotateShipAction: SirenAction? = null
+    private var getGameLink: SirenLink? = null
+    private var placeFleetLayout: SirenAction? = null
     private var placeShotAction: SirenAction? = null
-    private var confirmFleetLayoutAction: SirenAction? = null
-    private var fireShotAction: SirenAction? = null
 
     internal suspend fun startNewGame(token: String, mode: Mode, startNewGameAction: GameAction? = null) {
         val startNewGameLink: URL = ensureStartGameAction()
@@ -70,7 +67,11 @@ class RealGamesDataServices(
         }.toGameAction()
     }
 
-    internal suspend fun getGameId(token: String, mode: Mode): Int? {
+    internal suspend fun getGameId(
+        token: String,
+        mode: Mode,
+
+    ): Int? {
         val request = Request.Builder()
             .url(getGameIdUri)
             .build()
@@ -99,7 +100,7 @@ class RealGamesDataServices(
     }
 
     internal suspend fun placeShotInternal(
-        requestParams: RequestParams,
+        mode: Mode,
         token: String,
         gameId: Int,
         coordinate: Coordinate
@@ -113,12 +114,12 @@ class RealGamesDataServices(
             Post(
                 placeShotLink,
                 requestBody
-            ), requestParams.mode
+            ), mode
         )
 
-        return request.send(requestParams.client) { response ->
+        return request.send(httpClient) { response ->
             handleResponse<GameActionDto>(
-                requestParams.jsonEncoder,
+                jsonEncoder,
                 response,
                 CreateUserDtoType.type
             )
@@ -217,10 +218,10 @@ class RealGamesDataServices(
     }
 
     private suspend fun ensurePlaceShipAction(requestParams: RequestParams): URL {
-        if (placeShipAction == null) {
+        if (placeFleetLayout == null) {
             getHome(requestParams)
         }
-        val action = placeShipAction ?: throw UnresolvedLinkException()
+        val action = placeFleetLayout ?: throw UnresolvedLinkException()
         return action.href.toURL()
     }
 

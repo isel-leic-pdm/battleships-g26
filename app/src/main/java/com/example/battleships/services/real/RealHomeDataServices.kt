@@ -21,10 +21,11 @@ class RealHomeDataServices(
     private val httpClient: OkHttpClient,
     private val jsonEncoder: Gson
 ): HomeDataServices {
-    var rankingsLink: SirenLink? = null
-    var serverInfoLink: SirenLink? = null
     var userCreateAction: SirenAction? = null
     var userLoginAction: SirenAction? = null
+    var userHomeLink: SirenLink? = null
+    var rankingsLink: SirenLink? = null
+    var serverInfoLink: SirenLink? = null
 
     private suspend fun getHome(): Home {
         val request = buildRequest(Get(battleshipsHome), Mode.FORCE_REMOTE)
@@ -33,28 +34,32 @@ class RealHomeDataServices(
             handleResponse<HomeDto>(jsonEncoder, response, HomeDtoType.type)
         }
 
-        rankingsLink = getRankingsLink(homeDto)
         userCreateAction = getCreateUserAction(homeDto)
         userLoginAction = getUserLoginAction(homeDto)
-        if (rankingsLink == null || userCreateAction == null || userLoginAction == null)
+        userHomeLink = getUserHomeLink(homeDto)
+        rankingsLink = getRankingsLink(homeDto)
+        serverInfoLink = getServerInfoLink(homeDto)
+
+        if (userCreateAction == null || userLoginAction == null || userHomeLink == null
+            || rankingsLink == null || serverInfoLink == null)
             throw UnresolvedLinkException()
 
         return Home(homeDto)
     }
 
-    internal suspend fun getServerInfo(mode: Mode): ServerInfo {
+    override suspend fun getServerInfo(mode: Mode): ServerInfo {
         val serverInfoURL: URL = ensureServerInfoLink()
         val request = buildRequest(Get(serverInfoURL), mode)
 
         val serverInfoDto = request.send(httpClient) { response ->
-            handleResponse<HomeDto>(jsonEncoder, response, HomeDtoType.type)
+            handleResponse<ServerInfoDto>(jsonEncoder, response, HomeDtoType.type)
         }
         val serverInfoProperties = serverInfoDto.properties
         require(serverInfoProperties != null) { "ServerInfoDto properties should not have been null" }
         return serverInfo(serverInfoProperties)
     }
 
-    internal suspend fun getRankings(mode: Mode): GameRanking {
+    override suspend fun getRankings(mode: Mode): GameRanking {
         val rankingsURL: URL = ensureRankingsLink()
         val request = buildRequest(Get(rankingsURL), mode)
 
@@ -66,49 +71,50 @@ class RealHomeDataServices(
         return rankings(rankingsProperties)
     }
 
-    /**
-     * Navigates [home] in search of the link for the APIs resource
-     * bearing the week's quotes.
-     * @return the link found in the DTO, or null
-     */
-    fun getRankingsLink(home: HomeDto) =
-        home.links?.find { it.rel.contains("user-stats") }
-
-    fun getCreateUserAction(home: HomeDto) =
+    private fun getCreateUserAction(home: HomeDto) =
         home.actions?.find { it.name == "create-user" }
 
-    fun getUserLoginAction(home: HomeDto) =
+    private fun getUserLoginAction(home: HomeDto) =
         home.actions?.find { it.name == "login" }
 
-    suspend fun ensureServerInfoLink(requestParams: RequestParams): URL {
+    private fun getUserHomeLink(home: HomeDto) =
+        home.links?.find { it.rel.contains("user-home") }
+
+    private fun getRankingsLink(home: HomeDto) =
+        home.links?.find { it.rel.contains("user-stats") }
+
+    private fun getServerInfoLink(home: HomeDto) =
+        home.links?.find { it.rel.contains("server-info") }
+
+    private suspend fun ensureServerInfoLink(): URL {
         if (serverInfoLink == null) {
-            getHome(requestParams)
+            getHome()
         }
         val action = serverInfoLink ?: throw UnresolvedLinkException()
         return action.href.toURL()
     }
 
-    suspend fun ensureRankingsLink(): URL {
+    private suspend fun ensureRankingsLink(): URL {
         if (rankingsLink == null) {
             getHome()
         }
-        val link = rankingsLink ?: throw UnresolvedLinkException()
-        return link.href.toURL()
+        val action = rankingsLink ?: throw UnresolvedLinkException()
+        return action.href.toURL()
     }
 
-    suspend fun ensureUserCreateAction(): SirenAction {
+    suspend fun getCreateUserAction(): SirenAction {
         if (userCreateAction == null) {
             getHome()
+            return userCreateAction ?: throw UnresolvedLinkException()
         }
-        val action = userCreateAction ?: throw UnresolvedLinkException()
-        return action
+        return userCreateAction ?: throw UnresolvedLinkException()
     }
 
-    suspend fun ensureUserLoginAction(): SirenAction {
+    suspend fun getCreateTokenAction(): SirenAction {
         if (userLoginAction == null) {
             getHome()
+            return userLoginAction ?: throw UnresolvedLinkException()
         }
-        val action = userLoginAction ?: throw UnresolvedLinkException()
-        return action
+        return userLoginAction ?: throw UnresolvedLinkException()
     }
 }
