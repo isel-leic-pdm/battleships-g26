@@ -11,7 +11,7 @@ import java.net.URL
 internal var userCreateAction: SirenAction? = null
 internal var userLoginAction: SirenAction? = null
 
-internal suspend fun createUserInternal(requestParams: RequestParams, username: String, password: String): Boolean {
+internal suspend fun createUserInternal(requestParams: RequestParams, username: String, password: String): Int {
     val createUserURL: URL = ensureUserCreateLink(requestParams)
 
     val request = buildRequest(Post(createUserURL,
@@ -19,7 +19,7 @@ internal suspend fun createUserInternal(requestParams: RequestParams, username: 
 
     return request.send(requestParams.client) { response ->
         handleResponse<CreateUserDto>(requestParams.jsonEncoder, response, CreateUserDtoType.type)
-    }.toQuoteList()
+    }.toUserId()
 }
 
 internal suspend fun doLoginInternal(requestParams: RequestParams, username: String, password: String): String {
