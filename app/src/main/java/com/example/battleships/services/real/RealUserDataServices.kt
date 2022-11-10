@@ -32,7 +32,7 @@ class RealUserDataServices(
         mode: Mode,
         newUserCreateAction: SirenAction?,
     ): Int? {
-        val userCreateAction: SirenAction = newUserCreateAction.also { userCreateAction = it }
+        val userCreateAction: SirenAction = newUserCreateAction?.also { userCreateAction = it }
             ?: this.userCreateAction ?: return null
         val url = userCreateAction.href.toURL()
 
@@ -59,7 +59,7 @@ class RealUserDataServices(
         mode: Mode,
         newCreateTokenAction: SirenAction?
     ): String? {
-        val createTokenAction = newCreateTokenAction.also { createTokenAction = it }
+        val createTokenAction = newCreateTokenAction?.also { createTokenAction = it }
             ?: this.createTokenAction ?: return null
         val url = createTokenAction.href.toURL()
 

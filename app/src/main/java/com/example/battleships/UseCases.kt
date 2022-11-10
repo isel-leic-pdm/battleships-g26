@@ -38,4 +38,6 @@ class UseCases(
         return token
     }
 
+    suspend fun createGame()
+
 }

@@ -23,15 +23,15 @@ class GameActivity : ComponentActivity() {
         }
     }
 
-    private val service by lazy {
-        (application as DependenciesContainer).battleshipsService
+    private val useCases by lazy {
+        (application as DependenciesContainer).useCases
     }
 
     @Suppress("UNCHECKED_CAST")
     internal val vm by viewModels<GameViewModel> {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return GameViewModel(service, token) as T
+                return GameViewModel(useCases, token) as T
             }
         }
     }

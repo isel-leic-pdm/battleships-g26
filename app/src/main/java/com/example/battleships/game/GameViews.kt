@@ -34,7 +34,7 @@ fun GameView(
     game: Game,
     player: Player,
     onShipClick: (ShipType) -> Unit,
-    onShipPlaced: (Coordinate) -> Unit,
+    onSquarePressed: (Coordinate) -> Unit,
     onShotPlaced: (Coordinate) -> Unit,
     onConfirmLayout: () -> Unit
 ) {
@@ -46,7 +46,7 @@ fun GameView(
                     PreparationPhase(
                         board,
                         game.configuration,
-                        onShipPlaced,
+                        onSquarePressed,
                         onShipClick,
                         onConfirmLayout
                     )

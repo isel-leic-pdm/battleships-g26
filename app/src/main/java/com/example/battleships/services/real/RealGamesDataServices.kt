@@ -4,7 +4,7 @@ import android.util.Log
 import com.example.battleships.TAG
 import com.example.battleships.dtos.*
 import com.example.battleships.game.BoardDtoType
-import com.example.battleships.game.GameAction
+import com.example.battleships.game.GameInfo
 import com.example.battleships.game.GameDtoType
 import com.example.battleships.game.domain.board.Board
 import com.example.battleships.game.domain.state.Game
@@ -35,8 +35,14 @@ class RealGamesDataServices(
     private var placeFleetLayout: SirenAction? = null
     private var placeShotAction: SirenAction? = null
 
-    internal suspend fun startNewGame(token: String, mode: Mode, startNewGameAction: GameAction? = null) {
-        val startNewGameLink: URL = ensureStartGameAction()
+    /**
+     * Creates a new game.
+     * @return The GameInfo of the newly created game, or null if needs [createGameAction].
+     */
+    override suspend fun createGame(token: String, mode: Mode, newGameCreateAction: SirenAction?): GameInfo? {
+        val createGameAction = newGameCreateAction?.also { createGameAction = it }
+            ?: this.createGameAction ?: return null
+        val url = createGameAction.href.toURL()
 
         // TODO -> parameterize the game configuration
         val requestBody = "{\n" +
@@ -51,23 +57,23 @@ class RealGamesDataServices(
                 "    \"nShotsPerRound\": 10,\n" +
                 "    \"roundTimeout\": 10\n" +
                 "}"
-        val request = buildRequest(
-            Post(
-                startNewGameLink,
-                requestBody
-            ), mode
-        )
+        val request = buildRequest(Post(url, requestBody), mode)
 
-        return request.send(httpClient) { response ->
-            handleResponse<GameActionDto>(
+        val gameCreatedDto = request.send(httpClient) { response ->
+            handleResponse<GameInfoDto>(
                 jsonEncoder,
                 response,
                 CreateUserDtoType.type
             )
-        }.toGameAction()
+        }
+
+        getCurrentGameIdLink = getGetCurrentGameIdLink(gameCreatedDto) // could be null if game is already started
+        getGameLink = getGetGameLink(gameCreatedDto) // could be null if game still hasn't started
+
+        return gameCreatedDto.toGameInfo()
     }
 
-    internal suspend fun getGameId(
+    override suspend fun getCurrentGameId(
         token: String,
         mode: Mode,
 
@@ -104,7 +110,7 @@ class RealGamesDataServices(
         token: String,
         gameId: Int,
         coordinate: Coordinate
-    ): GameAction {
+    ): GameInfo {
         val placeShotLink: URL = ensurePlaceShotAction(requestParams)
 
         val requestBody = "{\n" +
@@ -118,12 +124,12 @@ class RealGamesDataServices(
         )
 
         return request.send(httpClient) { response ->
-            handleResponse<GameActionDto>(
+            handleResponse<GameInfoDto>(
                 jsonEncoder,
                 response,
                 CreateUserDtoType.type
             )
-        }.toGameAction()
+        }.toGameInfo()
     }
 
     internal suspend fun getMyFleetInternal(
@@ -208,53 +214,12 @@ class RealGamesDataServices(
         return gameDto.properties?.toGame()
     }
 
-
-    private suspend fun ensureStartGameAction(requestParams: RequestParams): URL {
-        if (userCreateAction == null) {
-            getHome(requestParams)
-        }
-        val action = userCreateAction ?: throw UnresolvedLinkException()
-        return action.href.toURL()
+    private fun getGetCurrentGameIdLink(gameCreatedDto: GameInfoDto): SirenLink? {
+        return gameCreatedDto.links?.find { it.rel.contains("game-id") }
     }
 
-    private suspend fun ensurePlaceShipAction(requestParams: RequestParams): URL {
-        if (placeFleetLayout == null) {
-            getHome(requestParams)
-        }
-        val action = placeFleetLayout ?: throw UnresolvedLinkException()
-        return action.href.toURL()
-    }
-
-    private suspend fun ensureMoveShipAction(requestParams: RequestParams): URL {
-        if (moveShipAction == null) {
-            getHome(requestParams)
-        }
-        val action = moveShipAction ?: throw UnresolvedLinkException()
-        return action.href.toURL()
-    }
-
-    private suspend fun ensureRotateShipAction(requestParams: RequestParams): URL {
-        if (rotateShipAction == null) {
-            getHome(requestParams)
-        }
-        val action = rotateShipAction ?: throw UnresolvedLinkException()
-        return action.href.toURL()
-    }
-
-    private suspend fun ensurePlaceShotAction(requestParams: RequestParams): URL {
-        if (placeShotAction == null) {
-            getHome(requestParams)
-        }
-        val action = placeShotAction ?: throw UnresolvedLinkException()
-        return action.href.toURL()
-    }
-
-    private suspend fun ensureConfirmFleetAction(requestParams: RequestParams): URL {
-        if (confirmFleetLayoutAction == null) {
-            getHome(requestParams)
-        }
-        val action = confirmFleetLayoutAction ?: throw UnresolvedLinkException()
-        return action.href.toURL()
+    private fun getGetGameLink(gameCreatedDto: GameInfoDto): SirenLink? {
+        return gameCreatedDto.links?.find { it.rel.contains("game-info") }
     }
 
 }

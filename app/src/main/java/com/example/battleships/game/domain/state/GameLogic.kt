@@ -14,7 +14,7 @@ import pt.isel.daw.dawbattleshipgame.domain.ship.getShip
  * Tries to place [shipType] on the Board, on give in [position].
  * @return updated Game or null, if is not possible to position [shipType] in [position]
  */
-fun Game.placeShip(
+fun Game.onSquarePressed(
     shipType: ShipType,
     position: Coordinate,
     orientation: Orientation,
@@ -94,7 +94,7 @@ fun Game.rotateShip(position: Coordinate, player: Player = Player.ONE): Game? {
         val curOrientation = ship.getOrientation()
         val shipPosOrigin = getBoard(player).getShips().getShip(position).coordinates.first()
         val tmpGame = removeShip(position, player)
-        return tmpGame?.placeShip(ship.type, shipPosOrigin, curOrientation.other(), player)
+        return tmpGame?.onSquarePressed(ship.type, shipPosOrigin, curOrientation.other(), player)
     }catch (e : Exception){
         null
     }

@@ -4,3 +4,5 @@ Cada use case, vai conhecer todos os Services. Caso  o Service_2 necessite de um
 Os links sao guardados em cada Service.
 
 A activity é que deve primeiro verificar a validade da chamada e so depois chamar o view model.
+
+Extract info from SirenAction

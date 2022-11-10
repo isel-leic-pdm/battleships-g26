@@ -53,11 +53,11 @@ class FakeBattleshipService : BattleshipsService {
         if (game.state === GameState.FLEET_SETUP) {
             val board = game.board2
             if (!board.isConfirmed()) {
-                val newGame = game.placeShip(ShipType.CARRIER, Coordinate(1, 1), Orientation.HORIZONTAL, Player.TWO)
-                    ?.placeShip(ShipType.BATTLESHIP, Coordinate(3, 1), Orientation.HORIZONTAL, Player.TWO)
-                    ?.placeShip(ShipType.CRUISER, Coordinate(5, 2), Orientation.HORIZONTAL, Player.TWO)
-                    ?.placeShip(ShipType.SUBMARINE, Coordinate(7, 3), Orientation.HORIZONTAL, Player.TWO)
-                    ?.placeShip(ShipType.DESTROYER, Coordinate(9, 4), Orientation.HORIZONTAL, Player.TWO)
+                val newGame = game.onSquarePressed(ShipType.CARRIER, Coordinate(1, 1), Orientation.HORIZONTAL, Player.TWO)
+                    ?.onSquarePressed(ShipType.BATTLESHIP, Coordinate(3, 1), Orientation.HORIZONTAL, Player.TWO)
+                    ?.onSquarePressed(ShipType.CRUISER, Coordinate(5, 2), Orientation.HORIZONTAL, Player.TWO)
+                    ?.onSquarePressed(ShipType.SUBMARINE, Coordinate(7, 3), Orientation.HORIZONTAL, Player.TWO)
+                    ?.onSquarePressed(ShipType.DESTROYER, Coordinate(9, 4), Orientation.HORIZONTAL, Player.TWO)
                     ?.confirmFleet(Player.TWO) ?: throw IllegalStateException("Opponent fleet not placed")
 
                 games[token1 to token2] = newGame
@@ -70,7 +70,7 @@ class FakeBattleshipService : BattleshipsService {
         if (game.state === GameState.FLEET_SETUP) {
             val board = game.board1
             if (!board.isConfirmed()) {
-                val newGame = game.placeShip(shipType, coordinate, orientation, Player.ONE)
+                val newGame = game.onSquarePressed(shipType, coordinate, orientation, Player.ONE)
                 if (newGame != null) {
                     games[token1 to token2] = newGame
                 }

@@ -1,16 +1,16 @@
 
 package com.example.battleships.dtos
 
-import com.example.battleships.game.GameAction
+import com.example.battleships.game.GameInfo
 import com.example.battleships.game.domain.state.Game
 import com.example.battleships.game.domain.state.GameState
 import com.example.battleships.utils.hypermedia.SirenEntity
 import com.example.battleships.game.domain.board.Board
 import com.example.battleships.game.domain.state.Configuration
 
-data class GameActionDtoProperties(val state: String, val gameId: Int?)
-typealias GameActionDto = SirenEntity<GameActionDtoProperties>
-val GameActionDtoType = SirenEntity.getType<GameActionDtoProperties>()
+data class GameInfoDtoProperties(val state: String, val gameId: Int?)
+typealias GameInfoDto = SirenEntity<GameInfoDtoProperties>
+val GameInfoDtoType = SirenEntity.getType<GameInfoDtoProperties>()
 
 data class GameIdDtoProperties(val gameId: Int)
 
@@ -60,8 +60,8 @@ fun BoardDtoProperties.toBoard(): Board {
     return Board(cells, confirmed)
 }
 
-fun GameActionDto.toGameAction(): GameAction {
+fun GameInfoDto.toGameInfo(): GameInfo {
     val properties = this.properties
     require(properties != null) { "GameActionDto properties are null" }
-    return GameAction(properties.state, properties.gameId)
+    return GameInfo(properties.state, properties.gameId)
 }
