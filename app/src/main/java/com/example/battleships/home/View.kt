@@ -12,8 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.battleships.menu.views.LoadingButton
-import com.example.battleships.menu.views.LoadingState
+import com.example.battleships.auth.views.LoadingButton
+import com.example.battleships.auth.views.LoadingState
 
 @Composable
 fun Menu(

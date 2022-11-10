@@ -27,7 +27,7 @@
         </activity>
 
         <activity
-            android:name="com.example.battleships.menu.MenuActivity"
+            android:name="com.example.battleships.auth.AuthActivity"
             android:exported="true"
             android:theme="@style/Theme.Battleships">
 

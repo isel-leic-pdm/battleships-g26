@@ -1,4 +1,4 @@
-package com.example.battleships.menu
+package com.example.battleships.auth
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,13 +9,13 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.battleships.menu.views.LoadingState
+import com.example.battleships.auth.views.LoadingState
 import com.example.battleships.home.Menu
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
 
 @Composable
-internal fun MenuScreen(
+internal fun AuthScreen(
     onBackRequested: () -> Unit = { },
     isCreated: LoadingState,
     isLogin: LoadingState,

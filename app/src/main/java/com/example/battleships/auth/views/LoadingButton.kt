@@ -1,4 +1,4 @@
-package com.example.battleships.menu.views
+package com.example.battleships.auth.views
 
 import android.util.Log
 import androidx.compose.material.Button

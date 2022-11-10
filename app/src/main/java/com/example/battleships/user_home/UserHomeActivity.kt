@@ -1,4 +1,4 @@
-package com.example.battleships.home
+package com.example.battleships.user_home
 
 import android.app.Activity
 import android.content.Intent
@@ -6,24 +6,19 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.example.battleships.auth.AuthActivity
 import com.example.battleships.game.GameActivity
 import com.example.battleships.info.InfoActivity
-import com.example.battleships.rankings.RankingsActivity
 import com.example.battleships.ui.Handler
 import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.StartScreen
 
-class HomeActivity : ComponentActivity() {
+class UserHomeActivity : ComponentActivity() {
 
     companion object {
         private const val TOKEN_EXTRA = "START_GAME_TOKEN_EXTRA"
         fun navigate(origin: Activity, token: String) {
             with(origin) {
-                val intent = Intent(this, HomeActivity::class.java)
+                val intent = Intent(this, UserHomeActivity::class.java)
                 intent.putExtra(TOKEN_EXTRA, token)
                 startActivity(intent)
             }
@@ -34,11 +29,8 @@ class HomeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             StartScreen(
-                Handler("Create User", "create-user") {
-                    AuthActivity.navigate(this)
-                },
-                Handler("Rankings", "rankings") {
-                    RankingsActivity.navigate(this)
+                Handler("Start Game", "start-game") {
+                    GameActivity.navigate(this, token)
                 },
                 onNavigationRequested = NavigationHandlers(
                     onInfoRequested = { InfoActivity.navigate(origin = this) },

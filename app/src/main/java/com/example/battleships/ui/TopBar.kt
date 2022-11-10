@@ -11,8 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import palbp.laboratory.demos.quoteofday.R
-import palbp.laboratory.demos.quoteofday.ui.theme.QuoteOfDayTheme
 import pt.isel.battleships.R
 
 /**

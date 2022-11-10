@@ -1,5 +1,7 @@
-package com.example.battleships.menu
+package com.example.battleships.auth
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -7,19 +9,29 @@ import androidx.activity.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.battleships.DependenciesContainer
-import com.example.battleships.menu.views.LoadingState
+import com.example.battleships.auth.views.LoadingState
 import com.example.battleships.home.HomeActivity
 
-class MenuActivity : ComponentActivity() {
-    private val service by lazy {
-        (application as DependenciesContainer).userService
+class AuthActivity : ComponentActivity() {
+
+    companion object {
+        fun navigate(origin: Activity) {
+            with(origin) {
+                val intent = Intent(this, AuthActivity::class.java)
+                startActivity(intent)
+            }
+        }
+    }
+
+    private val useCases by lazy {
+        (application as DependenciesContainer).useCases
     }
 
     @Suppress("UNCHECKED_CAST")
-    val vm by viewModels<MenuViewModel> {
+    val vm by viewModels<AuthViewModel> {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return MenuViewModel(service) as T
+                return AuthViewModel(useCases) as T
             }
         }
     }
@@ -35,7 +47,7 @@ class MenuActivity : ComponentActivity() {
                 if (vm.isLoginLoading.value) LoadingState.Loading
                 else LoadingState.Idle
 
-            MenuScreen(
+            AuthScreen(
                 onBackRequested = { finish() },
                 isCreated = isCreateUserLoading,
                 isLogin = isLoginLoading,

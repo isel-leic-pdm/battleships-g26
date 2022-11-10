@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
 import pt.isel.battleships.R
@@ -26,17 +27,13 @@ val NavigateToRankingsButtonTestTag = "NavigateToRankingsButton"
 
 @Composable
 fun RankingsScreen(
-    onInfoRequest: () -> Unit,
+    onNavigationRequested: NavigationHandlers = NavigationHandlers()
 ) {
     BattleshipsTheme {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             backgroundColor = Color.Black,
-            topBar = {
-                TopBar(
-                    onInfoRequested = onInfoRequest
-                )
-            },
+            topBar = { TopBar(navigation = onNavigationRequested) },
             bottomBar = { BottomAppBar {} },
         ) { innerPadding ->
             // Img()

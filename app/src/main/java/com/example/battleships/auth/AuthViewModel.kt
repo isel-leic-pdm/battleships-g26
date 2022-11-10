@@ -1,16 +1,16 @@
-package com.example.battleships.menu
+package com.example.battleships.auth
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.battleships.UseCases
+import com.example.battleships.services.Mode
 import kotlinx.coroutines.launch
 
 
-class MenuViewModel(
-    private val dataService: UserService
-) : ViewModel() {
+class AuthViewModel(private val useCases: UseCases): ViewModel() {
     private val _token: MutableState<String?> = mutableStateOf(null)
     val token: State<String?>
         get() = _token
@@ -26,7 +26,8 @@ class MenuViewModel(
     fun createUser(username: String, password: String) {
         viewModelScope.launch {
             _isCreateUserLoading.value = true
-            dataService.createUser(username, password)
+            createUser(username, password)
+            useCases.createUser(username, password, Mode.FORCE_REMOTE)
             _isCreateUserLoading.value = false
         }
     }
@@ -34,7 +35,7 @@ class MenuViewModel(
     fun login(username: String, password: String) {
         viewModelScope.launch {
             _isLoginLoading.value = true
-            _token.value = dataService.login(username, password)
+            _token.value = useCases.getToken(username, password, Mode.FORCE_REMOTE)
             _isLoginLoading.value = false
         }
     }

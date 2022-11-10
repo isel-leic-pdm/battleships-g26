@@ -1,4 +1,4 @@
-package com.example.battleships.menu
+package com.example.battleships.auth
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -16,7 +16,7 @@ import org.junit.runner.RunWith
 class InfoActivityTests {
 
     @get:Rule
-    val testRule = createAndroidComposeRule<MenuActivity>()
+    val testRule = createAndroidComposeRule<AuthActivity>()
 
     @Test
     fun screen_only_contains_back_navigation_option() {
