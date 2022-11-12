@@ -1,25 +1,19 @@
 package com.example.battleships.services.real
 
-import android.util.Log
-import com.example.battleships.TAG
 import com.example.battleships.dtos.*
-import com.example.battleships.game.BoardDtoType
 import com.example.battleships.game.GameInfo
-import com.example.battleships.game.GameDtoType
-import com.example.battleships.game.domain.board.Board
+import com.example.battleships.game.domain.ship.ShipType
 import com.example.battleships.game.domain.state.Game
 import com.example.battleships.services.*
 import com.example.battleships.services.buildRequest
 import com.example.battleships.services.handleResponse
 import com.example.battleships.utils.hypermedia.SirenAction
+import com.example.battleships.utils.hypermedia.SirenEntity
 import com.example.battleships.utils.hypermedia.SirenLink
-import com.example.battleships.utils.hypermedia.SirenMediaType
 import com.example.battleships.utils.send
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
-import okhttp3.Request
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
-import java.net.URL
 
 class RealGamesDataServices(
     private val httpClient: OkHttpClient,
@@ -32,8 +26,9 @@ class RealGamesDataServices(
     private var createGameAction: SirenAction? = null
     private var getCurrentGameIdLink: SirenLink? = null
     private var getGameLink: SirenLink? = null
-    private var placeFleetLayout: SirenAction? = null
+    private var placeShipsAction: SirenAction? = null
     private var placeShotAction: SirenAction? = null
+    private var confirmFleetLayoutAction: SirenAction? = null
 
     /**
      * Creates a new game.
@@ -66,160 +61,123 @@ class RealGamesDataServices(
                 CreateUserDtoType.type
             )
         }
-
         getCurrentGameIdLink = getGetCurrentGameIdLink(gameCreatedDto) // could be null if game is already started
-        getGameLink = getGetGameLink(gameCreatedDto) // could be null if game still hasn't started
-
+        getGameLink = getGetGameLinkByGameInfoDto(gameCreatedDto) // could be null if game still hasn't started
         return gameCreatedDto.toGameInfo()
     }
 
     override suspend fun getCurrentGameId(
         token: String,
         mode: Mode,
-
+        newGetCurrentGameIdLink: SirenLink?
     ): Int? {
-        val request = Request.Builder()
-            .url(getGameIdUri)
-            .build()
+        val getCurrentGameIdLink = newGetCurrentGameIdLink?.also { getCurrentGameIdLink = it }
+            ?: this.getCurrentGameIdLink ?: return null
+        val url = getCurrentGameIdLink.href.toURL()
+
+        val request = buildRequest(Get(url), mode)
 
         val gameIdDto = request.send(httpClient) { response ->
-            Log.v(
-                TAG,
-                "fetchQuote: inside response handler in Thread = ${Thread.currentThread().name}"
-            )
-            val contentType = response.body?.contentType()
-            if (response.isSuccessful && contentType != null && contentType == SirenMediaType) {
-                jsonEncoder.fromJson<GameIdDto>(
-                    response.body?.string(),
-                    GameDtoType.type
-                )
-            } else {
-                Log.e(
-                    TAG,
-                    "fetchQuote: Got response status ${response.code} from API. Is the home URL correct?"
-                )
-                TODO()
-            }
-        }
-        Log.v(TAG, "fetchQuote: after request.send in Thread = ${Thread.currentThread().name}")
-        return gameIdDto.properties?.gameId
-    }
-
-    internal suspend fun placeShotInternal(
-        mode: Mode,
-        token: String,
-        gameId: Int,
-        coordinate: Coordinate
-    ): GameInfo {
-        val placeShotLink: URL = ensurePlaceShotAction(requestParams)
-
-        val requestBody = "{\n" +
-                "    \"coordinate\": \"${coordinate.row},${coordinate.column}\"\n" +
-                "}"
-        val request = buildRequest(
-            Post(
-                placeShotLink,
-                requestBody
-            ), mode
-        )
-
-        return request.send(httpClient) { response ->
-            handleResponse<GameInfoDto>(
+            handleResponse<GameIdDto>(
                 jsonEncoder,
                 response,
-                CreateUserDtoType.type
+                GameIdDtoType.type
             )
-        }.toGameInfo()
+        }
+        getGameLink = getGetGameLinkByGameIdDto(gameIdDto)
+        return gameIdDto.toGameId()
     }
 
-    internal suspend fun getMyFleetInternal(
-        requestParams: RequestParams,
+    override suspend fun setFleet(
         token: String,
-        gameId: Int
-    ): Board? {
-        val request = Request.Builder()
-            .url(getMyFleetUri(gameId))
-            .build()
-        val boardDto = request.send(httpClient) { response ->
-            Log.v(
-                TAG,
-                "fetchQuote: inside response handler in Thread = ${Thread.currentThread().name}"
-            )
-            val contentType = response.body?.contentType()
-            if (response.isSuccessful && contentType != null && contentType == SirenMediaType) {
-                jsonEncoder.fromJson<BoardDto>(
-                    response.body?.string(),
-                    BoardDtoType.type
-                )
-            } else {
-                Log.e(
-                    TAG,
-                    "fetchQuote: Got response status ${response.code} from API. Is the home URL correct?"
-                )
-                TODO()
-            }
+        ships: List<Pair<Coordinate, ShipType>>,
+        mode: Mode,
+        newSetFleetAction: SirenAction?
+    ): List<Int>? {
+        val placeFleetLayout = newSetFleetAction?.also { placeShipsAction = it }
+            ?: this.placeShipsAction ?: return null
+        val placeShipsUrl = placeFleetLayout.href.toURL()
+
+        val requestBody = ships.joinToString(prefix = "[", postfix = "]") { (coordinate, shipType) ->
+            "{\n" +
+                    "    \"type\": \"${shipType.name}\",\n" +
+                    "    \"position\": {\n" +
+                    "        \"x\": ${coordinate.row},\n" +
+                    "        \"y\": ${coordinate.column}\n" +
+                    "    }\n" +
+                    "}"
         }
-        return boardDto.properties?.toBoard()
+        val request = buildRequest(Post(placeShipsUrl, requestBody), mode)
+
+        val fleetLayoutDto = request.send(httpClient) { response ->
+            handleResponse<PlaceShipsDto>(
+                jsonEncoder,
+                response,
+                PlaceShipsDtoType.type
+            )
+        }
+        return fleetLayoutDto.toShipIds()
     }
 
-    suspend fun getEnemyFleetInternal(token: String, gameId: Int): Board? {
-        val request = Request.Builder()
-            .url(getOpponentFleetUri(gameId))
-            .build()
-        val boardDto = request.send(httpClient) { response ->
-            Log.v(
-                TAG,
-                "fetchQuote: inside response handler in Thread = ${Thread.currentThread().name}"
-            )
-            val contentType = response.body?.contentType()
-            if (response.isSuccessful && contentType != null && contentType == SirenMediaType) {
-                jsonEncoder.fromJson<BoardDto>(
-                    response.body?.string(),
-                    BoardDtoType.type
-                )
-            } else {
-                Log.e(
-                    TAG,
-                    "fetchQuote: Got response status ${response.code} from API. Is the home URL correct?"
-                )
-                TODO()
-            }
-        }
-        return boardDto.properties?.toBoard()
-    }
+    override fun confirmFleetLayout(
+        token: String,
+        mode: Mode,
+        newConfirmFleetLayoutAction: SirenAction?
+    ): Boolean {
+        val confirmFleetLayoutAction = newConfirmFleetLayoutAction?.also { confirmFleetLayoutAction = it }
+            ?: this.confirmFleetLayoutAction ?: return false
+        val confirmFleetLayoutUrl = confirmFleetLayoutAction.href.toURL()
 
-    internal suspend fun getGameInternal(token: String, gameId: Int): Game? {
-        val request = Request.Builder()
-            .url(getGameInfoUri(gameId))
-            .build()
+        val request = buildRequest(Put(confirmFleetLayoutUrl), mode)
+
+        val fleetLayoutDto = request.send(httpClient) { response ->
+            handleResponse<ConfirmFleetLayoutDto>(
+                jsonEncoder,
+                response,
+                ConfirmFleetLayoutDtoType.type
+            )
+        }
+
+        return fleetLayoutDto.toBoolean()
+    )
+
+    override suspend fun getGameInfo(
+        token: String,
+        gameId: Int,
+        mode: Mode,
+        newGetGameLink: SirenLink?
+    ): Game? {
+        val getGameInfoLink = newGetGameLink?.also { getGameLink = it }
+            ?: this.getGameLink ?: return null
+        val url = getGameInfoLink.href.toURL()
+
+        val request = buildRequest(Get(url), mode)
+
         val gameDto = request.send(httpClient) { response ->
-            Log.v(
-                TAG,
-                "fetchQuote: inside response handler in Thread = ${Thread.currentThread().name}"
+            handleResponse<GameDto>(
+                jsonEncoder,
+                response,
+                GameInfoDtoType.type
             )
-            val contentType = response.body?.contentType()
-            if (response.isSuccessful && contentType != null && contentType == SirenMediaType) {
-                jsonEncoder.fromJson<GameDto>(
-                    response.body?.string(),
-                    BoardDtoType.type
-                )//12.30
-            } else {
-                Log.e(
-                    TAG,
-                    "fetchQuote: Got response status ${response.code} from API. Is the home URL correct?"
-                )
-                TODO()
-            }
         }
-        return gameDto.properties?.toGame()
+        placeShipsAction = getPlaceFleetLayout(gameDto)
+        confirmFleetLayoutAction = getConfirmFleetLayout(gameDto)
+        return gameDto.toGame()
     }
 
-    private fun getGetCurrentGameIdLink(gameCreatedDto: GameInfoDto): SirenLink? {
-        return gameCreatedDto.links?.find { it.rel.contains("game-id") }
-    }
+    private fun getConfirmFleetLayout(gameDto: SirenEntity<GameDtoProperties>) =
+        gameDto.actions?.find { it.name == "confirm-fleet-layout" }
 
-    private fun getGetGameLink(gameCreatedDto: GameInfoDto): SirenLink? {
-        return gameCreatedDto.links?.find { it.rel.contains("game-info") }
-    }
+    private fun getPlaceFleetLayout(gameDto: GameDto) =
+        gameDto.actions?.find { it.name == "place-fleet" }
+
+    private fun getGetCurrentGameIdLink(gameCreatedDto: GameInfoDto) =
+        gameCreatedDto.links?.find { it.rel.contains("game-id") }
+
+    private fun getGetGameLinkByGameInfoDto(gameCreatedDto: GameInfoDto) =
+        gameCreatedDto.links?.find { it.rel.contains("game-info") }
+
+    private fun getGetGameLinkByGameIdDto(gameIdDto: GameIdDto) =
+        gameIdDto.links?.find { it.rel.contains("game-info") }
 
 }

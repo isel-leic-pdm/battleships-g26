@@ -30,16 +30,19 @@ data class GameDtoProperties(
 typealias GameDto = SirenEntity<GameDtoProperties>
 val GameDtoType = SirenEntity.getType<GameDtoProperties>()
 
-fun GameDtoProperties.toGame() =
-    Game(
-        gameId,
-        configuration,
-        player1,
-        player2,
-        board1.toBoard(),
-        board2.toBoard(),
-        state
+fun GameDto.toGame(): Game {
+    val game = this.properties
+    require(game != null) { "GameDto properties are null" }
+    return Game(
+        game.gameId,
+        game.configuration,
+        game.player1,
+        game.player2,
+        game.board1.toBoard(),
+        game.board2.toBoard(),
+        game.state
     )
+}
 
 data class BoardDtoProperties(
     val cells: String,
@@ -47,14 +50,9 @@ data class BoardDtoProperties(
     val confirmed: Boolean
 )
 
-data class CoordinateDto(
-    val l: Int,
-    val c: Int
-)
-data class CoordinateContentDto(val shipType: String, val isHit: Boolean)
-
-typealias BoardDto = SirenEntity<BoardDtoProperties>
-val BoardDtoType = SirenEntity.getType<BoardDtoProperties>()
+data class PlaceShipsDtoProperties(val shipIds: List<Int>)
+typealias PlaceShipsDto = SirenEntity<PlaceShipsDtoProperties>
+val PlaceShipsDtoType = SirenEntity.getType<PlaceShipsDtoProperties>()
 
 fun BoardDtoProperties.toBoard(): Board {
     return Board(cells, confirmed)
@@ -64,4 +62,16 @@ fun GameInfoDto.toGameInfo(): GameInfo {
     val properties = this.properties
     require(properties != null) { "GameActionDto properties are null" }
     return GameInfo(properties.state, properties.gameId)
+}
+
+fun GameIdDto.toGameId(): Int {
+    val properties = this.properties
+    require(properties != null) { "GameActionDto properties are null" }
+    return properties.gameId
+}
+
+fun PlaceShipsDto.toShipIds(): List<Int> {
+    val properties = this.properties
+    require(properties != null) { "GameActionDto properties are null" }
+    return properties.shipIds
 }
