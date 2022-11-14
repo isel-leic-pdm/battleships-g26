@@ -21,11 +21,11 @@ interface GameDataServices {
         mode: Mode,
         newSetFleetAction: SirenAction? = null,
         newConfirmFleetLayoutAction: SirenAction? = null
-    ): List<Int>?
+    ): Boolean
 
     suspend fun confirmFleetLayout(token: String, mode: Mode, newConfirmFleetLayoutAction: SirenAction? = null): Boolean?
 
-    suspend fun placeShot(token: String, gameId: Int, coordinate: Coordinate, mode: Mode): GameInfo?
+    suspend fun placeShot(token: String, gameId: Int, coordinate: Coordinate, mode: Mode, newPlaceShotAction: SirenAction?): Boolean
 
-    suspend fun getGameInfo(token: String, gameId: Int, mode: Mode, newGetGameLink: SirenLink? = null): Game?
+    suspend fun getGame(token: String, gameId: Int, mode: Mode, newGetGameLink: SirenLink? = null): Game?
 }

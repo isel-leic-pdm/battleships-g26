@@ -20,11 +20,11 @@ class Delete(url: URL) : RequestMethod(url)
 /**
  * Builds a request.
  */
-internal fun buildRequest(requestMethod: RequestMethod, mode: BattleshipsService.Mode) =
+internal fun buildRequest(requestMethod: RequestMethod, mode: Mode) =
     with(Request.Builder()) {
         when(mode) {
-            BattleshipsService.Mode.FORCE_REMOTE -> cacheControl(CacheControl.FORCE_NETWORK)
-            BattleshipsService.Mode.FORCE_LOCAL -> cacheControl(CacheControl.FORCE_CACHE)
+            Mode.FORCE_REMOTE -> cacheControl(CacheControl.FORCE_NETWORK)
+            Mode.FORCE_LOCAL -> cacheControl(CacheControl.FORCE_CACHE)
             else -> this
         }
     }.url(requestMethod.url).method(

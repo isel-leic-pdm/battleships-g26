@@ -104,4 +104,12 @@ class RealUserDataServices(
 
     private fun getCurrentGameIdLink(userHomeDto: SirenEntity<UserHomeDtoProperties>) =
         userHomeDto.links?.find { it.rel.contains("game-id") }
+
+    suspend fun getCreateGameAction(token: String, newUserHomeLink: SirenLink): SirenAction {
+        if (createGameAction == null) {
+            getHome(token, Mode.FORCE_REMOTE, newUserHomeLink)
+            return createGameAction ?: throw UnresolvedLinkException()
+        }
+        return createGameAction ?: throw UnresolvedLinkException()
+    }
 }

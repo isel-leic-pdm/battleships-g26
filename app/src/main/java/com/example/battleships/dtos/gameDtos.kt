@@ -50,10 +50,6 @@ data class BoardDtoProperties(
     val confirmed: Boolean
 )
 
-data class PlaceShipsDtoProperties(val shipIds: List<Int>)
-typealias PlaceShipsDto = SirenEntity<PlaceShipsDtoProperties>
-val PlaceShipsDtoType = SirenEntity.getType<PlaceShipsDtoProperties>()
-
 fun BoardDtoProperties.toBoard(): Board {
     return Board(cells, confirmed)
 }
@@ -68,10 +64,4 @@ fun GameIdDto.toGameId(): Int {
     val properties = this.properties
     require(properties != null) { "GameActionDto properties are null" }
     return properties.gameId
-}
-
-fun PlaceShipsDto.toShipIds(): List<Int> {
-    val properties = this.properties
-    require(properties != null) { "GameActionDto properties are null" }
-    return properties.shipIds
 }

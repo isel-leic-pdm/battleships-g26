@@ -7,7 +7,9 @@ import com.example.battleships.services.UserDataServices
 import com.example.battleships.services.real.RealGamesDataServices
 import com.example.battleships.services.real.RealHomeDataServices
 import com.example.battleships.services.real.RealUserDataServices
+import com.example.battleships.utils.hypermedia.SirenAction
 
+// TODO -> optimize how the links and actions are obtained
 class UseCases(
     private val homeServices: HomeDataServices,
     private val userServices: UserDataServices,
@@ -38,6 +40,15 @@ class UseCases(
         return token
     }
 
-    suspend fun createGame()
-
+    suspend fun createGame(token: String, mode: Mode) {
+        val gameId = gameServices.createGame(token, mode)
+        if (servicesAreReal && gameId == null) {
+            gameServices as RealGamesDataServices
+            userServices as RealUserDataServices
+            homeServices as RealHomeDataServices
+            val userHomeLink = homeServices.getUserHomeLink()
+            val createGameAction = userServices.getCreateGameAction(token, userHomeLink)
+            gameServices.createGame(token, mode, createGameAction)
+        }
+    }
 }

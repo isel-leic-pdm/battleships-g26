@@ -88,14 +88,19 @@ class RealGamesDataServices(
         return gameIdDto.toGameId()
     }
 
+    /**
+     * Sets the fleet of the current game.
+     * @return True if the fleet was set, false if needs [placeShipsAction].
+     */
     override suspend fun setFleet(
         token: String,
         ships: List<Pair<Coordinate, ShipType>>,
         mode: Mode,
-        newSetFleetAction: SirenAction?
-    ): List<Int>? {
+        newSetFleetAction: SirenAction?,
+        newConfirmFleetLayoutAction: SirenAction?
+    ): Boolean {
         val placeFleetLayout = newSetFleetAction?.also { placeShipsAction = it }
-            ?: this.placeShipsAction ?: return null
+            ?: this.placeShipsAction ?: return false
         val placeShipsUrl = placeFleetLayout.href.toURL()
 
         val requestBody = ships.joinToString(prefix = "[", postfix = "]") { (coordinate, shipType) ->
@@ -109,17 +114,17 @@ class RealGamesDataServices(
         }
         val request = buildRequest(Post(placeShipsUrl, requestBody), mode)
 
-        val fleetLayoutDto = request.send(httpClient) { response ->
-            handleResponse<PlaceShipsDto>(
+        request.send(httpClient) { response ->
+            handleResponse<Unit>(
                 jsonEncoder,
                 response,
-                PlaceShipsDtoType.type
+                Unit.javaClass
             )
         }
-        return fleetLayoutDto.toShipIds()
+        return true
     }
 
-    override fun confirmFleetLayout(
+    override suspend fun confirmFleetLayout(
         token: String,
         mode: Mode,
         newConfirmFleetLayoutAction: SirenAction?
@@ -128,20 +133,51 @@ class RealGamesDataServices(
             ?: this.confirmFleetLayoutAction ?: return false
         val confirmFleetLayoutUrl = confirmFleetLayoutAction.href.toURL()
 
-        val request = buildRequest(Put(confirmFleetLayoutUrl), mode)
+        val body = "{\n" +
+                "\t\"fleetConfirmed\": \"true\"\n" +
+                "}"
 
-        val fleetLayoutDto = request.send(httpClient) { response ->
-            handleResponse<ConfirmFleetLayoutDto>(
+        val request = buildRequest(Put(confirmFleetLayoutUrl, body), mode)
+
+        request.send(httpClient) { response ->
+            handleResponse<Unit>(
                 jsonEncoder,
                 response,
-                ConfirmFleetLayoutDtoType.type
+                Unit.javaClass
             )
         }
+        return true
+    }
 
-        return fleetLayoutDto.toBoolean()
-    )
+    override suspend fun placeShot(
+        token: String,
+        gameId: Int,
+        coordinate: Coordinate,
+        mode: Mode,
+        newPlaceShotAction: SirenAction?
+    ): Boolean {
+        val placeShotAction = newPlaceShotAction?.also { placeShotAction = it }
+            ?: this.placeShotAction ?: return false
+        val placeShotUrl = placeShotAction.href.toURL()
 
-    override suspend fun getGameInfo(
+        val body = "{\n" +
+                "\t\"x\": ${coordinate.row},\n" +
+                "\t\"y\": ${coordinate.column}\n" +
+                "}"
+
+        val request = buildRequest(Post(placeShotUrl, body), mode)
+
+        request.send(httpClient) { response ->
+            handleResponse<Unit>(
+                jsonEncoder,
+                response,
+                Unit.javaClass
+            )
+        }
+        return true
+    }
+
+    override suspend fun getGame(
         token: String,
         gameId: Int,
         mode: Mode,
@@ -179,5 +215,4 @@ class RealGamesDataServices(
 
     private fun getGetGameLinkByGameIdDto(gameIdDto: GameIdDto) =
         gameIdDto.links?.find { it.rel.contains("game-info") }
-
 }

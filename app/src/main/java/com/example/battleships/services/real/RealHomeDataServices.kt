@@ -117,4 +117,12 @@ class RealHomeDataServices(
         }
         return userLoginAction ?: throw UnresolvedLinkException()
     }
+
+    suspend fun getUserHomeLink(): SirenLink {
+        if (userHomeLink == null) {
+            getHome()
+            return userHomeLink ?: throw UnresolvedLinkException()
+        }
+        return userHomeLink ?: throw UnresolvedLinkException()
+    }
 }
