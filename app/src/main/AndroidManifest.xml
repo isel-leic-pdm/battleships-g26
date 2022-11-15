@@ -45,6 +45,26 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.example.battleships.info.InfoActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Battleships">
+
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+
+        <activity
+            android:name="com.example.battleships.user_home.UserHomeActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Battleships">
+
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
     </application>
 
 </manifest>

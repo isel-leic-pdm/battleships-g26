@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.battleships.ui.NavigationHandlers
@@ -20,15 +21,13 @@ import com.example.battleships.ui.theme.BattleshipsTheme
 
 @Composable
 fun InfoScreen(
-    onInfoRequest: () -> Unit
+    onBackRequested: () -> Unit = { }
 ) {
     BattleshipsTheme {
         Scaffold(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().testTag("InfoScreen"),
             backgroundColor = MaterialTheme.colors.background,
-            topBar = {
-                TopBar(NavigationHandlers(onInfoRequest))
-            },
+            topBar = { TopBar(NavigationHandlers(onBackRequested = onBackRequested)) },
         ) { innerPadding ->
             Column(
                 verticalArrangement = Arrangement.SpaceAround,
@@ -37,7 +36,7 @@ fun InfoScreen(
                     .padding(innerPadding)
                     .fillMaxSize(),
             ) {
-                Author {}
+                Author()
             }
         }
     }

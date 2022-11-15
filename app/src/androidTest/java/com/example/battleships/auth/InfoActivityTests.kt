@@ -5,6 +5,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.Lifecycle
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.battleships.info.InfoActivity
 import com.example.battleships.ui.NavigateBackTestTag
 import com.example.battleships.ui.NavigateToInfoTestTag
 import org.junit.Rule
@@ -16,7 +17,7 @@ import org.junit.runner.RunWith
 class InfoActivityTests {
 
     @get:Rule
-    val testRule = createAndroidComposeRule<AuthActivity>()
+    val testRule = createAndroidComposeRule<InfoActivity>()
 
     @Test
     fun screen_only_contains_back_navigation_option() {
@@ -38,6 +39,7 @@ class InfoActivityTests {
 
         // Assert
         testRule.onNodeWithTag("InfoScreen").assertDoesNotExist()
+        testRule.waitForIdle()
         assert(testRule.activityRule.scenario.state == Lifecycle.State.DESTROYED)
     }
 }
