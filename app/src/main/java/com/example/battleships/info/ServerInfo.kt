@@ -1,6 +1,5 @@
 package com.example.battleships.info
 
-import com.example.battleships.dtos.ServerInfoDto
 import com.example.battleships.dtos.ServerInfoDtoProperties
 
 data class ServerInfo(

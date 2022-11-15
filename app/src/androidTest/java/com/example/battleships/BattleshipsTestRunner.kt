@@ -3,14 +3,13 @@ package com.example.battleships
 import android.app.Application
 import android.content.Context
 import androidx.test.runner.AndroidJUnitRunner
-import com.example.battleships.rankings.services.RankingsService
 import io.mockk.coEvery
 import io.mockk.mockk
-import palbp.laboratory.demos.quoteofday.quotes.Quote
 
 class BattleshipsTestRunner : DependenciesContainer, Application() {
-    var battleshipsService1: RankingsService =
+    override var useCases: UseCases =
         mockk {
+            /*
             coEvery { fetchQuote() } returns
                 Quote(text = "Test text", author = "Test author")
 
@@ -25,6 +24,7 @@ class BattleshipsTestRunner : DependenciesContainer, Application() {
                         )
                     }
                 }
+             */
         }
 }
 

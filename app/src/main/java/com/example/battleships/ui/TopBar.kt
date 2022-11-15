@@ -5,12 +5,13 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.List
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import pt.isel.battleships.R
 
 /**
@@ -39,7 +40,7 @@ fun TopBar(navigation: NavigationHandlers = NavigationHandlers()) {
                 ) {
                     Icon(
                         Icons.Default.ArrowBack,
-                        contentDescription = stringResource(id = R.string.top_bar_go_back)
+                        contentDescription = /* stringResource(id = R.string.top_bar_go_back) */ null
                     )
                 }
             }
@@ -52,7 +53,7 @@ fun TopBar(navigation: NavigationHandlers = NavigationHandlers()) {
                 ) {
                     Icon(
                         Icons.Default.List,
-                        contentDescription = stringResource(id = R.string.top_bar_navigate_to_history)
+                        contentDescription = /* stringResource(id = R.string.top_bar_navigate_to_history) */ null
                     )
                 }
             }
@@ -63,37 +64,9 @@ fun TopBar(navigation: NavigationHandlers = NavigationHandlers()) {
                 ) {
                     Icon(
                         Icons.Default.Info,
-                        contentDescription = stringResource(id = R.string.top_bar_navigate_to_info)
+                        contentDescription = /* stringResource(id = R.string.top_bar_navigate_to_info) */ null
                     )
                 }
             }
         }
     )}
-
-@Preview
-@Composable
-private fun TopBarPreviewInfoAndHistory() {
-    QuoteOfDayTheme {
-        TopBar(
-            NavigationHandlers(onInfoRequested = { }, onHistoryRequested = { })
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun TopBarPreviewBackAndInfo() {
-    QuoteOfDayTheme {
-        TopBar(
-            NavigationHandlers(onBackRequested = { }, onInfoRequested = { })
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun TopBarPreviewBack() {
-    QuoteOfDayTheme {
-        TopBar(NavigationHandlers(onBackRequested = { }))
-    }
-}

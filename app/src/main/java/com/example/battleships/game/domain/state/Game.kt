@@ -1,8 +1,8 @@
 package com.example.battleships.game.domain.state
 
-import com.example.battleships.game.domain.state.GameState.*
 import com.example.battleships.game.domain.board.Board
 import com.example.battleships.game.domain.player.Player
+import com.example.battleships.game.domain.state.GameState.*
 import pt.isel.daw.dawbattleshipgame.domain.state.requireNull
 import java.util.*
 

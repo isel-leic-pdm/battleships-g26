@@ -1,16 +1,7 @@
-package com.example.battleships.services
+package com.example.battleships.services.fake
 
-import com.example.battleships.game.domain.player.Player
-import com.example.battleships.game.domain.state.*
-import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
-import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
-import com.example.battleships.game.domain.ship.ShipType
-import com.example.battleships.home.Home
-import com.example.battleships.info.ServerAuthor
-import com.example.battleships.info.ServerInfo
-
-
-class FakeBattleshipService : BattleshipsService {
+/*
+class FakeBattleshipService : GameDataServices {
     private val games = mutableMapOf<Pair<String, String>, Game>()
 
     private val configuration = Configuration(
@@ -164,3 +155,4 @@ class FakeBattleshipService : BattleshipsService {
         return Triple(token1, token2, localGame)
     }
 }
+ */

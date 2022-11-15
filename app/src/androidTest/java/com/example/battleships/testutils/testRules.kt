@@ -1,14 +1,14 @@
-package palbp.laboratory.demos.quoteofday.testutils
+package com.example.battleships.testutils
 
 import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
+import com.example.battleships.BattleshipsTestRunner
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
-import palbp.laboratory.demos.quoteofday.QuoteOfDayTestApplication
 
 /**
  * Creates a test rule that starts an activity of type <A> with the received
@@ -34,18 +34,18 @@ fun <A : ComponentActivity> createAndroidComposeRule(
  */
 class PreserveDefaultFakeServiceRule : TestRule {
 
-    val testApplication: QuoteOfDayTestApplication = InstrumentationRegistry
+    val testApplication: BattleshipsTestRunner = InstrumentationRegistry
         .getInstrumentation()
         .targetContext
-        .applicationContext as QuoteOfDayTestApplication
+        .applicationContext as BattleshipsTestRunner
 
     override fun apply(test: Statement, description: Description): Statement =
         object : Statement() {
             override fun evaluate() {
-                val defaultService = testApplication.quoteService
+                val defaultService = testApplication.useCases
                 try { test.evaluate() }
                 finally {
-                    testApplication.quoteService = defaultService
+                    testApplication.useCases = defaultService
                 }
             }
         }

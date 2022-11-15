@@ -2,11 +2,11 @@
 package com.example.battleships.dtos
 
 import com.example.battleships.game.GameInfo
+import com.example.battleships.game.domain.board.Board
+import com.example.battleships.game.domain.state.Configuration
 import com.example.battleships.game.domain.state.Game
 import com.example.battleships.game.domain.state.GameState
 import com.example.battleships.utils.hypermedia.SirenEntity
-import com.example.battleships.game.domain.board.Board
-import com.example.battleships.game.domain.state.Configuration
 
 data class GameInfoDtoProperties(val state: String, val gameId: Int?)
 typealias GameInfoDto = SirenEntity<GameInfoDtoProperties>

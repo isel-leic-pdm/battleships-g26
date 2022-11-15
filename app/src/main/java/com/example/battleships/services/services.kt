@@ -1,5 +1,6 @@
 package com.example.battleships.services
 
+import com.example.battleships.services.Mode.*
 import okhttp3.Response
 
 /**

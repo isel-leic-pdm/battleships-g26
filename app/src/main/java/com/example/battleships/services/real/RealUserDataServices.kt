@@ -2,8 +2,6 @@ package com.example.battleships.services.real
 
 import com.example.battleships.dtos.*
 import com.example.battleships.services.*
-import com.example.battleships.services.buildRequest
-import com.example.battleships.services.handleResponse
 import com.example.battleships.user_home.UserHome
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenEntity

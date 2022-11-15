@@ -5,8 +5,6 @@ import com.example.battleships.game.GameInfo
 import com.example.battleships.game.domain.ship.ShipType
 import com.example.battleships.game.domain.state.Game
 import com.example.battleships.services.*
-import com.example.battleships.services.buildRequest
-import com.example.battleships.services.handleResponse
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenEntity
 import com.example.battleships.utils.hypermedia.SirenLink

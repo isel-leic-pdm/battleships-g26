@@ -7,8 +7,6 @@ import com.example.battleships.info.serverInfo
 import com.example.battleships.rankings.GameRanking
 import com.example.battleships.rankings.rankings
 import com.example.battleships.services.*
-import com.example.battleships.services.buildRequest
-import com.example.battleships.services.handleResponse
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenLink
 import com.example.battleships.utils.send

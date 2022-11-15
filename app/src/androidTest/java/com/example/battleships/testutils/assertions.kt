@@ -1,5 +1,5 @@
 @file:Suppress("unused")
-package palbp.laboratory.demos.quoteofday.testutils
+package com.example.battleships.testutils
 
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 

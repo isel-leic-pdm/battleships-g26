@@ -15,9 +15,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import com.example.battleships.ui.theme.BattleshipsTheme
 
-val NavigateToAuthenticationButtonTestTag = "NavigateToAuthenticationButton"
-val NavigateToRankingsButtonTestTag = "NavigateToRankingsButton"
-
 data class Handler(val name: String, val tag: String, val handler: () -> Unit)
 
 @Composable

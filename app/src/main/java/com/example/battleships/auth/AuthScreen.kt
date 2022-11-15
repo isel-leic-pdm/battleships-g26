@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.battleships.auth.views.LoadingState
 import com.example.battleships.home.Menu
+import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
 
@@ -26,7 +27,9 @@ internal fun AuthScreen(
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             backgroundColor = MaterialTheme.colors.background,
-            topBar = { TopBar(onBackRequested = { onBackRequested() }) }
+            topBar = { TopBar(NavigationHandlers(
+                onBackRequested = onBackRequested,
+            ))}
         ) { padding ->
             Column(
                 verticalArrangement = Arrangement.SpaceAround,
