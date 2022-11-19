@@ -1,4 +1,4 @@
-package com.example.fleetbattletemp.ui.theme
+package com.example.battleships.ui.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle
