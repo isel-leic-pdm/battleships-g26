@@ -1,14 +1,15 @@
 package com.example.battleships.services.fake
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.example.battleships.services.GameDataServices
 import com.example.battleships.services.Mode
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenLink
-import pt.isel.daw.dawbattleshipgame.domain.board.Board
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
-import pt.isel.daw.dawbattleshipgame.domain.game.Configuration
-import pt.isel.daw.dawbattleshipgame.domain.game.Game
-import pt.isel.daw.dawbattleshipgame.domain.game.GameState
+import pt.isel.daw.dawbattleshipgame.domain.game.*
+import pt.isel.daw.dawbattleshipgame.domain.player.Player
+import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 
 const val GAME_ID = 333
@@ -32,22 +33,33 @@ class FakeGameDataServices : GameDataServices {
 
     var game: Game? = null
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun createGame(
         token: String,
         mode: Mode,
         newCreateGameAction: SirenAction?
     ): Boolean {
-        game = Game(
+        val newGame = Game.newGame(
             GAME_ID,
-            configuration,
             PLAYER1_ID,
             PLAYER2_ID,
-            board1 = Board(configuration.boardSize),
-            board2 = Board(configuration.boardSize),
-            state = GameState.FLEET_SETUP,
-            playerTurn = PLAYER1_ID
+            configuration
         )
+        game = setEnemyShipLayout(newGame)
         return true
+    }
+
+    private fun setEnemyShipLayout(game: Game): Game {
+        var newGame = game
+        val ships = game.configuration.fleet
+        ships.forEachIndexed { idx, ship ->
+            val shipType = ship.first
+            val shipOrientation = Orientation.HORIZONTAL
+            val shipPosition = Coordinate(idx * 2, 0)
+            newGame = newGame.placeShip(shipType, shipPosition, shipOrientation, Player.TWO)
+                ?: throw java.lang.IllegalStateException("Ship placement failed")
+        }
+        return newGame
     }
 
     override suspend fun getCurrentGameId(
@@ -55,7 +67,7 @@ class FakeGameDataServices : GameDataServices {
         mode: Mode,
         newGetCurrentGameIdLink: SirenLink?
     ): Int? {
-        TODO("Not yet implemented")
+        return game?.id
     }
 
     override suspend fun setFleet(
@@ -65,34 +77,42 @@ class FakeGameDataServices : GameDataServices {
         newSetFleetAction: SirenAction?,
         newConfirmFleetLayoutAction: SirenAction?
     ): Boolean {
-        TODO("Not yet implemented")
+        var newGame = game
+        ships.forEach { (coordinate, shipType) ->
+            newGame = newGame?.placeShip(shipType, coordinate, Orientation.HORIZONTAL, Player.ONE) ?: return false
+        }
+        game = newGame
+        return true
     }
 
+    /**
+     * Confirms the fleet layout.
+     */
     override suspend fun confirmFleetLayout(
         token: String,
         mode: Mode,
         newConfirmFleetLayoutAction: SirenAction?
-    ): Boolean? {
-        TODO("Not yet implemented")
+    ): Boolean {
+        game = game?.confirmFleet(Player.ONE) ?: return false
+        return true
     }
 
     override suspend fun placeShot(
         token: String,
-        gameId: Int,
         coordinate: Coordinate,
-        mode: Mode,
-        newPlaceShotAction: SirenAction?
+        newPlaceShotAction: SirenAction?,
+        mode: Mode
     ): Boolean {
-        TODO("Not yet implemented")
+        val game = game ?: return false
+        this.game = game.placeShot(game.player1, coordinate, Player.ONE)
+        return true
     }
 
     override suspend fun getGame(
         token: String,
-        gameId: Int,
-        mode: Mode,
-        newGetGameLink: SirenLink?
+        newGetGameLink: SirenLink?,
+        mode: Mode
     ): Game? {
-        TODO("Not yet implemented")
+        return game
     }
-
 }

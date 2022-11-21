@@ -24,7 +24,7 @@ interface GameDataServices {
 
     suspend fun confirmFleetLayout(token: String, mode: Mode, newConfirmFleetLayoutAction: SirenAction? = null): Boolean?
 
-    suspend fun placeShot(token: String, gameId: Int, coordinate: Coordinate, mode: Mode, newPlaceShotAction: SirenAction?): Boolean
+    suspend fun placeShot(token: String, coordinate: Coordinate, newPlaceShotAction: SirenAction?, mode: Mode): Boolean
 
-    suspend fun getGame(token: String, gameId: Int, mode: Mode, newGetGameLink: SirenLink? = null): Game?
+    suspend fun getGame(token: String, newGetGameLink: SirenLink? = null, mode: Mode): Game?
 }

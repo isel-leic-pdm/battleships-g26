@@ -148,10 +148,9 @@ class RealGamesDataServices(
 
     override suspend fun placeShot(
         token: String,
-        gameId: Int,
         coordinate: Coordinate,
-        mode: Mode,
-        newPlaceShotAction: SirenAction?
+        newPlaceShotAction: SirenAction?,
+        mode: Mode
     ): Boolean {
         val placeShotAction = newPlaceShotAction?.also { placeShotAction = it }
             ?: this.placeShotAction ?: return false
@@ -176,9 +175,8 @@ class RealGamesDataServices(
 
     override suspend fun getGame(
         token: String,
-        gameId: Int,
-        mode: Mode,
-        newGetGameLink: SirenLink?
+        newGetGameLink: SirenLink?,
+        mode: Mode
     ): Game? {
         val getGameInfoLink = newGetGameLink?.also { getGameLink = it }
             ?: this.getGameLink ?: return null
