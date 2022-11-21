@@ -1,5 +1,6 @@
 package com.example.battleships
 
+import com.example.battleships.rankings.GameRanking
 import com.example.battleships.services.GameDataServices
 import com.example.battleships.services.HomeDataServices
 import com.example.battleships.services.Mode
@@ -49,5 +50,9 @@ class UseCases(
             val createGameAction = userServices.getCreateGameAction(token, userHomeLink)
             gameServices.createGame(token, mode, createGameAction)
         }
+    }
+
+    suspend fun rankings(mode: Mode): GameRanking {
+        return homeServices.getRankings(mode)
     }
 }

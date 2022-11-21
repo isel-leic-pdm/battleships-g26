@@ -3,12 +3,7 @@ package com.example.battleships.services.fake
 import com.example.battleships.game.GameInfo
 import com.example.battleships.game.domain.ship.ShipType
 import com.example.battleships.game.domain.state.Game
-import com.example.battleships.info.ServerAuthor
-import com.example.battleships.info.ServerInfo
-import com.example.battleships.rankings.GameRanking
-import com.example.battleships.rankings.UserStats
 import com.example.battleships.services.GameDataServices
-import com.example.battleships.services.HomeDataServices
 import com.example.battleships.services.Mode
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenLink

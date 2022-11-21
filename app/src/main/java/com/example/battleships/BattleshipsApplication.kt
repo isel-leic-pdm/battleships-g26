@@ -1,6 +1,9 @@
 package com.example.battleships
 
 import android.app.Application
+import com.example.battleships.services.fake.FakeGameDataServices
+import com.example.battleships.services.fake.FakeHomeDataServices
+import com.example.battleships.services.fake.FakeUserDataServices
 import com.example.battleships.services.real.RealGamesDataServices
 import com.example.battleships.services.real.RealHomeDataServices
 import com.example.battleships.services.real.RealUserDataServices
@@ -22,9 +25,16 @@ class BattleshipsApplication : DependenciesContainer, Application() {
     private val jsonEncoder: Gson by lazy { GsonBuilder().create() }
 
     override val useCases: UseCases
+    /*
         get() = UseCases(
             RealHomeDataServices(battleshipsAPIHome, httpClient, jsonEncoder),
             RealUserDataServices(httpClient, jsonEncoder),
             RealGamesDataServices(httpClient, jsonEncoder)
+        )
+     */
+        get() = UseCases(
+            FakeHomeDataServices(),
+            FakeUserDataServices(),
+            FakeGameDataServices()
         )
 }

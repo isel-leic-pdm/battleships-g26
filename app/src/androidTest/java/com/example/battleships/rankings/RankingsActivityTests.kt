@@ -24,6 +24,7 @@ class RankingsActivityTests {
     @Test
     fun screen_contains_all_options() {
         // Assert
+        testRule.onNodeWithTag(RankingListTestTag).assertExists()
         testRule.onNodeWithTag(NavigateToInfoTestTag).assertExists()
         testRule.onNodeWithTag(NavigateBackTestTag).assertExists()
     }
@@ -56,5 +57,20 @@ class RankingsActivityTests {
         testRule.onNodeWithTag("InfoScreen").assertExists()
         testRule.waitForIdle()
         assert(testRule.activityRule.scenario.state == Lifecycle.State.STARTED)
+    }
+
+    @Test
+    fun pressing_refresh_button() {
+        // Arrange
+        testRule.onNodeWithTag("RankingsScreen").assertExists()
+        testRule.onNodeWithTag(RankingListTestTag).assertExists()
+
+        // Act
+        testRule.onNodeWithTag(RefreshButtonTestTag).performClick()
+        testRule.waitForIdle()
+
+        // Assert
+        testRule.onNodeWithTag("RankingsScreen").assertExists()
+        testRule.onNodeWithTag(RankingListTestTag).assertExists()
     }
 }
