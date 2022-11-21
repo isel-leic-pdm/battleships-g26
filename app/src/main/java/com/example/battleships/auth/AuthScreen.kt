@@ -1,29 +1,28 @@
 package com.example.battleships.auth
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.battleships.auth.views.LoadingButton
 import com.example.battleships.auth.views.LoadingState
 import com.example.battleships.home.CreateUserButtonTestTag
-import com.example.battleships.home.LoginButtonTestTag
 import com.example.battleships.home.Menu
 import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.TopBar
@@ -32,17 +31,17 @@ import com.example.battleships.ui.theme.LightWhite
 
 @Composable
 internal fun AuthScreen(
-    onBackRequested: () -> Unit = { },
     isCreated: LoadingState,
     isLogin: LoadingState,
     onCreateUser: (String, String) -> Unit,
     onLoginUser: (String, String) -> Unit,
+    navigationHandlers: NavigationHandlers = NavigationHandlers(),
 ) {
     BattleshipsTheme {
         Scaffold(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().testTag("AuthScreen"),
             backgroundColor = MaterialTheme.colors.background,
-            topBar = { TopBar() }
+            topBar = { TopBar(navigationHandlers) }
         ) { padding ->
             Column(
                 verticalArrangement = Arrangement.SpaceAround,

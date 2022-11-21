@@ -13,7 +13,7 @@ import io.mockk.coEvery
 import io.mockk.mockk
 
 class BattleshipsTestRunner : DependenciesContainer, Application() {
-    override val useCases: UseCases
+    override var useCases: UseCases
         = mockk {
             coEvery {  }
         }

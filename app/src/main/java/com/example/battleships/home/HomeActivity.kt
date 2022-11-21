@@ -33,7 +33,7 @@ class HomeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             StartScreen(
-                Handler("Create User", NavigateToAuthenticationButtonTestTag) {
+                Handler("Create/Login", NavigateToAuthenticationButtonTestTag) {
                     AuthActivity.navigate(this)
                 },
                 Handler("Rankings", NavigateToRankingsButtonTestTag) {
