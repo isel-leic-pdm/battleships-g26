@@ -9,15 +9,15 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.battleships.game.domain.ship.ShipType
-import com.example.battleships.game.domain.state.Game
-import com.example.battleships.game.domain.state.moveShip
-import com.example.battleships.game.domain.state.onSquarePressed
-import com.example.battleships.game.domain.state.rotateShip
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
+import pt.isel.daw.dawbattleshipgame.domain.game.Game
+import pt.isel.daw.dawbattleshipgame.domain.game.moveShip
+import pt.isel.daw.dawbattleshipgame.domain.game.placeShip
+import pt.isel.daw.dawbattleshipgame.domain.game.rotateShip
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
+import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 
 internal open class Selection
 internal class ShipOption(val shipType: ShipType) : Selection()
@@ -80,7 +80,7 @@ private fun onSquarePressed(
         return Square(coordinate)
     } else {
         if (selected is ShipOption) {
-            curGame.onSquarePressed(selected.shipType, coordinate, Orientation.HORIZONTAL) ?: return null // validates
+            curGame.placeShip(selected.shipType, coordinate, Orientation.HORIZONTAL) ?: return null // validates
             activity.vm.placeShip(
                 selected.shipType,
                 coordinate,

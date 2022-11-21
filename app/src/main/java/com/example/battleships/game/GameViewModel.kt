@@ -5,11 +5,11 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.battleships.UseCases
-import com.example.battleships.game.domain.player.Player
-import com.example.battleships.game.domain.ship.ShipType
-import com.example.battleships.game.domain.state.Game
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
+import pt.isel.daw.dawbattleshipgame.domain.game.Game
+import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
+import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 
 /**
  * The ViewModel for BattleshipActivity.

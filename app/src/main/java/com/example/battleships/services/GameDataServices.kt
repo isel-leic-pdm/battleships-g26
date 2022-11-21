@@ -1,11 +1,11 @@
 package com.example.battleships.services
 
 import com.example.battleships.game.GameInfo
-import com.example.battleships.game.domain.ship.ShipType
-import com.example.battleships.game.domain.state.Game
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenLink
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
+import pt.isel.daw.dawbattleshipgame.domain.game.Game
+import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 
 /**
  * This interface is responsible for providing the options that interact with the game.

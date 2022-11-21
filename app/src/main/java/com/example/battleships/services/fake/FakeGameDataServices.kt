@@ -1,14 +1,14 @@
 package com.example.battleships.services.fake
 
 import com.example.battleships.game.GameInfo
-import com.example.battleships.game.domain.ship.ShipType
-import com.example.battleships.game.domain.state.Configuration
-import com.example.battleships.game.domain.state.Game
 import com.example.battleships.services.GameDataServices
 import com.example.battleships.services.Mode
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenLink
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
+import pt.isel.daw.dawbattleshipgame.domain.game.Configuration
+import pt.isel.daw.dawbattleshipgame.domain.game.Game
+import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 
 class FakeGameDataServices : GameDataServices {
     private val configuration = Configuration(

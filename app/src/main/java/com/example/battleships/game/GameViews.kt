@@ -17,14 +17,14 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.battleships.game.domain.board.Board
-import com.example.battleships.game.domain.player.Player
-import com.example.battleships.game.domain.ship.ShipType
-import com.example.battleships.game.domain.state.Configuration
-import com.example.battleships.game.domain.state.Game
-import com.example.battleships.game.domain.state.GameState
+import pt.isel.daw.dawbattleshipgame.domain.board.Board
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.board.Panel
+import pt.isel.daw.dawbattleshipgame.domain.game.Configuration
+import pt.isel.daw.dawbattleshipgame.domain.game.Game
+import pt.isel.daw.dawbattleshipgame.domain.game.GameState
+import pt.isel.daw.dawbattleshipgame.domain.player.Player
+import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 
 val PLAY_SIDE = 30.dp
 val GRID_WIDTH = 5.dp
