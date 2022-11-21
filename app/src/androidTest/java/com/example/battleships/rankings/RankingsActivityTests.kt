@@ -1,4 +1,4 @@
-package com.example.battleships.authentication
+package com.example.battleships.rankings
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -16,16 +16,14 @@ import org.junit.runner.RunWith
 
 
 @RunWith(AndroidJUnit4::class)
-class AuthenticationActivityTests {
+class RankingsActivityTests {
 
     @get:Rule
-    val testRule = createAndroidComposeRule<AuthActivity>()
+    val testRule = createAndroidComposeRule<RankingsActivity>()
 
     @Test
     fun screen_contains_all_options() {
         // Assert
-        testRule.onNodeWithTag(CreateUserButtonTestTag).assertExists()
-        testRule.onNodeWithTag(LoginButtonTestTag).assertExists()
         testRule.onNodeWithTag(NavigateToInfoTestTag).assertExists()
         testRule.onNodeWithTag(NavigateBackTestTag).assertExists()
     }
@@ -33,7 +31,7 @@ class AuthenticationActivityTests {
     @Test
     fun pressing_navigate_back_finishes_activity() {
         // Arrange
-        testRule.onNodeWithTag("AuthScreen").assertExists()
+        testRule.onNodeWithTag("RankingsScreen").assertExists()
 
         // Act
         testRule.onNodeWithTag(NavigateBackTestTag).performClick()
@@ -46,9 +44,9 @@ class AuthenticationActivityTests {
     }
 
     @Test
-    fun pressing_navigate_to_info_opens_info_screen() {
+    fun pressing_navigate_to_info_opens_info_activity() {
         // Arrange
-        testRule.onNodeWithTag("AuthScreen").assertExists()
+        testRule.onNodeWithTag("RankingsScreen").assertExists()
 
         // Act
         testRule.onNodeWithTag(NavigateToInfoTestTag).performClick()
@@ -57,5 +55,6 @@ class AuthenticationActivityTests {
         // Assert
         testRule.onNodeWithTag("InfoScreen").assertExists()
         testRule.waitForIdle()
+        assert(testRule.activityRule.scenario.state == Lifecycle.State.STARTED)
     }
 }

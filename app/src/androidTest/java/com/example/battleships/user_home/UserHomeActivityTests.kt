@@ -1,13 +1,10 @@
-package com.example.battleships.authentication
+package com.example.battleships.user_home
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.Lifecycle
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.battleships.auth.AuthActivity
-import com.example.battleships.home.CreateUserButtonTestTag
-import com.example.battleships.home.LoginButtonTestTag
 import com.example.battleships.ui.NavigateBackTestTag
 import com.example.battleships.ui.NavigateToInfoTestTag
 import org.junit.Rule
@@ -16,16 +13,14 @@ import org.junit.runner.RunWith
 
 
 @RunWith(AndroidJUnit4::class)
-class AuthenticationActivityTests {
+class UserHomeActivityTests {
 
     @get:Rule
-    val testRule = createAndroidComposeRule<AuthActivity>()
+    val testRule = createAndroidComposeRule<UserHomeActivity>()
 
     @Test
     fun screen_contains_all_options() {
         // Assert
-        testRule.onNodeWithTag(CreateUserButtonTestTag).assertExists()
-        testRule.onNodeWithTag(LoginButtonTestTag).assertExists()
         testRule.onNodeWithTag(NavigateToInfoTestTag).assertExists()
         testRule.onNodeWithTag(NavigateBackTestTag).assertExists()
     }
@@ -33,14 +28,14 @@ class AuthenticationActivityTests {
     @Test
     fun pressing_navigate_back_finishes_activity() {
         // Arrange
-        testRule.onNodeWithTag("AuthScreen").assertExists()
+        testRule.onNodeWithTag("UserHomeScreen").assertExists()
 
         // Act
         testRule.onNodeWithTag(NavigateBackTestTag).performClick()
         testRule.waitForIdle()
 
         // Assert
-        testRule.onNodeWithTag("AuthScreen").assertDoesNotExist()
+        testRule.onNodeWithTag("UserHomeScreen").assertDoesNotExist()
         testRule.waitForIdle()
         assert(testRule.activityRule.scenario.state == Lifecycle.State.DESTROYED)
     }
@@ -48,7 +43,7 @@ class AuthenticationActivityTests {
     @Test
     fun pressing_navigate_to_info_opens_info_screen() {
         // Arrange
-        testRule.onNodeWithTag("AuthScreen").assertExists()
+        testRule.onNodeWithTag("UserHomeScreen").assertExists()
 
         // Act
         testRule.onNodeWithTag(NavigateToInfoTestTag).performClick()

@@ -9,13 +9,11 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
-
-val NavigateToAuthenticationButtonTestTag = "NavigateToAuthenticationButton"
-val NavigateToRankingsButtonTestTag = "NavigateToRankingsButton"
 
 @Composable
 fun RankingsScreen(
@@ -23,7 +21,7 @@ fun RankingsScreen(
 ) {
     BattleshipsTheme {
         Scaffold(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().testTag("RankingsScreen"),
             backgroundColor = Color.Black,
             topBar = { TopBar(navigation = onNavigationRequested) },
             bottomBar = { BottomAppBar {} },

@@ -20,11 +20,13 @@ data class Handler(val name: String, val tag: String, val handler: () -> Unit)
 @Composable
 fun StartScreen(
     vararg handlers: Handler,
+    tag: String? = null,
     onNavigationRequested: NavigationHandlers = NavigationHandlers(),
 ) {
     BattleshipsTheme {
+        val modifier = if (tag != null) Modifier.testTag(tag) else Modifier
         Scaffold(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             backgroundColor = Color.Black,
             topBar = { TopBar(navigation = onNavigationRequested) },
             bottomBar = { BottomAppBar {} },

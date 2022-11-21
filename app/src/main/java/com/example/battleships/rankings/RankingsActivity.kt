@@ -25,6 +25,7 @@ class RankingsActivity : ComponentActivity() {
             RankingsScreen(
                 NavigationHandlers(
                     onInfoRequested = { InfoActivity.navigate(origin = this) },
+                    onBackRequested = { finish() }
                 )
             )
         }

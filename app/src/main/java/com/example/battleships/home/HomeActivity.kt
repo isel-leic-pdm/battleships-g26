@@ -39,8 +39,10 @@ class HomeActivity : ComponentActivity() {
                 Handler("Rankings", NavigateToRankingsButtonTestTag) {
                     RankingsActivity.navigate(this)
                 },
+                tag = "HomeScreen",
                 onNavigationRequested = NavigationHandlers(
                     onInfoRequested = { InfoActivity.navigate(origin = this) },
+                    onBackRequested = { finish() }
                 )
             )
         }

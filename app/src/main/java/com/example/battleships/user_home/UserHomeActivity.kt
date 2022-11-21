@@ -32,8 +32,10 @@ class UserHomeActivity : ComponentActivity() {
                 Handler("Start Game", "start-game") {
                     GameActivity.navigate(this, token)
                 },
+                tag = "UserHomeScreen",
                 onNavigationRequested = NavigationHandlers(
                     onInfoRequested = { InfoActivity.navigate(origin = this) },
+                    onBackRequested = { finish() }
                 )
             )
         }
