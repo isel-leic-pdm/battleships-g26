@@ -32,7 +32,7 @@ fun <A : ComponentActivity> createAndroidComposeRule(
  * double by another double that serves their purposes. The behaviour of the remaining tests
  * is preserved by saving the default fake and restoring it after the execution of the test.
  */
-class PreserveDefaultFakeServiceRule : TestRule {
+class PreserveDefaultDependencies : TestRule {
 
     val testApplication: BattleshipsTestRunner = InstrumentationRegistry
         .getInstrumentation()
@@ -58,7 +58,7 @@ class PreserveDefaultFakeServiceRule : TestRule {
  */
 fun createPreserveDefaultFakeServiceComposeRule() =
     AndroidComposeTestRule<TestRule, ComponentActivity>(
-        activityRule = PreserveDefaultFakeServiceRule(),
+        activityRule = PreserveDefaultDependencies(),
         activityProvider = {
             error("This rule does not provide an Activity. Launch and use the Activity yourself.")
         }

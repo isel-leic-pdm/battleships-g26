@@ -52,7 +52,6 @@ class UseCases(
         }
     }
 
-    suspend fun rankings(mode: Mode): GameRanking {
-        return homeServices.getRankings(mode)
-    }
+    suspend fun rankings(mode: Mode): GameRanking =
+        homeServices.getRankings(mode)
 }
