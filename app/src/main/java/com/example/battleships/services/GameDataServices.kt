@@ -1,6 +1,5 @@
 package com.example.battleships.services
 
-import com.example.battleships.game.GameInfo
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenLink
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
@@ -11,7 +10,7 @@ import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
  * This interface is responsible for providing the options that interact with the game.
  */
 interface GameDataServices {
-    suspend fun createGame(token: String, mode: Mode, newCreateGameAction: SirenAction? = null): GameInfo?
+    suspend fun createGame(token: String, mode: Mode, newCreateGameAction: SirenAction? = null): Boolean
 
     suspend fun getCurrentGameId(token: String, mode: Mode, newGetCurrentGameIdLink: SirenLink? = null): Int?
 

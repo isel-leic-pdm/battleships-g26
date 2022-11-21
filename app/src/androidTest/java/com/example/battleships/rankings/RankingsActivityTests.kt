@@ -5,9 +5,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.Lifecycle
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.battleships.auth.AuthActivity
-import com.example.battleships.home.CreateUserButtonTestTag
-import com.example.battleships.home.LoginButtonTestTag
 import com.example.battleships.ui.NavigateBackTestTag
 import com.example.battleships.ui.NavigateToInfoTestTag
 import org.junit.Rule

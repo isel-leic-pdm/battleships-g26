@@ -2,13 +2,13 @@ package pt.isel.daw.dawbattleshipgame.domain.game
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.example.battleships.game.utils.RealClock
 import pt.isel.daw.dawbattleshipgame.domain.board.Board
 import pt.isel.daw.dawbattleshipgame.domain.game.GameState.*
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
-import com.example.battleships.game.utils.RealClock
+import java.time.Duration
 import java.time.Instant
 import java.util.*
-import java.time.Duration
 
 enum class GameState {
     NOT_STARTED,

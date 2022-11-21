@@ -5,14 +5,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.Lifecycle
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.battleships.UseCases
-import com.example.battleships.info.InfoActivity
-import com.example.battleships.services.Mode
-import com.example.battleships.testutils.PreserveDefaultDependencies
 import com.example.battleships.ui.NavigateBackTestTag
 import com.example.battleships.ui.NavigateToInfoTestTag
-import io.mockk.every
-import io.mockk.mockk
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

@@ -1,5 +1,6 @@
 package com.example.battleships.services.fake
 
+// TODO -> to be deleted later (this implemented all services but now, services were divided in multiple classes)
 /*
 class FakeBattleshipService : GameDataServices {
     private val games = mutableMapOf<Pair<String, String>, Game>()

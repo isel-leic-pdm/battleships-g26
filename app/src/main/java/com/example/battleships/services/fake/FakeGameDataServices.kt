@@ -1,14 +1,20 @@
 package com.example.battleships.services.fake
 
-import com.example.battleships.game.GameInfo
 import com.example.battleships.services.GameDataServices
 import com.example.battleships.services.Mode
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenLink
+import pt.isel.daw.dawbattleshipgame.domain.board.Board
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.game.Configuration
 import pt.isel.daw.dawbattleshipgame.domain.game.Game
+import pt.isel.daw.dawbattleshipgame.domain.game.GameState
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
+
+const val GAME_ID = 333
+const val PLAYER1_ID = 1
+const val PLAYER2_ID = 2
+const val TIMEOUT = 10000L
 
 class FakeGameDataServices : GameDataServices {
     private val configuration = Configuration(
@@ -21,15 +27,27 @@ class FakeGameDataServices : GameDataServices {
             Pair(ShipType.DESTROYER, 2)
         ),
         nShotsPerRound = 10,
-        roundTimeout = 10
+        roundTimeout = TIMEOUT
     )
+
+    var game: Game? = null
 
     override suspend fun createGame(
         token: String,
         mode: Mode,
         newCreateGameAction: SirenAction?
-    ): GameInfo? {
-        TODO("Not yet implemented")
+    ): Boolean {
+        game = Game(
+            GAME_ID,
+            configuration,
+            PLAYER1_ID,
+            PLAYER2_ID,
+            board1 = Board(configuration.boardSize),
+            board2 = Board(configuration.boardSize),
+            state = GameState.FLEET_SETUP,
+            playerTurn = PLAYER1_ID
+        )
+        return true
     }
 
     override suspend fun getCurrentGameId(

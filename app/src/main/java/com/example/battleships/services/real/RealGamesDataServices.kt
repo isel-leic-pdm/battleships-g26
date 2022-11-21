@@ -1,7 +1,6 @@
 package com.example.battleships.services.real
 
 import com.example.battleships.dtos.*
-import com.example.battleships.game.GameInfo
 import com.example.battleships.services.*
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenEntity
@@ -30,11 +29,11 @@ class RealGamesDataServices(
 
     /**
      * Creates a new game.
-     * @return The GameInfo of the newly created game, or null if needs [createGameAction].
+     * @return true if the game was created successfully, if [newCreateGameAction] is needed.
      */
-    override suspend fun createGame(token: String, mode: Mode, newGameCreateAction: SirenAction?): GameInfo? {
+    override suspend fun createGame(token: String, mode: Mode, newGameCreateAction: SirenAction?): Boolean {
         val createGameAction = newGameCreateAction?.also { createGameAction = it }
-            ?: this.createGameAction ?: return null
+            ?: this.createGameAction ?: return false
         val url = createGameAction.href.toURL()
 
         // TODO -> parameterize the game configuration
@@ -61,7 +60,7 @@ class RealGamesDataServices(
         }
         getCurrentGameIdLink = getGetCurrentGameIdLink(gameCreatedDto) // could be null if game is already started
         getGameLink = getGetGameLinkByGameInfoDto(gameCreatedDto) // could be null if game still hasn't started
-        return gameCreatedDto.toGameInfo()
+        return true
     }
 
     override suspend fun getCurrentGameId(

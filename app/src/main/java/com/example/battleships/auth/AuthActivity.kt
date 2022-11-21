@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.battleships.DependenciesContainer
 import com.example.battleships.auth.views.LoadingState
-import com.example.battleships.home.HomeActivity
 import com.example.battleships.info.InfoActivity
 import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.user_home.UserHomeActivity
