@@ -10,8 +10,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.battleships.DependenciesContainer
 import com.example.battleships.auth.views.LoadingState
-import com.example.battleships.info.InfoActivity
-import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.user_home.UserHomeActivity
 
 class AuthActivity : ComponentActivity() {
@@ -49,15 +47,11 @@ class AuthActivity : ComponentActivity() {
                 if (vm.isLoginLoading.value) LoadingState.Loading
                 else LoadingState.Idle
 
-            AuthScreen(
-                isCreated = isCreateUserLoading,
+            LaunchScreen(
                 isLogin = isLoginLoading,
-                onCreateUser = { username, password -> vm.createUser(username, password) },
+                isRegister = isCreateUserLoading,
+                onRegisterUser =  { username, password -> vm.createUser(username, password) },
                 onLoginUser = { username, password -> vm.login(username, password) },
-                navigationHandlers = NavigationHandlers(
-                    onBackRequested = { finish() },
-                    onInfoRequested = { InfoActivity.navigate(this) }
-                )
             )
             val token = vm.token.value
             if (token != null) {
