@@ -119,7 +119,11 @@ fun InputView(
                 Action.REGISTER -> {
                     if(retypedPassword.value != password.value)
                         Toast.makeText(mContext, "Passwords don't match", Toast.LENGTH_SHORT).show()
-                    onRegister(username.value, password.value)
+                    else if(username.value.isEmpty() || username.value.isBlank())
+                        Toast.makeText(mContext, "Username is empty", Toast.LENGTH_SHORT).show()
+                    else if(password.value.isEmpty() || password.value.isBlank())
+                        Toast.makeText(mContext, "Password is empty", Toast.LENGTH_SHORT).show()
+                    else onRegister(username.value, password.value)
                 }
                 Action.LOGIN -> onLogin(username.value, password.value)
             }
