@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.battleships.UseCases
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import com.example.battleships.game.domain.game.Game
+import com.example.battleships.game.domain.game.GameState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
@@ -65,33 +67,26 @@ class GameViewModel(
             if (!res) {
                 Log.e(TAG, "Tried to place ships but an error occurred")
                 return@launch
-            } else updateGame()
+            }
             Log.i(TAG, "Ships placed, and confirmed")
+            while (true) {
+                updateGame()
+                if (game.value?.state === GameState.BATTLE) break
+                delay(1000)
+                Log.d(TAG, "Waiting for opponent to place ships") // TODO: maybe, remove this later
+            }
         }
     }
 
     fun placeShot(coordinate: Coordinate) {
-        /*
-        val gameInternal = game.value ?: return
-        val gameId = _gameId.value ?: return
-        if (gameInternal.state === GameState.BATTLE) {
-            gameInternal.placeShot(gameInternal.player1, coordinate) // tests if the action is valid
-                ?: return
-            viewModelScope.launch {
-                useCases.placeShot(token, gameId, coordinate) // does the action
-                _game.value = useCases.getGame(token, gameId) ?: _game.value // updates the game
-                while (true) {
-                    delay(1000)
-                    val gameFromServices = useCases.getGame(token, gameId) ?: throw Exception("Game not found")
-                    userId.value ?: throw Exception("User not found")
-                    if (gameFromServices.playerTurn == userId.value) {
-                        _game.value = gameFromServices
-                        break
-                    }
-                }
-            }
+        viewModelScope.launch {
+            val res = useCases.placeShot(token, coordinate)
+            if (!res) {
+                Log.e(TAG, "Tried to place shot but an error occurred")
+                return@launch
+            } else updateGame()
+            Log.i(TAG, "Shot placed")
         }
-         */
     }
 
     private fun getMyBoard(game: Game) = if (myBoardDisplayed.value) game.board1 else game.board2

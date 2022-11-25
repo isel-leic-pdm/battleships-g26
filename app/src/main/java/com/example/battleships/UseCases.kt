@@ -65,12 +65,13 @@ class UseCases(
     suspend fun setFleet(
         token: String,
         ships: List<Triple<ShipType, Coordinate, Orientation>>,
-        newSetFleetAction: SirenAction? = null,
-        newConfirmFleetLayoutAction: SirenAction? = null,
         mode: Mode = Mode.AUTO
     ): Boolean {
-        if (!gameServices.setFleet(token, ships, newSetFleetAction, mode)) return false
-        if (!gameServices.confirmFleetLayout(token, mode, newConfirmFleetLayoutAction)) return false
+        if (!gameServices.setFleet(token, ships, null, mode)) return false
+        if (!gameServices.confirmFleetLayout(token, mode, null)) return false
         return true
     }
+
+    suspend fun placeShot(token: String, coordinate: Coordinate, mode: Mode = Mode.AUTO)
+        = gameServices.placeShot(token, coordinate, null, mode)
 }

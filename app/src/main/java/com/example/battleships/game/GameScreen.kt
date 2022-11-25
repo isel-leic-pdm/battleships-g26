@@ -10,23 +10,18 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.example.battleships.game.domain.game.*
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
-import com.example.battleships.game.domain.game.Game
 import com.example.battleships.game.domain.ship.getOrientation
-import pt.isel.daw.dawbattleshipgame.domain.board.first
-import pt.isel.daw.dawbattleshipgame.domain.game.confirmFleet
-import pt.isel.daw.dawbattleshipgame.domain.game.moveShip
-import pt.isel.daw.dawbattleshipgame.domain.game.placeShip
-import pt.isel.daw.dawbattleshipgame.domain.game.rotateShip
+import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 
 internal open class Selection
 internal class ShipOption(val shipType: ShipType) : Selection()
 internal class Square(val coordinate: Coordinate) : Selection()
-internal class PostedShips(val ships: List<Triple<ShipType, Coordinate, Orientation>>) : Selection()
 
 @Composable
 internal fun GameScreen(
@@ -46,7 +41,6 @@ internal fun GameScreen(
                     .fillMaxSize(),
             ) {
                 var selected: Selection? = null
-                var postedShips = PostedShips(emptyList())
                 val curGame = activity.vm.game.value
                 val player = activity.vm.player
 
@@ -60,7 +54,12 @@ internal fun GameScreen(
                         onSquarePressed = {
                             selected = onSquarePressed(selected, curGame, activity, it) ?: return@GameView
                         },
-                        onShotPlaced = { activity.vm.placeShot(it) },
+                        onShotPlaced = {
+                            val game = activity.vm.game.value ?: return@GameView
+                            val playerId = if (player == Player.ONE) game.player1 else game.player2
+                            game.placeShot(playerId, it, player) ?: return@GameView // TODO -> shouldn't require playerId
+                            activity.vm.placeShot(it)
+                        },
                         onConfirmLayout = {
                             val game = activity.vm.game.value ?: return@GameView
                             try { // TODO: change confirmFleet to return Game?, if invalid

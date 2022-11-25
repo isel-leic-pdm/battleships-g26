@@ -78,13 +78,11 @@ private fun PreparationPhase(
             ShipOptionView(configuration, if (isClickable) onShipClick else null)
         }
         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
-            if (isClickable) {
-                TextButton(
-                    modifier = Modifier.padding(top = 16.dp),
-                    onClick = onConfirmLayout!!
-                ) {
-                    Text("Confirm", fontSize = 40.sp)
-                }
+            TextButton(
+                modifier = Modifier.padding(top = 16.dp),
+                onClick = onConfirmLayout ?: {},
+            ) {
+                Text(if (onConfirmLayout != null) "Confirm" else "Confirmed", fontSize = 40.sp)
             }
         }
     }
@@ -206,16 +204,16 @@ private fun ShipOptionView(configuration: Configuration, onShipClick: ((ShipType
             .background(Color.Black)
             .fillMaxHeight()
     ) {
-        ShipType.values().forEach { ship ->
+        configuration.fleet.forEach { ship ->
             Text(
-                AnnotatedString(ship.name),
+                AnnotatedString(ship.first.name),
                 style = TextStyle(
                     fontSize = 26.sp,
                     color = Color.White
                 )
             )
             Spacer(modifier = Modifier.size(10.dp))
-            PlayView(configuration, ship) { if (onShipClick != null) onShipClick(ship) }
+            PlayView(configuration, ship.first) { if (onShipClick != null) onShipClick(ship.first) }
         }
     }
 }

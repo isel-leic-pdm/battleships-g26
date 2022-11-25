@@ -1,7 +1,5 @@
-package pt.isel.daw.dawbattleshipgame.domain.game
+package com.example.battleships.game.domain.game
 
-import com.example.battleships.game.domain.game.Game
-import com.example.battleships.game.domain.game.GameState
 import pt.isel.daw.dawbattleshipgame.domain.board.Board
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.board.CoordinateSet
