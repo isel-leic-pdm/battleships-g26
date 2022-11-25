@@ -5,8 +5,8 @@ import com.example.battleships.game.GameInfo
 import com.example.battleships.utils.hypermedia.SirenEntity
 import pt.isel.daw.dawbattleshipgame.domain.board.Board
 import pt.isel.daw.dawbattleshipgame.domain.game.Configuration
-import pt.isel.daw.dawbattleshipgame.domain.game.Game
-import pt.isel.daw.dawbattleshipgame.domain.game.GameState
+import com.example.battleships.game.domain.game.Game
+import com.example.battleships.game.domain.game.GameState
 
 data class GameInfoDtoProperties(val state: String, val gameId: Int?)
 typealias GameInfoDto = SirenEntity<GameInfoDtoProperties>

@@ -9,7 +9,9 @@ import com.example.battleships.utils.send
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
-import pt.isel.daw.dawbattleshipgame.domain.game.Game
+import com.example.battleships.game.domain.game.Game
+import pt.isel.daw.dawbattleshipgame.domain.player.Player
+import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 
 class RealGamesDataServices(
@@ -91,7 +93,7 @@ class RealGamesDataServices(
      */
     override suspend fun setFleet(
         token: String,
-        ships: List<Pair<Coordinate, ShipType>>,
+        ships: List<Triple<ShipType, Coordinate, Orientation>>,
         mode: Mode,
         newSetFleetAction: SirenAction?,
         newConfirmFleetLayoutAction: SirenAction?
@@ -100,7 +102,7 @@ class RealGamesDataServices(
             ?: this.placeShipsAction ?: return false
         val placeShipsUrl = placeFleetLayout.href.toURL()
 
-        val requestBody = ships.joinToString(prefix = "[", postfix = "]") { (coordinate, shipType) ->
+        val requestBody = ships.joinToString(prefix = "[", postfix = "]") { (shipType, coordinate) ->
             "{\n" +
                     "    \"type\": \"${shipType.name}\",\n" +
                     "    \"position\": {\n" +
@@ -177,7 +179,7 @@ class RealGamesDataServices(
         token: String,
         newGetGameLink: SirenLink?,
         mode: Mode
-    ): Game? {
+    ): Pair<Game, Player>? {
         val getGameInfoLink = newGetGameLink?.also { getGameLink = it }
             ?: this.getGameLink ?: return null
         val url = getGameInfoLink.href.toURL()
@@ -193,7 +195,8 @@ class RealGamesDataServices(
         }
         placeShipsAction = getPlaceFleetLayout(gameDto)
         confirmFleetLayoutAction = getConfirmFleetLayout(gameDto)
-        return gameDto.toGame()
+        TODO("Not yet implemented: needs to know wich player is acossiated withe token")
+        // return gameDto.toGame()
     }
 
     private fun getConfirmFleetLayout(gameDto: SirenEntity<GameDtoProperties>) =

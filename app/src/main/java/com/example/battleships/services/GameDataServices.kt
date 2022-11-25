@@ -3,7 +3,9 @@ package com.example.battleships.services
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenLink
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
-import pt.isel.daw.dawbattleshipgame.domain.game.Game
+import com.example.battleships.game.domain.game.Game
+import pt.isel.daw.dawbattleshipgame.domain.player.Player
+import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 
 /**
@@ -16,7 +18,7 @@ interface GameDataServices {
 
     suspend fun setFleet(
         token: String,
-        ships: List<Pair<Coordinate, ShipType>>,
+        ships: List<Triple<ShipType, Coordinate, Orientation>>,
         mode: Mode,
         newSetFleetAction: SirenAction? = null,
         newConfirmFleetLayoutAction: SirenAction? = null
@@ -26,5 +28,9 @@ interface GameDataServices {
 
     suspend fun placeShot(token: String, coordinate: Coordinate, newPlaceShotAction: SirenAction?, mode: Mode): Boolean
 
-    suspend fun getGame(token: String, newGetGameLink: SirenLink? = null, mode: Mode): Game?
+    /**
+     * This function is responsible for getting the game state.
+     * @return an object representing the current game state, and the player associated with the token.
+     */
+    suspend fun getGame(token: String, newGetGameLink: SirenLink? = null, mode: Mode): Pair<Game, Player>?
 }

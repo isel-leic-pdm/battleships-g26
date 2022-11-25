@@ -2,6 +2,7 @@ package com.example.battleships.services.fake
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.example.battleships.game.domain.game.Game
 import com.example.battleships.services.GameDataServices
 import com.example.battleships.services.Mode
 import com.example.battleships.utils.hypermedia.SirenAction
@@ -55,7 +56,7 @@ class FakeGameDataServices : GameDataServices {
         ships.forEachIndexed { idx, ship ->
             val shipType = ship.first
             val shipOrientation = Orientation.HORIZONTAL
-            val shipPosition = Coordinate(idx * 2, 0)
+            val shipPosition = Coordinate((idx+1) * 2, 1)
             newGame = newGame.placeShip(shipType, shipPosition, shipOrientation, Player.TWO)
                 ?: throw java.lang.IllegalStateException("Ship placement failed")
         }
@@ -72,14 +73,14 @@ class FakeGameDataServices : GameDataServices {
 
     override suspend fun setFleet(
         token: String,
-        ships: List<Pair<Coordinate, ShipType>>,
+        ships: List<Triple<ShipType, Coordinate, Orientation>>,
         mode: Mode,
         newSetFleetAction: SirenAction?,
         newConfirmFleetLayoutAction: SirenAction?
     ): Boolean {
         var newGame = game
-        ships.forEach { (coordinate, shipType) ->
-            newGame = newGame?.placeShip(shipType, coordinate, Orientation.HORIZONTAL, Player.ONE) ?: return false
+        ships.forEach { (shipType, coordinate, orientation) ->
+            newGame = newGame?.placeShip(shipType, coordinate, orientation, Player.ONE) ?: return false
         }
         game = newGame
         return true
@@ -112,7 +113,7 @@ class FakeGameDataServices : GameDataServices {
         token: String,
         newGetGameLink: SirenLink?,
         mode: Mode
-    ): Game? {
-        return game
+    ): Pair<Game, Player>? {
+        return game?.let { Pair(it, Player.ONE) }
     }
 }
