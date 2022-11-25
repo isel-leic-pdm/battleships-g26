@@ -23,21 +23,7 @@ class HomeActivityTests {
         testRule.onNodeWithTag(NavigateToInfoTestTag).assertExists()
         testRule.onNodeWithTag(NavigateToAuthenticationButtonTestTag).assertExists()
         testRule.onNodeWithTag(NavigateToRankingsButtonTestTag).assertExists()
-    }
-
-    @Test
-    fun pressing_navigate_back_finishes_activity() {
-        // Arrange
-        testRule.onNodeWithTag("HomeScreen").assertExists()
-
-        // Act
-        testRule.onNodeWithTag(NavigateBackTestTag).performClick()
-        testRule.waitForIdle()
-
-        // Assert
-        testRule.onNodeWithTag("HomeScreen").assertDoesNotExist()
-        testRule.waitForIdle()
-        assert(testRule.activityRule.scenario.state == Lifecycle.State.DESTROYED)
+        testRule.onNodeWithTag(NavigateBackTestTag).assertDoesNotExist()
     }
 
     @Test
