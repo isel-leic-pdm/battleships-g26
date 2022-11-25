@@ -8,6 +8,10 @@ import com.example.battleships.services.UserDataServices
 import com.example.battleships.services.real.RealGamesDataServices
 import com.example.battleships.services.real.RealHomeDataServices
 import com.example.battleships.services.real.RealUserDataServices
+import com.example.battleships.utils.hypermedia.SirenAction
+import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
+import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
+import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 
 // TODO -> optimize how the links and actions are obtained
 class UseCases(
@@ -18,7 +22,7 @@ class UseCases(
     private val servicesAreReal: Boolean = (homeServices is RealHomeDataServices && userServices is RealUserDataServices
             && gameServices is RealGamesDataServices)
 
-    suspend fun createUser(username: String, password: String, mode: Mode): Int? {
+    suspend fun createUser(username: String, password: String, mode: Mode = Mode.AUTO): Int? {
         val userId = userServices.createUser(username, password, mode)
         if (servicesAreReal && userId == null) {
             homeServices as RealHomeDataServices
@@ -29,7 +33,7 @@ class UseCases(
         return userId
     }
 
-    suspend fun getToken(username: String, password: String, mode: Mode): String? {
+    suspend fun getToken(username: String, password: String, mode: Mode = Mode.AUTO): String? {
         val token = userServices.getToken(username, password, mode)
         if (servicesAreReal && token == null) {
             homeServices as RealHomeDataServices
@@ -40,7 +44,7 @@ class UseCases(
         return token
     }
 
-    suspend fun createGame(token: String, mode: Mode) {
+    suspend fun createGame(token: String, mode: Mode = Mode.AUTO) {
         val gameId = gameServices.createGame(token, mode)
         if (servicesAreReal && gameId == null) {
             gameServices as RealGamesDataServices
@@ -52,6 +56,22 @@ class UseCases(
         }
     }
 
+    suspend fun fetchGame(token: String, mode: Mode = Mode.AUTO) =
+        gameServices.getGame(token, mode = mode)
+
     suspend fun rankings(mode: Mode): GameRanking =
         homeServices.getRankings(mode)
+
+    suspend fun setFleet(
+        token: String,
+        ships: List<Triple<ShipType, Coordinate, Orientation>>,
+        mode: Mode = Mode.AUTO
+    ): Boolean {
+        if (!gameServices.setFleet(token, ships, null, mode)) return false
+        if (!gameServices.confirmFleetLayout(token, mode, null)) return false
+        return true
+    }
+
+    suspend fun placeShot(token: String, coordinate: Coordinate, mode: Mode = Mode.AUTO)
+        = gameServices.placeShot(token, coordinate, null, mode)
 }

@@ -1,15 +1,22 @@
 package com.example.battleships.game
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.battleships.UseCases
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
-import pt.isel.daw.dawbattleshipgame.domain.game.Game
+import com.example.battleships.game.domain.game.Game
+import com.example.battleships.game.domain.game.GameState
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
+
+const val TAG = "GameViewModel"
 
 /**
  * The ViewModel for BattleshipActivity.
@@ -22,14 +29,6 @@ class GameViewModel(
     private val useCases: UseCases,
     private val token: String
 ) : ViewModel() {
-    private val _userId: MutableState<Int?> = mutableStateOf(null)
-    val userId: State<Int?>
-        get() = _userId
-
-    private var _gameId: MutableState<Int?> = mutableStateOf(null)
-    val gameId: State<Int?>
-        get() = _gameId
-
     private var _game: MutableState<Game?> = mutableStateOf(null)
     val game: State<Game?>
         get() = _game
@@ -38,142 +37,61 @@ class GameViewModel(
     val myBoardDisplayed: State<Boolean>
         get() = _myBoardDisplayed
 
-    private var _player: MutableState<Player?> = mutableStateOf(null)
-    val player: State<Player?>
-        get() = _player
-
+    var player: Player? = null
 
     fun startGame() {
-        /*
         viewModelScope.launch {
             useCases.createGame(token) // requests to start a new game
-            _gameId.value = useCases.getGameId(token) // asserts gameId
-            setGame() // asserts game
+            Log.i(TAG, "Game started")
+            updateGame() // asserts game
         }
-
-         */
     }
 
-    private fun setGame() {
-        /*
-        val gameId = _gameId.value
-        if (gameId != null) {
-            viewModelScope.launch {
-                while (game.value == null) {
-                    delay(1000)
-                    _game.value = useCases.getGame(token, gameId)
-                }
-                setPlayer() // asserts player
+    private fun updateGame() {
+        viewModelScope.launch {
+            val res = useCases.fetchGame(token)
+            Log.i(TAG, "Game updated")
+            if (res == null) {
+                Log.e(TAG, "Tried to update game but it was null")
+                return@launch
+            }
+            _game.value = res.first
+            player = res.second
+            Log.i(TAG, "Game updated")
+        }
+    }
+
+    fun setFleet(ships: List<Triple<ShipType, Coordinate, Orientation>>) {
+        viewModelScope.launch {
+            val res = useCases.setFleet(token, ships)
+            if (!res) {
+                Log.e(TAG, "Tried to place ships but an error occurred")
+                return@launch
+            }
+            Log.i(TAG, "Ships placed, and confirmed")
+            while (true) {
+                updateGame()
+                if (game.value?.state === GameState.BATTLE) break
+                delay(1000)
+                Log.d(TAG, "Waiting for opponent to place ships") // TODO: maybe, remove this later
             }
         }
-         */
-    }
-
-    private fun setPlayer() {
-        val gameInternal = game.value ?: return
-        val userId = _userId.value ?: return
-        if (gameInternal.player1 == userId) {
-            _player.value = Player.ONE
-        }
-        _player.value = Player.TWO
-    }
-
-    fun placeShip(shipType: ShipType, coordinate: Coordinate, orientation: Orientation) {
-        /*
-        val gameInternal = game.value ?: return
-        val player = player.value ?: return
-        val gameId = _gameId.value ?: return
-        if (gameInternal.state === GameState.FLEET_SETUP) {
-            val playerBoard = getMyBoard(gameInternal)
-            if (!playerBoard.isConfirmed()) {
-                gameInternal.onSquarePressed(shipType, coordinate, orientation, player)
-                    ?: return // tests if the action is valid
-                viewModelScope.launch {
-                    useCases.placeShip(token, gameId, shipType, coordinate, orientation)
-                    _game.value = useCases.getGame(token, gameId)
-                }
-            }
-        }
-         */
-    }
-
-    fun moveShip(origin: Coordinate, destination: Coordinate) {
-        /*
-        val gameInternal = game.value ?: return
-        val gameId = _gameId.value ?: return
-        if (gameInternal.state === GameState.FLEET_SETUP) {
-            val playerBoard = getMyBoard(gameInternal)
-            if (!playerBoard.isConfirmed()) {
-                gameInternal.moveShip(origin, destination)
-                    ?: return // tests if the action is valid
-                viewModelScope.launch {
-                    useCases.moveShip(token, gameId, origin, destination)
-                    _game.value = useCases.getGame(token, gameId)
-                }
-            }
-        }
-         */
-    }
-
-    fun rotateShip(position: Coordinate) {
-        /*
-        val gameInternal = game.value ?: return
-        val gameId = _gameId.value ?: return
-        if (gameInternal.state === GameState.FLEET_SETUP) {
-            val playerBoard = getMyBoard(gameInternal)
-            if (!playerBoard.isConfirmed()) {
-                gameInternal.rotateShip(position)
-                    ?: return // tests if the action is valid
-                viewModelScope.launch {
-                    useCases.rotateShip(token, gameId, position)
-                    _game.value = useCases.getGame(token, gameId) ?: _game.value
-                }
-            }
-        }
-         */
-    }
-
-    fun confirmFleet() {
-        /*
-        val gameInternal = game.value ?: return
-        val player = player.value ?: return
-        val gameId = _gameId.value ?: return
-        if (gameInternal.state === GameState.FLEET_SETUP) {
-            val playerBoard = getMyBoard(gameInternal)
-            if (!playerBoard.isConfirmed()) {
-                gameInternal.confirmFleet(player)
-                viewModelScope.launch {
-                    useCases.confirmFleet(token, gameId)
-                    _game.value = useCases.getGame(token, gameId) ?: _game.value
-                }
-            }
-        }
-         */
     }
 
     fun placeShot(coordinate: Coordinate) {
-        /*
-        val gameInternal = game.value ?: return
-        val gameId = _gameId.value ?: return
-        if (gameInternal.state === GameState.BATTLE) {
-            gameInternal.placeShot(gameInternal.player1, coordinate) // tests if the action is valid
-                ?: return
-            viewModelScope.launch {
-                useCases.placeShot(token, gameId, coordinate) // does the action
-                _game.value = useCases.getGame(token, gameId) ?: _game.value // updates the game
-                while (true) {
-                    delay(1000)
-                    val gameFromServices = useCases.getGame(token, gameId) ?: throw Exception("Game not found")
-                    userId.value ?: throw Exception("User not found")
-                    if (gameFromServices.playerTurn == userId.value) {
-                        _game.value = gameFromServices
-                        break
-                    }
-                }
-            }
+        viewModelScope.launch {
+            val res = useCases.placeShot(token, coordinate)
+            if (!res) {
+                Log.e(TAG, "Tried to place shot but an error occurred")
+                return@launch
+            } else updateGame()
+            Log.i(TAG, "Shot placed")
         }
-         */
     }
 
     private fun getMyBoard(game: Game) = if (myBoardDisplayed.value) game.board1 else game.board2
+
+    internal fun setGame(game: Game) {
+        _game.value = game
+    }
 }

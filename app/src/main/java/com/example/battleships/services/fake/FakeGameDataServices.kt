@@ -2,10 +2,15 @@ package com.example.battleships.services.fake
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.example.battleships.game.domain.game.Game
+import com.example.battleships.game.domain.game.confirmFleet
+import com.example.battleships.game.domain.game.placeShip
+import com.example.battleships.game.domain.game.placeShot
 import com.example.battleships.services.GameDataServices
 import com.example.battleships.services.Mode
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenLink
+import kotlinx.coroutines.delay
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.game.*
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
@@ -22,10 +27,12 @@ class FakeGameDataServices : GameDataServices {
         boardSize = 10,
         fleet = setOf(
             Pair(ShipType.CARRIER, 5),
+            /*
             Pair(ShipType.BATTLESHIP, 4),
             Pair(ShipType.CRUISER, 3),
             Pair(ShipType.SUBMARINE, 3),
             Pair(ShipType.DESTROYER, 2)
+             */
         ),
         nShotsPerRound = 10,
         roundTimeout = TIMEOUT
@@ -55,11 +62,11 @@ class FakeGameDataServices : GameDataServices {
         ships.forEachIndexed { idx, ship ->
             val shipType = ship.first
             val shipOrientation = Orientation.HORIZONTAL
-            val shipPosition = Coordinate(idx * 2, 0)
+            val shipPosition = Coordinate((idx+1) * 2, 1)
             newGame = newGame.placeShip(shipType, shipPosition, shipOrientation, Player.TWO)
                 ?: throw java.lang.IllegalStateException("Ship placement failed")
         }
-        return newGame
+        return newGame.confirmFleet(Player.TWO)
     }
 
     override suspend fun getCurrentGameId(
@@ -72,14 +79,13 @@ class FakeGameDataServices : GameDataServices {
 
     override suspend fun setFleet(
         token: String,
-        ships: List<Pair<Coordinate, ShipType>>,
-        mode: Mode,
+        ships: List<Triple<ShipType, Coordinate, Orientation>>,
         newSetFleetAction: SirenAction?,
-        newConfirmFleetLayoutAction: SirenAction?
+        mode: Mode
     ): Boolean {
         var newGame = game
-        ships.forEach { (coordinate, shipType) ->
-            newGame = newGame?.placeShip(shipType, coordinate, Orientation.HORIZONTAL, Player.ONE) ?: return false
+        ships.forEach { (shipType, coordinate, orientation) ->
+            newGame = newGame?.placeShip(shipType, coordinate, orientation, Player.ONE) ?: return false
         }
         game = newGame
         return true
@@ -105,14 +111,30 @@ class FakeGameDataServices : GameDataServices {
     ): Boolean {
         val game = game ?: return false
         this.game = game.placeShot(game.player1, coordinate, Player.ONE)
+        delay(1500)
+        shootWithEnemy()
         return true
+    }
+
+    private fun shootWithEnemy() {
+        val game = game ?: return
+        // tries to shoot with enemy, on a random coordinate, until it succeeds
+        while (true) {
+            val randomCoordinate = Coordinate(
+                (1..configuration.boardSize).random(),
+                (1..configuration.boardSize).random()
+            )
+            val newGame = game.placeShot(game.player2, randomCoordinate, Player.TWO) ?: continue
+            this.game = newGame
+            break
+        }
     }
 
     override suspend fun getGame(
         token: String,
         newGetGameLink: SirenLink?,
         mode: Mode
-    ): Game? {
-        return game
+    ): Pair<Game, Player>? {
+        return game?.let { Pair(it, Player.ONE) }
     }
 }
