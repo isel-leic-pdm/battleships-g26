@@ -3,6 +3,7 @@ package com.example.battleships.rankings
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -11,16 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.battleships.ui.CenteredTopAppBar
+import com.example.battleships.ui.MarqueeText
 import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.TopBar
-import com.example.battleships.ui.theme.BattleshipsTheme
-import com.example.battleships.ui.theme.Milk
+import com.example.battleships.ui.theme.*
 
 // Test tags for the Rankings screen
 const val RankingListTestTag = "RankingList"
@@ -89,7 +88,7 @@ fun RankingsScreenNew(
                 Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
-            ){
+            ) {
                 Column(
                     Modifier
                         .offset(y = -20.dp)
@@ -102,16 +101,19 @@ fun RankingsScreenNew(
                     verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Row{
-                        Column { Text("NAME", fontSize = 25.sp)}
+                    Row (Modifier.offset(x = 17.dp)){
+                        Column { Text("NAME", fontSize = 25.sp) }
                         Spacer(Modifier.size(20.dp))
-                        Column { Text("GAMES", fontSize = 25.sp)}
+                        Column { Text("GAMES", fontSize = 25.sp) }
                         Spacer(Modifier.size(20.dp))
-                        Column { Text("WINS", fontSize = 25.sp)}
+                        Column { Text("WINS", fontSize = 25.sp) }
                     }
                     Row(Modifier.height(20.dp)) {}
-                    ranking.users.forEach {
-                        ListEntry(name = it.username, games = it.gamesPlayed, wins = it.wins)
+                    ranking.users.forEachIndexed { idx, it ->
+                        ListEntry(name = it.username,
+                            games = it.gamesPlayed,
+                            wins = it.wins, idx = idx + 1
+                        )
                     }
                 }
             }
@@ -121,7 +123,7 @@ fun RankingsScreenNew(
 
 
 @Composable
-fun ListEntry(name : String, games: Int, wins : Int){
+fun ListEntry(name: String, games: Int, wins: Int, idx : Int) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -131,42 +133,68 @@ fun ListEntry(name : String, games: Int, wins : Int){
             .padding(6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
-    ){
-        Entry(value = name)
-        Entry(value = games.toString())
-        Entry(value = wins.toString())
+    ) {
+        Meddle(idx = idx)
+        Spacer(modifier = Modifier.size(20.dp))
+        Entry(label = name)
+        Entry(label = games.toString())
+        Entry(label = wins.toString())
     }
+
 }
 
 @Composable
-fun Entry(value : String) {
-    Column(Modifier.width(90.dp),
+fun Entry(label: String) {
+    Column(
+        Modifier
+            .width(90.dp)
+            .height(60.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(value, fontSize = 20.sp)
+        if (label.length > 6) MarqueeText(text = label, fontSize = 20.sp)
+        else Text(label, fontSize = 20.sp)
     }
 }
 
+
+@Composable
+fun Meddle(idx : Int){
+    val color = when(idx){
+        1 -> Gold
+        2 -> Silver
+        3 -> Bronze
+        else -> Color.White
+    }
+    Column(
+        Modifier
+            .size(25.dp)
+            .clip(CircleShape)
+            .background(color),
+        verticalArrangement = Arrangement.SpaceEvenly,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        Text(idx.toString(), fontSize = 20.sp,
+            modifier = Modifier.offset(y = (-3).dp)
+        )
+    }
+}
 
 @Preview
 @Composable
 fun StartScreenPreview() {
     val fakeRankings = GameRanking(
         listOf(
-            UserStats("Antonio", 0, 0),
+            UserStats("Antonio Carvalho", 5, 8),
             UserStats("Miguel", 0, 0),
             UserStats("Pedro", 0, 0),
-            UserStats("Antonio", 0, 0),
+            UserStats("Antonio Carvalho", 0, 0),
             UserStats("Miguel", 0, 0),
             UserStats("Pedro", 0, 0),
-            UserStats("Antonio", 0, 0),
-            UserStats("Miguel", 0, 0),
-            UserStats("Pedro Manel", 0, 0),
-            UserStats("Antonio", 0, 0),
+            UserStats("Antonio Carvalho", 0, 0),
             UserStats("Miguel", 0, 0),
             UserStats("Pedro", 0, 0),
-            UserStats("Antonio", 0, 0),
+            UserStats("Antonio Carvalho", 0, 0),
             UserStats("Miguel", 0, 0),
             UserStats("Pedro", 0, 0),
         )
