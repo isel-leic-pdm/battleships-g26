@@ -31,7 +31,7 @@ fun Menu(
 }
 
 // Test tags for the TopBar navigation elements
-const val CreateUserButtonTestTag = "CreateUserButton"
+const val RegisterUserButtonTestTag = "CreateUserButton"
 const val LoginButtonTestTag = "LoginUserButton"
 
 @Composable
@@ -59,7 +59,7 @@ fun CredentialsView(
         LoadingButton(
             value = title,
             state = createLoading,
-            tagName = if (title == "Create User") CreateUserButtonTestTag else LoginButtonTestTag,
+            tagName = if (title == "Create User") RegisterUserButtonTestTag else LoginButtonTestTag,
             onClick = { onCreate(username.value, password.value) }
         )
     }

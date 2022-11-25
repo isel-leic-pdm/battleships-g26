@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,10 +26,18 @@ import androidx.compose.ui.unit.dp
 import com.example.battleships.auth.views.LoadingButton
 import com.example.battleships.auth.views.LoadingState
 import com.example.battleships.auth.views.PasswordOutlinedTextField
-import com.example.battleships.home.CreateUserButtonTestTag
+import com.example.battleships.home.RegisterUserButtonTestTag
+import com.example.battleships.home.LoginButtonTestTag
+import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
 import com.example.battleships.ui.theme.Milk
+
+// Test tags for the TopBar navigation elements
+const val RegisterUserButtonTestTag = "CreateUserButton"
+const val LoginButtonTestTag = "LoginUserButton"
+const val SwitchToLoginButtonTestTag = "SwitchToLoginButton"
+const val SwitchToRegisterButtonTestTag = "SwitchToRegisterButton"
 
 @Composable
 internal fun LaunchScreen(
@@ -36,16 +45,16 @@ internal fun LaunchScreen(
     isRegister: LoadingState,
     onRegisterUser: (String, String) -> Unit,
     onLoginUser: (String, String) -> Unit,
+    navigationHandlers: NavigationHandlers? = null
 ) {
     val username = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
     BattleshipsTheme {
         Scaffold(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().testTag("AuthScreen"),
             backgroundColor = MaterialTheme.colors.background,
-            topBar = { TopBar() }
-        ){
-                paddingValues ->
+            topBar = { TopBar(navigationHandlers ?: NavigationHandlers()) }
+        ){ paddingValues ->
             Column(
                 verticalArrangement = Arrangement.SpaceAround,
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -70,7 +79,6 @@ internal fun LaunchScreen(
     }
 }
 
-
 enum class Action(val companion : String) {
     REGISTER("Register"),
     LOGIN("Log In");
@@ -89,8 +97,7 @@ fun InputView(
     isRegister: LoadingState,
     onRegister: (String, String) -> Unit,
     onLogin: (String, String) -> Unit,
-
-    ) {
+) {
     val mContext = LocalContext.current
     val buttonAction = remember { mutableStateOf(Action.REGISTER) }
     val retypedPassword = remember { mutableStateOf("") }
@@ -110,13 +117,18 @@ fun InputView(
             passwordVisible = retypePasswordVisible)
     }
 
+    val confirmOperationButtonTestTag = when (buttonAction.value) {
+        Action.REGISTER -> RegisterUserButtonTestTag
+        Action.LOGIN -> LoginButtonTestTag
+    }
+
     LoadingButton(
         value = buttonAction.value.companion,
         state = when(buttonAction.value) {
             Action.REGISTER -> isLogin
             Action.LOGIN -> isRegister
         },
-        tagName = CreateUserButtonTestTag,
+        tagName = confirmOperationButtonTestTag,
         onClick = {
             when(buttonAction.value) {
                 Action.REGISTER -> {
@@ -132,6 +144,12 @@ fun InputView(
             }
         }
     )
+
+    val switchButtonTestTag = when (buttonAction.value) {
+        Action.REGISTER -> SwitchToLoginButtonTestTag
+        Action.LOGIN -> SwitchToRegisterButtonTestTag
+    }
+
     Row {
         Text(text =
         when(buttonAction.value) {
@@ -139,6 +157,7 @@ fun InputView(
             Action.LOGIN -> "Don't have an account? "
         })
         ClickableText(
+            modifier = Modifier.testTag(switchButtonTestTag),
             text = AnnotatedString(buttonAction.value.other().companion) ,
             onClick = {
                 buttonAction.value = buttonAction.value.other()
