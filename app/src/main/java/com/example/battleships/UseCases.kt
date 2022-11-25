@@ -68,5 +68,9 @@ class UseCases(
         newSetFleetAction: SirenAction? = null,
         newConfirmFleetLayoutAction: SirenAction? = null,
         mode: Mode = Mode.AUTO
-    ) = gameServices.setFleet(token, ships, mode, newSetFleetAction, newConfirmFleetLayoutAction)
+    ): Boolean {
+        if (!gameServices.setFleet(token, ships, newSetFleetAction, mode)) return false
+        if (!gameServices.confirmFleetLayout(token, mode, newConfirmFleetLayoutAction)) return false
+        return true
+    }
 }

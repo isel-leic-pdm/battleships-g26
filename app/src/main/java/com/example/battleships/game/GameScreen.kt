@@ -1,5 +1,6 @@
 package com.example.battleships.game
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +14,9 @@ import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import com.example.battleships.game.domain.game.Game
+import com.example.battleships.game.domain.ship.getOrientation
+import pt.isel.daw.dawbattleshipgame.domain.board.first
+import pt.isel.daw.dawbattleshipgame.domain.game.confirmFleet
 import pt.isel.daw.dawbattleshipgame.domain.game.moveShip
 import pt.isel.daw.dawbattleshipgame.domain.game.placeShip
 import pt.isel.daw.dawbattleshipgame.domain.game.rotateShip
@@ -23,7 +27,6 @@ internal open class Selection
 internal class ShipOption(val shipType: ShipType) : Selection()
 internal class Square(val coordinate: Coordinate) : Selection()
 internal class PostedShips(val ships: List<Triple<ShipType, Coordinate, Orientation>>) : Selection()
-
 
 @Composable
 internal fun GameScreen(
@@ -55,12 +58,27 @@ internal fun GameScreen(
                             selected = ShipOption(it)
                         },
                         onSquarePressed = {
-                            val res = onSquarePressed(selected, postedShips, curGame, activity, it) ?: return@GameView
-                            selected = res.first
-                            postedShips = res.second
+                            selected = onSquarePressed(selected, curGame, activity, it) ?: return@GameView
                         },
                         onShotPlaced = { activity.vm.placeShot(it) },
-                        onConfirmLayout = { activity.vm.setFleet(postedShips.ships) }
+                        onConfirmLayout = {
+                            val game = activity.vm.game.value ?: return@GameView
+                            try { // TODO: change confirmFleet to return Game?, if invalid
+                                game.confirmFleet(player) // checks if its possible to confirm the current fleet state
+                            } catch (e: Exception) {
+                                Log.i("GameScreen", "Invalid fleet layout. Could not confirm.")
+                                return@GameView
+                            }
+                            game.getBoard(player).getShips().map { ship ->
+                                Triple(
+                                    ship.type,
+                                    ship.coordinates.sortedBy { (it.row * game.configuration.boardSize) + it.column }.first(), // this will choose the first/lower coordinate
+                                    ship.getOrientation()
+                                )
+                            }.let { ships ->
+                                activity.vm.setFleet(ships)
+                            }
+                        }
                     )
                 }
             }
@@ -78,29 +96,26 @@ internal fun GameScreen(
  */
 private fun onSquarePressed(
     selected: Selection?,
-    postedShips: PostedShips,
     curGame: Game,
     activity: GameActivity,
     coordinate: Coordinate
-): Pair<Selection?, PostedShips>? {
+): Selection? {
     if (selected == null /*&& curGame.isShip(coordinate)*/) {
-        return Square(coordinate) to postedShips
+        return Square(coordinate)
     } else {
         if (selected is ShipOption) {
             val newGame = curGame.placeShip(selected.shipType, coordinate, Orientation.HORIZONTAL) ?: return null // validates
             activity.vm.setGame(newGame) // updates game locally
-            return null to PostedShips(postedShips.ships + Triple(selected.shipType, coordinate, Orientation.HORIZONTAL))
+            return null
         }
         if (selected is Square) {
             return if (coordinate == selected.coordinate) {
                 val newGame = curGame.rotateShip(coordinate) ?: return null // validates
                 activity.vm.setGame(newGame) // updates game locally
-                // TODO: update postedShips
                 null
             } else {
                 val newGame = curGame.moveShip(selected.coordinate, coordinate) ?: return null // validates
                 activity.vm.setGame(newGame) // updates game locally
-                // TODO: update postedShips
                 null
             }
         }

@@ -63,47 +63,11 @@ class GameViewModel(
         viewModelScope.launch {
             val res = useCases.setFleet(token, ships)
             if (!res) {
-                Log.e(TAG, "Tried to place ship but it was null")
+                Log.e(TAG, "Tried to place ships but an error occurred")
                 return@launch
             } else updateGame()
-            Log.i(TAG, "Ship placed")
+            Log.i(TAG, "Ships placed, and confirmed")
         }
-    }
-
-    fun moveShip(origin: Coordinate, destination: Coordinate) {
-        /*
-        val gameInternal = game.value ?: return
-        val gameId = _gameId.value ?: return
-        if (gameInternal.state === GameState.FLEET_SETUP) {
-            val playerBoard = getMyBoard(gameInternal)
-            if (!playerBoard.isConfirmed()) {
-                gameInternal.moveShip(origin, destination)
-                    ?: return // tests if the action is valid
-                viewModelScope.launch {
-                    useCases.moveShip(token, gameId, origin, destination)
-                    _game.value = useCases.getGame(token, gameId)
-                }
-            }
-        }
-         */
-    }
-
-    fun rotateShip(position: Coordinate) {
-        /*
-        val gameInternal = game.value ?: return
-        val gameId = _gameId.value ?: return
-        if (gameInternal.state === GameState.FLEET_SETUP) {
-            val playerBoard = getMyBoard(gameInternal)
-            if (!playerBoard.isConfirmed()) {
-                gameInternal.rotateShip(position)
-                    ?: return // tests if the action is valid
-                viewModelScope.launch {
-                    useCases.rotateShip(token, gameId, position)
-                    _game.value = useCases.getGame(token, gameId) ?: _game.value
-                }
-            }
-        }
-         */
     }
 
     fun placeShot(coordinate: Coordinate) {

@@ -9,8 +9,8 @@ import pt.isel.daw.dawbattleshipgame.domain.board.moveFromTo
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
-import pt.isel.daw.dawbattleshipgame.domain.ship.getOrientation
-import pt.isel.daw.dawbattleshipgame.domain.ship.getShip
+import com.example.battleships.game.domain.ship.getOrientation
+import com.example.battleships.game.domain.ship.getShip
 
 /**
  * Tries to place [shipType] on the Board, on give in [position].

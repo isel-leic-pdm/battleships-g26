@@ -94,9 +94,8 @@ class RealGamesDataServices(
     override suspend fun setFleet(
         token: String,
         ships: List<Triple<ShipType, Coordinate, Orientation>>,
-        mode: Mode,
         newSetFleetAction: SirenAction?,
-        newConfirmFleetLayoutAction: SirenAction?
+        mode: Mode
     ): Boolean {
         val placeFleetLayout = newSetFleetAction?.also { placeShipsAction = it }
             ?: this.placeShipsAction ?: return false

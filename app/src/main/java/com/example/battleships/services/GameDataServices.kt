@@ -19,12 +19,11 @@ interface GameDataServices {
     suspend fun setFleet(
         token: String,
         ships: List<Triple<ShipType, Coordinate, Orientation>>,
-        mode: Mode,
         newSetFleetAction: SirenAction? = null,
-        newConfirmFleetLayoutAction: SirenAction? = null
+        mode: Mode
     ): Boolean
 
-    suspend fun confirmFleetLayout(token: String, mode: Mode, newConfirmFleetLayoutAction: SirenAction? = null): Boolean?
+    suspend fun confirmFleetLayout(token: String, mode: Mode, newConfirmFleetLayoutAction: SirenAction? = null): Boolean
 
     suspend fun placeShot(token: String, coordinate: Coordinate, newPlaceShotAction: SirenAction?, mode: Mode): Boolean
 

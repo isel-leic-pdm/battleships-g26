@@ -74,9 +74,8 @@ class FakeGameDataServices : GameDataServices {
     override suspend fun setFleet(
         token: String,
         ships: List<Triple<ShipType, Coordinate, Orientation>>,
-        mode: Mode,
         newSetFleetAction: SirenAction?,
-        newConfirmFleetLayoutAction: SirenAction?
+        mode: Mode
     ): Boolean {
         var newGame = game
         ships.forEach { (shipType, coordinate, orientation) ->
