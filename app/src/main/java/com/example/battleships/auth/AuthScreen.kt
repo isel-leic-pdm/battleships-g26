@@ -27,7 +27,8 @@ import com.example.battleships.auth.views.LoadingState
 import com.example.battleships.auth.views.PasswordOutlinedTextField
 import com.example.battleships.home.CreateUserButtonTestTag
 import com.example.battleships.ui.TopBar
-import com.example.battleships.ui.theme.LightWhite
+import com.example.battleships.ui.theme.BattleshipsTheme
+import com.example.battleships.ui.theme.Milk
 
 @Composable
 internal fun LaunchScreen(
@@ -38,30 +39,32 @@ internal fun LaunchScreen(
 ) {
     val username = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        backgroundColor = MaterialTheme.colors.background,
-        topBar = { TopBar() }
-    ){
-        paddingValues ->
-        Column(
-            verticalArrangement = Arrangement.SpaceAround,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize(),
+    BattleshipsTheme {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            backgroundColor = MaterialTheme.colors.background,
+            topBar = { TopBar() }
         ){
+                paddingValues ->
             Column(
                 verticalArrangement = Arrangement.SpaceAround,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .offset(y = (-50).dp)
-                    .size(350.dp)
-                    .clip(RoundedCornerShape(30.dp))
-                    .background(LightWhite)
-            )
-            {
-                InputView(username, password, isLogin, isRegister, onRegisterUser, onLoginUser)
+                    .padding(paddingValues)
+                    .fillMaxSize(),
+            ){
+                Column(
+                    verticalArrangement = Arrangement.SpaceAround,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .offset(y = (-50).dp)
+                        .size(350.dp)
+                        .clip(RoundedCornerShape(30.dp))
+                        .background(Milk)
+                )
+                {
+                    InputView(username, password, isLogin, isRegister, onRegisterUser, onLoginUser)
+                }
             }
         }
     }
