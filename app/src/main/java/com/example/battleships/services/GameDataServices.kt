@@ -16,14 +16,16 @@ interface GameDataServices {
 
     suspend fun getCurrentGameId(token: String, mode: Mode, newGetCurrentGameIdLink: SirenLink? = null): Int?
 
+    /**
+     * Sets a fleet of ships for the player.
+     * @note after calling this function, its not possible to change the fleet.
+     */
     suspend fun setFleet(
         token: String,
         ships: List<Triple<ShipType, Coordinate, Orientation>>,
         newSetFleetAction: SirenAction? = null,
         mode: Mode
     ): Boolean
-
-    suspend fun confirmFleetLayout(token: String, mode: Mode, newConfirmFleetLayoutAction: SirenAction? = null): Boolean
 
     suspend fun placeShot(token: String, coordinate: Coordinate, newPlaceShotAction: SirenAction?, mode: Mode): Boolean
 

@@ -87,19 +87,7 @@ class FakeGameDataServices : GameDataServices {
         ships.forEach { (shipType, coordinate, orientation) ->
             newGame = newGame?.placeShip(shipType, coordinate, orientation, Player.ONE) ?: return false
         }
-        game = newGame
-        return true
-    }
-
-    /**
-     * Confirms the fleet layout.
-     */
-    override suspend fun confirmFleetLayout(
-        token: String,
-        mode: Mode,
-        newConfirmFleetLayoutAction: SirenAction?
-    ): Boolean {
-        game = game?.confirmFleet(Player.ONE) ?: return false
+        game = newGame?.confirmFleet(Player.ONE)
         return true
     }
 

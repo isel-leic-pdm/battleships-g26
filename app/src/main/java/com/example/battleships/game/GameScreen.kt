@@ -10,6 +10,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import com.example.battleships.game.domain.game.*
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
@@ -29,7 +30,7 @@ internal fun GameScreen(
 ) {
     BattleshipsTheme {
         Scaffold(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().testTag("GameScreen"),
             backgroundColor = MaterialTheme.colors.background,
             topBar = { TopBar() }
         ) { padding ->

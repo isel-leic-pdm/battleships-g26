@@ -68,7 +68,6 @@ class UseCases(
         mode: Mode = Mode.AUTO
     ): Boolean {
         if (!gameServices.setFleet(token, ships, null, mode)) return false
-        if (!gameServices.confirmFleetLayout(token, mode, null)) return false
         return true
     }
 

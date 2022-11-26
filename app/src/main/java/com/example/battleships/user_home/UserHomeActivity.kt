@@ -15,7 +15,7 @@ import com.example.battleships.ui.StartScreen
 class UserHomeActivity : ComponentActivity() {
 
     companion object {
-        private const val TOKEN_EXTRA = "START_GAME_TOKEN_EXTRA"
+        const val TOKEN_EXTRA = "START_GAME_TOKEN_EXTRA"
         fun navigate(origin: Activity, token: String) {
             with(origin) {
                 val intent = Intent(this, UserHomeActivity::class.java)
