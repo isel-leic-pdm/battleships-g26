@@ -1,5 +1,7 @@
 package com.example.battleships.info
 
+import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
@@ -12,66 +14,121 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
+import pt.isel.battleships.R
 
 @Composable
 fun InfoScreen(
-    onBackRequested: () -> Unit = { }
-) {
-    BattleshipsTheme {
-        Scaffold(
-            modifier = Modifier.fillMaxSize().testTag("InfoScreen"),
-            backgroundColor = MaterialTheme.colors.background,
-            topBar = { TopBar(NavigationHandlers(onBackRequested = onBackRequested)) },
-        ) { innerPadding ->
-            Column(
-                verticalArrangement = Arrangement.SpaceAround,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize(),
-            ) {
-                Author()
+    onBackRequest : () -> Unit = {},
+    onSendEmailRequested: () -> Unit = { },
+    onOpenUrlRequested: (Uri) -> Unit = { },
+){
+        BattleshipsTheme {
+            Scaffold(
+                modifier = Modifier.fillMaxSize(),
+                backgroundColor = MaterialTheme.colors.background,
+                topBar = { TopBar(
+                    NavigationHandlers(
+                        onBackRequest
+                    )
+                ) },
+            ) { innerPadding ->
+                Column(
+                    verticalArrangement = Arrangement.SpaceAround,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize(),
+                ) {
+                    Authors(
+                        onSendEmailRequested,
+                        onOpenUrlRequested
+                    )
+                }
             }
-        }
     }
 }
 
 
 @Composable
-fun Author(onSendEmailRequested: () -> Unit = { }) {
+fun Authors(onSendEmailRequested: () -> Unit = { },
+            onOpenUrlRequested: (Uri) -> Unit
+) {
     Column(
-        verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .offset(y = (-60).dp)
     ) {
-        Text(text = "Made with love by:", style = MaterialTheme.typography.h6)
-        Text(text = "António Carvalho", style = MaterialTheme.typography.h6)
-        Text(text = "Pedro Silva", style = MaterialTheme.typography.h6)
-        Text(text = "Miguel Rocha", style = MaterialTheme.typography.h6)
+        Text(text = "Made with ❤ by:", style = MaterialTheme.typography.h6)
+        MySpacer()
+        Developer(name = "António Carvalho", "https://github.com/ACRae", onOpenUrlRequested)
+        Developer(name = "Pedro Silva", "https://github.com/psilva20019", onOpenUrlRequested)
+        Developer(name = "Miguel Rocha", "https://github.com/MiguelRocha2001", onOpenUrlRequested)
+        MySpacer(30.dp)
+        Text(text = "Email us:", style = MaterialTheme.typography.h6)
+        MySpacer()
         Icon(imageVector = Icons.Default.Email,
             contentDescription = null,
-            tint = Color.DarkGray,
+            tint = Color.Black,
             modifier = Modifier
                 .clickable { onSendEmailRequested() }
-                .size(50.dp)
+                .size(60.dp)
         )
     }
+}
+
+@Composable
+fun Developer(name : String, link : String = "", onOpenUrlRequested : (Uri) -> Unit){
+    val uri = Uri.parse(link)
+    Row (
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start,
+        modifier = Modifier
+            .clickable { onOpenUrlRequested(uri) }
+            .fillMaxWidth()
+            .offset(x = 20.dp)
+            .padding(10.dp)
+    )
+    {
+        Image(
+            painter = painterResource(id = R.drawable.github_logo),
+            contentDescription = null,
+            modifier = Modifier.size(50.dp)
+        )
+        MySpacer()
+        Text(text = name, style = MaterialTheme.typography.h6)
+    }
+}
+
+@Composable
+fun MySpacer(size : Dp = 10.dp){
+    Spacer(modifier = Modifier.size(size))
+}
+
+@Preview
+@Composable
+fun DeveloperPreview(){
+    Developer(name = "Antonio") {}
 }
 
 
 @Preview
 @Composable
 fun AuthorPreview() {
-    Author {}
+    Authors{}
 }
 
 @Preview
 @Composable
-fun InfoScreenPreview() {
-    InfoScreen {}
+fun InfoScreenPreview(){
+    InfoScreen({}, {}, {})
 }

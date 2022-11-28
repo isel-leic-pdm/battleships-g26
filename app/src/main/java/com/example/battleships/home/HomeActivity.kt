@@ -12,6 +12,7 @@ import com.example.battleships.rankings.RankingsActivity
 import com.example.battleships.ui.Handler
 import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.StartScreen
+import com.example.battleships.ui.StartScreenNew
 
 const val NavigateToAuthenticationButtonTestTag = "NavigateToAuthenticationButton"
 const val NavigateToRankingsButtonTestTag = "NavigateToRankingsButton"
@@ -21,17 +22,10 @@ class HomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            StartScreen(
-                Handler("Create/Login", NavigateToAuthenticationButtonTestTag) {
-                    AuthActivity.navigate(this)
-                },
-                Handler("Rankings", NavigateToRankingsButtonTestTag) {
-                    RankingsActivity.navigate(this)
-                },
-                tag = "HomeScreen",
-                onNavigationRequested = NavigationHandlers(
-                    onInfoRequested = { InfoActivity.navigate(origin = this) },
-                )
+            StartScreenNew(
+                onSignIn = { AuthActivity.navigate(this) },
+                onRanking = { RankingsActivity.navigate(this) },
+                onAppInfo = { InfoActivity.navigate(this) }
             )
         }
     }

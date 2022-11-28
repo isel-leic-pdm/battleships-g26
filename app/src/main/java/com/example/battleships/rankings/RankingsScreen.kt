@@ -6,6 +6,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,10 +23,14 @@ import com.example.battleships.ui.MarqueeText
 import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.*
+import com.example.battleships.utils.SCREEN_HEIGHT
+import com.example.battleships.utils.SCREEN_WIDTH
 
 // Test tags for the Rankings screen
 const val RankingListTestTag = "RankingList"
 const val RefreshButtonTestTag = "RefreshButton"
+
+
 
 @Composable
 fun RankingsScreen(
@@ -33,56 +40,10 @@ fun RankingsScreen(
 ) {
     BattleshipsTheme {
         Scaffold(
-            modifier = Modifier
-                .fillMaxSize()
-                .testTag("RankingsScreen"),
-            backgroundColor = Color.White,
-            topBar = { TopBar(navigation = onNavigationRequested) },
-            bottomBar = { BottomAppBar {} },
-        ) { innerPadding ->
-            LazyColumn(
-                Modifier
-                    .padding(innerPadding)
-                    .fillMaxWidth()
-                    .testTag(RankingListTestTag)
-            ) {
-                ranking.users.forEach { user ->
-                    item {
-                        UserItem(user)
-                    }
-                }
-                item {
-                    Button(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag(RefreshButtonTestTag),
-                        onClick = onRefreshRequested
-                    ) { Text("Refresh") }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun UserItem(user: UserStats) {
-    Row(Modifier.fillMaxWidth()) {
-        Text(text = "Username: ${user.username}")
-        Text(text = "Wins: ${user.wins}")
-        Text(text = "Games played: ${user.gamesPlayed}")
-    }
-}
-
-
-@Composable
-fun RankingsScreenNew(
-    ranking: GameRanking,
-    onRefreshRequested: () -> Unit,
-    onNavigationRequested: NavigationHandlers = NavigationHandlers()
-) {
-    BattleshipsTheme {
-        Scaffold(
-            topBar = { CenteredTopAppBar(title = "Rankings") }
+            topBar = { CenteredTopAppBar(
+                navigation = onNavigationRequested,
+                title = "Rankings"
+            ) }
         ) { padding ->
             Column(
                 Modifier.fillMaxSize(),
@@ -92,11 +53,11 @@ fun RankingsScreenNew(
                 Column(
                     Modifier
                         .offset(y = -20.dp)
-                        .height(650.dp)
-                        .width(360.dp)
+                        .height(SCREEN_HEIGHT.dp/3 - 150.dp)
+                        .width(SCREEN_WIDTH.dp/3)
                         .clip(RoundedCornerShape(30.dp))
                         .background(Milk)
-                        .padding(20.dp)
+                        .padding(30.dp)
                         .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -115,6 +76,16 @@ fun RankingsScreenNew(
                             wins = it.wins, idx = idx + 1
                         )
                     }
+                }
+
+                Button(
+                    modifier = Modifier
+                        .testTag(RefreshButtonTestTag)
+                        .size(50.dp)
+                        .clip(CircleShape),
+                    onClick = onRefreshRequested
+                ) {
+                    Icon(Icons.Default.Refresh, null)
                 }
             }
         }
@@ -199,5 +170,5 @@ fun StartScreenPreview() {
             UserStats("Pedro", 0, 0),
         )
     )
-    RankingsScreenNew(ranking = fakeRankings, onRefreshRequested = { /*TODO*/ })
+    RankingsScreen(ranking = fakeRankings, onRefreshRequested = { /*TODO*/ })
 }
