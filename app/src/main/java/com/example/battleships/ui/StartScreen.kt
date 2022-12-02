@@ -1,10 +1,8 @@
 package com.example.battleships.ui
 
-import android.util.DisplayMetrics
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
 import androidx.compose.runtime.Composable
@@ -12,7 +10,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.battleships.ui.theme.BattleshipsTheme
 
 data class Handler(val name: String, val tag: String, val handler: () -> Unit)

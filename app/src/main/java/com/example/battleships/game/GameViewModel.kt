@@ -7,11 +7,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.battleships.UseCases
-import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.game.domain.game.GameState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
@@ -33,9 +33,11 @@ class GameViewModel(
     val game: State<Game?>
         get() = _game
 
+    /*
     private val _myBoardDisplayed: MutableState<Boolean> = mutableStateOf(true)
     val myBoardDisplayed: State<Boolean>
         get() = _myBoardDisplayed
+     */
 
     var player: Player? = null
 
@@ -89,7 +91,7 @@ class GameViewModel(
         }
     }
 
-    private fun getMyBoard(game: Game) = if (myBoardDisplayed.value) game.board1 else game.board2
+    // private fun getMyBoard(game: Game) = if (myBoardDisplayed.value) game.board1 else game.board2
 
     internal fun setGame(game: Game) {
         _game.value = game

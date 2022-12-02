@@ -66,7 +66,7 @@ class FakeGameDataServices : GameDataServices {
             newGame = newGame.placeShip(shipType, shipPosition, shipOrientation, Player.TWO)
                 ?: throw java.lang.IllegalStateException("Ship placement failed")
         }
-        return newGame.confirmFleet(Player.TWO)
+        return newGame.confirmFleet(Player.TWO) ?: throw java.lang.IllegalStateException("Fleet confirmation failed")
     }
 
     override suspend fun getCurrentGameId(
@@ -98,7 +98,8 @@ class FakeGameDataServices : GameDataServices {
         mode: Mode
     ): Boolean {
         val game = game ?: return false
-        this.game = game.placeShot(game.player1, coordinate, Player.ONE)
+        val newGame = game.placeShot(game.player1, coordinate, Player.ONE) ?: return false
+        this.game = newGame
         delay(1500)
         shootWithEnemy()
         return true

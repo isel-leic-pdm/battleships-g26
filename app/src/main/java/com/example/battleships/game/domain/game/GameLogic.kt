@@ -1,5 +1,7 @@
 package com.example.battleships.game.domain.game
 
+import com.example.battleships.game.domain.ship.getOrientation
+import com.example.battleships.game.domain.ship.getShip
 import pt.isel.daw.dawbattleshipgame.domain.board.Board
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.board.CoordinateSet
@@ -7,8 +9,6 @@ import pt.isel.daw.dawbattleshipgame.domain.board.moveFromTo
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
-import com.example.battleships.game.domain.ship.getOrientation
-import com.example.battleships.game.domain.ship.getShip
 
 /**
  * Tries to place [shipType] on the Board, on give in [position].
@@ -102,10 +102,8 @@ fun Game.rotateShip(position: Coordinate, player: Player = Player.ONE): Game? {
 }
 
 
-fun Game.confirmFleet(player: Player): Game {
-    require(getBoard(player).allShipsPlaced(configuration.fleet.toMap())) {
-        "All ships must be placed"
-    }
+fun Game.confirmFleet(player: Player): Game? {
+    if (!getBoard(player).allShipsPlaced(configuration.fleet.toMap())) return null
     val isOtherConfirmed = getBoard(player.other()).isConfirmed()
     return this.updateGame(
             getBoard(player).confirm(),

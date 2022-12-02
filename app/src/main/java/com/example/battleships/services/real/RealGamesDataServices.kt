@@ -1,6 +1,7 @@
 package com.example.battleships.services.real
 
 import com.example.battleships.dtos.*
+import com.example.battleships.game.domain.game.Game
 import com.example.battleships.services.*
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenEntity
@@ -9,7 +10,6 @@ import com.example.battleships.utils.send
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
-import com.example.battleships.game.domain.game.Game
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType

@@ -17,12 +17,12 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.battleships.game.domain.game.Game
+import com.example.battleships.game.domain.game.GameState
 import pt.isel.daw.dawbattleshipgame.domain.board.Board
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.board.Panel
 import pt.isel.daw.dawbattleshipgame.domain.game.Configuration
-import com.example.battleships.game.domain.game.Game
-import com.example.battleships.game.domain.game.GameState
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 
@@ -54,7 +54,11 @@ fun GameView(
                 else
                     PreparationPhase(board, game.configuration, null, null, null)
             }
-            game.state === GameState.BATTLE -> Battle(player, game.board1, game.board2, onShotPlaced)
+            game.state === GameState.BATTLE -> {
+                val playerIdTurn = game.playerTurn ?: return
+                val playerTurn = game.getPlayerFromId(playerIdTurn)
+                Battle(player, playerTurn, game.board1, game.board2, onShotPlaced)
+            }
             game.state === GameState.FINISHED -> End(game)
         }
     }
@@ -91,28 +95,33 @@ private fun PreparationPhase(
 @Composable
 private fun Battle(
     player: Player,
+    turn: Player,
     player1Board: Board,
     player2Board: Board,
     onShot: (Coordinate) -> Unit
 ) {
-    val boardToDisplay = remember { mutableStateOf(player)}
+    val displayedBoard = remember { mutableStateOf(player.other())}
     val clickAction = remember { mutableStateOf<((Coordinate) -> Unit)?>(onShot) }
-
+    clickAction.value = if (turn === player && displayedBoard.value === player.other()) onShot else null
     Column(
         Modifier.verticalScroll(rememberScrollState())
     ) {
-        val isMyBoardDisplayed = clickAction.value != null
         Text(
-            text = if (isMyBoardDisplayed) "Place Shot" else "Your Board",
+            text = "Turn: ${turn.name}",
+            fontSize = 40.sp,
+            modifier = Modifier.padding(16.dp)
+        )
+        Text(
+            text = if (displayedBoard.value === player) "Your Board" else "Opponent Board",
             fontSize = 40.sp,
             modifier = Modifier.padding(16.dp)
         )
         BoardView(
-            if (boardToDisplay.value === Player.ONE) player1Board else player2Board,
+            if (displayedBoard.value === Player.ONE) player1Board else player2Board,
             clickAction.value
         )
         TextButton(onClick = {
-            boardToDisplay.value = if (boardToDisplay.value === Player.ONE) Player.TWO else Player.ONE
+            displayedBoard.value = displayedBoard.value.other()
             clickAction.value = if (clickAction.value == null) onShot else null
         }) {
             Text("Switch board")

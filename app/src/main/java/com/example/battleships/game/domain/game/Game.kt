@@ -1,15 +1,14 @@
 package com.example.battleships.game.domain.game
 
+import com.example.battleships.game.domain.game.GameState.*
 import com.example.battleships.game.utils.RealClock
 import pt.isel.daw.dawbattleshipgame.domain.board.Board
-import com.example.battleships.game.domain.game.GameState.*
 import pt.isel.daw.dawbattleshipgame.domain.game.Configuration
 import pt.isel.daw.dawbattleshipgame.domain.game.checkNull
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
-import java.lang.IllegalArgumentException
+import java.time.Duration
 import java.time.Instant
 import java.util.*
-import java.time.Duration
 
 enum class GameState {
     NOT_STARTED,
@@ -161,6 +160,13 @@ class Game (
         when (player) {
             Player.ONE -> player1
             Player.TWO -> player2
+        }
+
+    fun getPlayerFromId(id : Int) =
+        when(id){
+            player1 -> Player.ONE
+            player2 -> Player.TWO
+            else -> throw IllegalArgumentException("No player found")
         }
 
     //TODO(to be changed, its like this because of the tests)

@@ -1,7 +1,7 @@
 package pt.isel.daw.dawbattleshipgame.domain.board
 
-import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import com.example.battleships.game.domain.ship.Ship
+import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 import pt.isel.daw.dawbattleshipgame.domain.ship.getPanel
 import kotlin.math.sqrt

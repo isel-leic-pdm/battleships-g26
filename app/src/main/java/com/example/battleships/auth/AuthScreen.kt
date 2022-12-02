@@ -26,8 +26,8 @@ import androidx.compose.ui.unit.dp
 import com.example.battleships.auth.views.LoadingButton
 import com.example.battleships.auth.views.LoadingState
 import com.example.battleships.auth.views.PasswordOutlinedTextField
-import com.example.battleships.home.RegisterUserButtonTestTag
 import com.example.battleships.home.LoginButtonTestTag
+import com.example.battleships.home.RegisterUserButtonTestTag
 import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme

@@ -1,6 +1,5 @@
 package com.example.battleships.game
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,10 +11,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.example.battleships.game.domain.game.*
+import com.example.battleships.game.domain.ship.getOrientation
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
-import com.example.battleships.game.domain.ship.getOrientation
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
@@ -63,12 +62,7 @@ internal fun GameScreen(
                         },
                         onConfirmLayout = {
                             val game = activity.vm.game.value ?: return@GameView
-                            try { // TODO: change confirmFleet to return Game?, if invalid
-                                game.confirmFleet(player) // checks if its possible to confirm the current fleet state
-                            } catch (e: Exception) {
-                                Log.i("GameScreen", "Invalid fleet layout. Could not confirm.")
-                                return@GameView
-                            }
+                            game.confirmFleet(player) ?: return@GameView // checks if its possible to confirm the current fleet state
                             game.getBoard(player).getShips().map { ship ->
                                 Triple(
                                     ship.type,
