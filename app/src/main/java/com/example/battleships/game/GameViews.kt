@@ -59,7 +59,11 @@ fun GameView(
                 val playerTurn = game.getPlayerFromId(playerIdTurn)
                 Battle(player, playerTurn, game.board1, game.board2, onShotPlaced)
             }
-            game.state === GameState.FINISHED -> End(game)
+            game.state === GameState.FINISHED -> {
+                val winnerId = game.winner ?: return
+                val winner = game.getPlayerFromId(winnerId)
+                End(winner)
+            }
         }
     }
 }
@@ -130,11 +134,11 @@ private fun Battle(
 }
 
 @Composable
-private fun End(game: Game) {
-    val winner = game.winner
-    require(winner != null)
-    Text("Game over")
-    Text(text = "Winner: $winner")
+private fun End(winner: Player) {
+    val fontSize = 40.sp
+    val modifier = Modifier.padding(16.dp)
+    Text("Game over", modifier = modifier, fontSize = fontSize)
+    Text("Winner: $winner", modifier = modifier, fontSize = fontSize)
 }
 
 @Composable

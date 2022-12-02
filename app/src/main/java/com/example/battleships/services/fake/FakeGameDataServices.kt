@@ -2,10 +2,7 @@ package com.example.battleships.services.fake
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.example.battleships.game.domain.game.Game
-import com.example.battleships.game.domain.game.confirmFleet
-import com.example.battleships.game.domain.game.placeShip
-import com.example.battleships.game.domain.game.placeShot
+import com.example.battleships.game.domain.game.*
 import com.example.battleships.services.GameDataServices
 import com.example.battleships.services.Mode
 import com.example.battleships.utils.hypermedia.SirenAction
@@ -100,13 +97,15 @@ class FakeGameDataServices : GameDataServices {
         val game = game ?: return false
         val newGame = game.placeShot(game.player1, coordinate, Player.ONE) ?: return false
         this.game = newGame
-        delay(1500)
+        if (newGame.state == GameState.FINISHED) return true
+        delay(100)
         shootWithEnemy()
         return true
     }
 
     private fun shootWithEnemy() {
         val game = game ?: return
+        if (game.state == GameState.FINISHED) return
         // tries to shoot with enemy, on a random coordinate, until it succeeds
         while (true) {
             val randomCoordinate = Coordinate(
@@ -115,6 +114,7 @@ class FakeGameDataServices : GameDataServices {
             )
             val newGame = game.placeShot(game.player2, randomCoordinate, Player.TWO) ?: continue
             this.game = newGame
+            if (newGame.state == GameState.FINISHED) return
             break
         }
     }
