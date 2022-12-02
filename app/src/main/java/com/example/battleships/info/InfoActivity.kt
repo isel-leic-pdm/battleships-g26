@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import com.example.battleships.ui.NavigationHandlers
 
 class InfoActivity : ComponentActivity() {
 
@@ -20,7 +21,11 @@ class InfoActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            InfoScreen { finish() }
+            InfoScreen(
+                navigationHandlers = NavigationHandlers(
+                    onBackRequested = { finish() }
+                )
+            )
         }
     }
 }

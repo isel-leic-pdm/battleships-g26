@@ -17,6 +17,7 @@ class HomeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             StartScreenNew(
+                tag = "HomeScreen",
                 onSignIn = { AuthActivity.navigate(this) },
                 onRanking = { RankingsActivity.navigate(this) },
                 onAppInfo = { InfoActivity.navigate(this) }

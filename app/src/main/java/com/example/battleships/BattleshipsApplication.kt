@@ -4,6 +4,9 @@ import android.app.Application
 import com.example.battleships.services.fake.FakeGameDataServices
 import com.example.battleships.services.fake.FakeHomeDataServices
 import com.example.battleships.services.fake.FakeUserDataServices
+import com.example.battleships.services.real.RealGamesDataServices
+import com.example.battleships.services.real.RealHomeDataServices
+import com.example.battleships.services.real.RealUserDataServices
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
@@ -28,6 +31,7 @@ class BattleshipsApplication : DependenciesContainer, Application() {
             RealUserDataServices(httpClient, jsonEncoder),
             RealGamesDataServices(httpClient, jsonEncoder)
         )
+
      */
         get() = UseCases(
             FakeHomeDataServices(),

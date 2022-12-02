@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -25,33 +26,29 @@ import pt.isel.battleships.R
 
 @Composable
 fun InfoScreen(
-    onBackRequest : () -> Unit = {},
+    navigationHandlers: NavigationHandlers = NavigationHandlers(),
     onSendEmailRequested: () -> Unit = { },
     onOpenUrlRequested: (Uri) -> Unit = { },
 ){
-        BattleshipsTheme {
-            Scaffold(
-                modifier = Modifier.fillMaxSize(),
-                backgroundColor = MaterialTheme.colors.background,
-                topBar = { TopBar(
-                    NavigationHandlers(
-                        onBackRequest
-                    )
-                ) },
-            ) { innerPadding ->
-                Column(
-                    verticalArrangement = Arrangement.SpaceAround,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .padding(innerPadding)
-                        .fillMaxSize(),
-                ) {
-                    Authors(
-                        onSendEmailRequested,
-                        onOpenUrlRequested
-                    )
-                }
+    BattleshipsTheme {
+        Scaffold(
+            modifier = Modifier.fillMaxSize().testTag("InfoScreen"),
+            backgroundColor = MaterialTheme.colors.background,
+            topBar = { TopBar(navigationHandlers) },
+        ) { innerPadding ->
+            Column(
+                verticalArrangement = Arrangement.SpaceAround,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
+            ) {
+                Authors(
+                    onSendEmailRequested,
+                    onOpenUrlRequested
+                )
             }
+        }
     }
 }
 
@@ -130,5 +127,5 @@ fun AuthorPreview() {
 @Preview
 @Composable
 fun InfoScreenPreview(){
-    InfoScreen({}, {}, {})
+    InfoScreen()
 }

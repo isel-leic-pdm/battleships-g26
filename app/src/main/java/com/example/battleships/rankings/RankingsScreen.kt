@@ -1,13 +1,13 @@
 package com.example.battleships.rankings
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.example.battleships.ui.CenteredTopAppBar
 import com.example.battleships.ui.MarqueeText
 import com.example.battleships.ui.NavigationHandlers
+import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.*
 import com.example.battleships.utils.SCREEN_HEIGHT
 import com.example.battleships.utils.SCREEN_WIDTH
@@ -45,7 +46,7 @@ fun RankingsScreen(
             ) }
         ) { padding ->
             Column(
-                Modifier.fillMaxSize(),
+                Modifier.fillMaxSize().testTag("RankingsScreen"),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -57,7 +58,8 @@ fun RankingsScreen(
                         .clip(RoundedCornerShape(30.dp))
                         .background(Milk)
                         .padding(30.dp)
-                        .verticalScroll(rememberScrollState()),
+                        .verticalScroll(rememberScrollState())
+                        .testTag(RankingListTestTag),
                     verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {

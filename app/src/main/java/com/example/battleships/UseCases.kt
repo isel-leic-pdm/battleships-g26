@@ -32,7 +32,7 @@ class UseCases(
         return userId
     }
 
-    suspend fun getToken(username: String, password: String, mode: Mode = Mode.AUTO): String? {
+    suspend fun createToken(username: String, password: String, mode: Mode = Mode.AUTO): String? {
         val token = userServices.getToken(username, password, mode)
         if (servicesAreReal && token == null) {
             homeServices as RealHomeDataServices

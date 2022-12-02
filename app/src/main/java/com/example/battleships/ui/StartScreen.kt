@@ -10,6 +10,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.battleships.home.NavigateToAuthenticationButtonTestTag
+import com.example.battleships.home.NavigateToRankingsButtonTestTag
 import com.example.battleships.ui.theme.BattleshipsTheme
 
 data class Handler(val name: String, val tag: String, val handler: () -> Unit)
@@ -57,20 +59,22 @@ private fun NavigationButton(title: String, tagName: String, onClick: () -> Unit
 
 @Composable
 fun StartScreenNew(
+    tag: String? = null,
     onSignIn : () -> Unit = {},
     onRanking : () -> Unit = {},
     onAppInfo : () -> Unit = {},
     onNavigationRequested: NavigationHandlers = NavigationHandlers(),
 ) {
     BattleshipsTheme {
+        val modifier = if (tag != null) Modifier.testTag(tag) else Modifier
         Scaffold(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             topBar = {
                 TopBar(navigation = onNavigationRequested)
             },
             bottomBar = { BottomAppBar(
                 content = {
-                    BottomAppNavigation(onRanking,onAppInfo)
+                    BottomAppNavigation(onRanking, onAppInfo)
                 }
             ) },
         ) { innerPadding ->
@@ -82,6 +86,7 @@ fun StartScreenNew(
                     .fillMaxSize(),
             ) {
                 Button(
+                    modifier = Modifier.testTag(NavigateToAuthenticationButtonTestTag),
                     onClick = onSignIn
                 ) {
                     Text("Sign In")
@@ -98,6 +103,7 @@ fun BottomAppNavigation(ranking : () -> Unit, appInfo : () -> Unit)  = Row(
 ) {
     Column {
         IconButton(
+            modifier = Modifier.testTag(NavigateToRankingsButtonTestTag),
             onClick = ranking,
         ) {
             Icon(
@@ -111,6 +117,7 @@ fun BottomAppNavigation(ranking : () -> Unit, appInfo : () -> Unit)  = Row(
         horizontalAlignment = Alignment.End
     ) {
         IconButton(
+            modifier = Modifier.testTag(NavigateToInfoTestTag),
             onClick = appInfo,
         ) {
             Icon(
@@ -119,10 +126,7 @@ fun BottomAppNavigation(ranking : () -> Unit, appInfo : () -> Unit)  = Row(
             )
         }
     }
-
 }
-
-
 
 @Preview
 @Composable

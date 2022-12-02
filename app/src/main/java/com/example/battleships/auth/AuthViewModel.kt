@@ -35,7 +35,7 @@ class AuthViewModel(private val useCases: UseCases): ViewModel() {
     fun login(username: String, password: String) {
         viewModelScope.launch {
             _isLoginLoading.value = true
-            _token.value = useCases.getToken(username, password, Mode.FORCE_REMOTE)
+            _token.value = useCases.createToken(username, password, Mode.FORCE_REMOTE)
             _isLoginLoading.value = false
         }
     }

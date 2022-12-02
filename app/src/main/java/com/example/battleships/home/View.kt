@@ -15,21 +15,6 @@ import androidx.compose.ui.unit.dp
 import com.example.battleships.auth.views.LoadingButton
 import com.example.battleships.auth.views.LoadingState
 
-@Composable
-fun Menu(
-    createLoading: LoadingState,
-    loginLoading: LoadingState,
-    onCreateUser: (String, String) -> Unit,
-    onLogin: (String, String) -> Unit
-) {
-    Column {
-        Spacer(modifier = Modifier.height(50.dp))
-        CredentialsView(createLoading, onCreateUser, "Create User")
-        Spacer(modifier = Modifier.height(30.dp))
-        CredentialsView(loginLoading, onLogin, "Login")
-    }
-}
-
 // Test tags for the TopBar navigation elements
 const val RegisterUserButtonTestTag = "CreateUserButton"
 const val LoginButtonTestTag = "LoginUserButton"
