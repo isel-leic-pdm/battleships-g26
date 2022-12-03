@@ -16,7 +16,7 @@ import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 class UseCases(
     private val homeServices: HomeDataServices,
     private val userServices: UserDataServices,
-    private val gameServices: GameDataServices
+    val gameServices: GameDataServices
 ) {
     private val servicesAreReal: Boolean = (homeServices is RealHomeDataServices && userServices is RealUserDataServices
             && gameServices is RealGamesDataServices)

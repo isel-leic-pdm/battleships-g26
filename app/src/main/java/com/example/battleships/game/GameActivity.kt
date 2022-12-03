@@ -13,7 +13,7 @@ import com.example.battleships.DependenciesContainer
 
 class GameActivity : ComponentActivity() {
     companion object {
-        private const val TOKEN_EXTRA = "GAME_TOKEN_EXTRA"
+        const val TOKEN_EXTRA = "GAME_TOKEN_EXTRA"
         fun navigate(origin: Activity, token: String) {
             with(origin) {
                 val intent = Intent(this, GameActivity::class.java)

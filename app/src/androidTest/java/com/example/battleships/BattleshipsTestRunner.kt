@@ -6,7 +6,7 @@ import androidx.test.runner.AndroidJUnitRunner
 import io.mockk.coEvery
 import io.mockk.mockk
 
-class BattleshipsTestRunner : DependenciesContainer, Application() {
+class BattleshipsTestApplication : DependenciesContainer, Application() {
     override var useCases: UseCases
         = mockk {
             coEvery {  }

@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -28,6 +29,15 @@ import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 
 val PLAY_SIDE = 30.dp
 val GRID_WIDTH = 5.dp
+
+// Test tags for the Rankings screen
+const val CarrierShipButtonTestTag = "CarrierShipButton"
+const val BattleshipShipButtonTestTag = "BattleshipShipButton"
+const val CruiserShipButtonTestTag = "CruiserShipButton"
+const val SubmarineShipButtonTestTag = "SubmarineShipButton"
+const val DestroyerShipButtonTestTag = "DestroyerShipButton"
+
+const val ConfirmFleetButtonTestTag = "ConfirmFleetButton"
 
 
 @Composable
@@ -87,7 +97,7 @@ private fun PreparationPhase(
         }
         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
             TextButton(
-                modifier = Modifier.padding(top = 16.dp),
+                modifier = Modifier.padding(top = 16.dp).testTag(ConfirmFleetButtonTestTag),
                 onClick = onConfirmLayout ?: {},
             ) {
                 Text(if (onConfirmLayout != null) "Confirm" else "Confirmed", fontSize = 40.sp)
@@ -159,7 +169,7 @@ private fun BoardView(board: Board, onPanelClick: ((Coordinate) -> Unit)?) {
                 .size(boardSide),
         ) {
             board.board.forEach { panel ->
-                PlayView(panel.coordinate, panel) {
+                ShipOptionView(panel.coordinate, panel) {
                     onPanelClick?.invoke(panel.coordinate)
                 }
             }
@@ -171,7 +181,7 @@ private fun BoardView(board: Board, onPanelClick: ((Coordinate) -> Unit)?) {
  * Displays a single panel
  */
 @Composable
-private fun PlayView(coordinate: Coordinate, panel: Panel, onClick: (() -> Unit)?) {
+private fun ShipOptionView(coordinate: Coordinate, panel: Panel, onClick: (() -> Unit)?) {
     val color = if (panel.shipType != null) Color.Gray else Color.Blue
     val m = Modifier
         .size(PLAY_SIDE)
@@ -191,8 +201,8 @@ private fun PlayView(coordinate: Coordinate, panel: Panel, onClick: (() -> Unit)
 }
 
 @Composable
-private fun PlayView(configuration: Configuration, ship: ShipType, onClick: () -> Unit) {
-    Row {
+private fun ShipOptionView(configuration: Configuration, ship: ShipType, onClick: () -> Unit) {
+    Row(Modifier.testTag(ship.toTestTag())) {
         Spacer(Modifier.size(GRID_WIDTH))
         val shipLength = configuration.getShipLength(ship)
         require(shipLength != null)
@@ -204,6 +214,14 @@ private fun PlayView(configuration: Configuration, ship: ShipType, onClick: () -
             Spacer(Modifier.size(GRID_WIDTH))
         }
     }
+}
+
+private fun ShipType.toTestTag() = when (this) {
+    ShipType.BATTLESHIP -> BattleshipShipButtonTestTag
+    ShipType.CARRIER -> CarrierShipButtonTestTag
+    ShipType.DESTROYER -> DestroyerShipButtonTestTag
+    ShipType.SUBMARINE -> SubmarineShipButtonTestTag
+    ShipType.CRUISER -> CruiserShipButtonTestTag
 }
 
 /**
@@ -226,7 +244,7 @@ private fun ShipOptionView(configuration: Configuration, onShipClick: ((ShipType
                 )
             )
             Spacer(modifier = Modifier.size(10.dp))
-            PlayView(configuration, ship.first) { if (onShipClick != null) onShipClick(ship.first) }
+            ShipOptionView(configuration, ship.first) { if (onShipClick != null) onShipClick(ship.first) }
         }
     }
 }

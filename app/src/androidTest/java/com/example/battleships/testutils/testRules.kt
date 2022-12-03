@@ -5,7 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.battleships.BattleshipsTestRunner
+import com.example.battleships.BattleshipsApplication
+import com.example.battleships.BattleshipsTestApplication
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
@@ -32,12 +33,12 @@ fun <A : ComponentActivity> createAndroidComposeRule(
  * double by another double that serves their purposes. The behaviour of the remaining tests
  * is preserved by saving the default fake and restoring it after the execution of the test.
  */
-class PreserveDefaultDependencies : TestRule {
+class PreserveDefaultFakeServiceRule : TestRule {
 
-    val testApplication: BattleshipsTestRunner = InstrumentationRegistry
+    val testApplication: BattleshipsTestApplication = InstrumentationRegistry
         .getInstrumentation()
         .targetContext
-        .applicationContext as BattleshipsTestRunner
+        .applicationContext as BattleshipsTestApplication
 
     override fun apply(test: Statement, description: Description): Statement =
         object : Statement() {
@@ -58,7 +59,7 @@ class PreserveDefaultDependencies : TestRule {
  */
 fun createPreserveDefaultFakeServiceComposeRule() =
     AndroidComposeTestRule<TestRule, ComponentActivity>(
-        activityRule = PreserveDefaultDependencies(),
+        activityRule = PreserveDefaultFakeServiceRule(),
         activityProvider = {
             error("This rule does not provide an Activity. Launch and use the Activity yourself.")
         }
