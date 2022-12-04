@@ -6,9 +6,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.battleships.DependenciesContainer
+import com.example.battleships.ErrorMessage
 import com.example.battleships.auth.views.LoadingState
 import com.example.battleships.info.InfoActivity
 import com.example.battleships.ui.NavigationHandlers
@@ -41,28 +43,43 @@ class AuthActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val isCreateUserLoading =
-                if (vm.isCreateUserLoading.value) LoadingState.Loading
-                else LoadingState.Idle
-
-            val isLoginLoading =
-                if (vm.isLoginLoading.value) LoadingState.Loading
-                else LoadingState.Idle
-
-            LaunchScreen(
-                isLogin = isLoginLoading,
-                isRegister = isCreateUserLoading,
-                onRegisterUser =  { username, password -> vm.createUser(username, password) },
-                onLoginUser = { username, password -> vm.login(username, password) },
-                navigationHandlers = NavigationHandlers(
-                    onInfoRequested = { InfoActivity.navigate(this) },
-                    onBackRequested = { finish() }
-                )
-            )
-            val token = vm.token.value
+            val token = vm.token
             if (token != null) {
-                UserHomeActivity.navigate(this, token)
+                if (token.isFailure) AuthErrorMessage()
+                else{
+                    val tokenValue = token.getOrNull() ?: return@setContent
+                    UserHomeActivity.navigate(this, tokenValue)
+                }
+            }
+            else {
+                val isCreateUserLoading =
+                    if (vm.isCreateUserLoading.value) LoadingState.Loading
+                    else LoadingState.Idle
+
+                val isLoginLoading =
+                    if (vm.isLoginLoading.value) LoadingState.Loading
+                    else LoadingState.Idle
+
+                LaunchScreen(
+                    isLogin = isLoginLoading,
+                    isRegister = isCreateUserLoading,
+                    onRegisterUser = { username, password -> vm.createUser(username, password) },
+                    onLoginUser = { username, password -> vm.login(username, password) },
+                    navigationHandlers = NavigationHandlers(
+                        onInfoRequested = { InfoActivity.navigate(this) },
+                        onBackRequested = { finish() }
+                    )
+                )
             }
         }
+    }
+
+    @Composable
+    private fun AuthErrorMessage() {
+        ErrorMessage(
+            onNonError = { vm.token?.getOrThrow() },
+            onIoExceptionDismiss = { TODO("Not yet implemented") },
+            onApiExceptionDismiss = { finishAndRemoveTask() }
+        )
     }
 }

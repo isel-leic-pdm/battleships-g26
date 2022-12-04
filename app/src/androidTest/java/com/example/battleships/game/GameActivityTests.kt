@@ -4,17 +4,10 @@ import android.content.Intent
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.battleships.services.fake.FakeGameDataServices
-import com.example.battleships.services.fake.TIMEOUT
-import com.example.battleships.testutils.PreserveDefaultFakeServiceRule
 import com.example.battleships.testutils.createAndroidComposeRule
-import com.example.battleships.testutils.createPreserveDefaultFakeServiceComposeRule
-import com.example.battleships.user_home.UserHomeActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import pt.isel.daw.dawbattleshipgame.domain.game.Configuration
-import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 
 
 @RunWith(AndroidJUnit4::class)

@@ -6,6 +6,7 @@ import com.example.battleships.rankings.GameRanking
 import com.example.battleships.rankings.UserStats
 import com.example.battleships.services.HomeDataServices
 import com.example.battleships.services.Mode
+import com.example.battleships.services.UnexpectedResponseException
 
 class FakeHomeDataServices : HomeDataServices {
     override suspend fun getRankings(mode: Mode) = GameRanking(
@@ -17,6 +18,12 @@ class FakeHomeDataServices : HomeDataServices {
                 UserStats("user5", 0, 1)
             )
         )
+
+    /*
+    override suspend fun getRankings(mode: Mode): GameRanking {
+        throw UnexpectedResponseException()
+    }
+     */
 
     override suspend fun getServerInfo(mode: Mode) = ServerInfo(
         listOf(

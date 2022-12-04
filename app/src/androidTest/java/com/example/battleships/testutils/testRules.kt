@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.battleships.BattleshipsApplication
 import com.example.battleships.BattleshipsTestApplication
 import org.junit.rules.TestRule
 import org.junit.runner.Description

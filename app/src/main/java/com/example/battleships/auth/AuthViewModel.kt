@@ -1,8 +1,6 @@
 package com.example.battleships.auth
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.battleships.UseCases
@@ -11,8 +9,12 @@ import kotlinx.coroutines.launch
 
 
 class AuthViewModel(private val useCases: UseCases): ViewModel() {
-    private val _token: MutableState<String?> = mutableStateOf(null)
-    val token: State<String?>
+    private var _userId by mutableStateOf<Result<Int>?>(null)
+    val login: Result<Int>?
+        get() = _userId
+
+    private var _token by mutableStateOf<Result<String>?>(null)
+    val token: Result<String>?
         get() = _token
 
     private val _isCreateUserLoading: MutableState<Boolean> = mutableStateOf(false)
@@ -26,8 +28,10 @@ class AuthViewModel(private val useCases: UseCases): ViewModel() {
     fun createUser(username: String, password: String) {
         viewModelScope.launch {
             _isCreateUserLoading.value = true
-            createUser(username, password)
-            useCases.createUser(username, password, Mode.FORCE_REMOTE)
+            _userId =
+                try {
+                    Result.success(useCases.createUser(username, password, Mode.FORCE_REMOTE))
+                } catch (e: Exception) { Result.failure(e) }
             _isCreateUserLoading.value = false
         }
     }
@@ -35,7 +39,10 @@ class AuthViewModel(private val useCases: UseCases): ViewModel() {
     fun login(username: String, password: String) {
         viewModelScope.launch {
             _isLoginLoading.value = true
-            _token.value = useCases.createToken(username, password, Mode.FORCE_REMOTE)
+            _token =
+                try {
+                    Result.success(useCases.createToken(username, password, Mode.FORCE_REMOTE))
+                } catch (e: Exception) { Result.failure(e) }
             _isLoginLoading.value = false
         }
     }

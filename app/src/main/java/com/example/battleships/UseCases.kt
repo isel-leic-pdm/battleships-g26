@@ -1,10 +1,7 @@
 package com.example.battleships
 
 import com.example.battleships.rankings.GameRanking
-import com.example.battleships.services.GameDataServices
-import com.example.battleships.services.HomeDataServices
-import com.example.battleships.services.Mode
-import com.example.battleships.services.UserDataServices
+import com.example.battleships.services.*
 import com.example.battleships.services.real.RealGamesDataServices
 import com.example.battleships.services.real.RealHomeDataServices
 import com.example.battleships.services.real.RealUserDataServices
@@ -16,31 +13,29 @@ import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 class UseCases(
     private val homeServices: HomeDataServices,
     private val userServices: UserDataServices,
-    val gameServices: GameDataServices
+    private val gameServices: GameDataServices
 ) {
     private val servicesAreReal: Boolean = (homeServices is RealHomeDataServices && userServices is RealUserDataServices
             && gameServices is RealGamesDataServices)
 
-    suspend fun createUser(username: String, password: String, mode: Mode = Mode.AUTO): Int? {
+    suspend fun createUser(username: String, password: String, mode: Mode = Mode.AUTO): Int {
         val userId = userServices.createUser(username, password, mode)
-        if (servicesAreReal && userId == null) {
+        return if (servicesAreReal && userId == null) {
             homeServices as RealHomeDataServices
             val userCreateAction = homeServices.getCreateUserAction()
-            return userServices.createUser(username, password, mode, userCreateAction)
+            userServices.createUser(username, password, mode, userCreateAction)
                 ?: throw IllegalStateException("User creation failed")
-        }
-        return userId
+        } else userId ?: throw IllegalStateException("User creation failed") // fake should never return null
     }
 
-    suspend fun createToken(username: String, password: String, mode: Mode = Mode.AUTO): String? {
+    suspend fun createToken(username: String, password: String, mode: Mode = Mode.AUTO): String {
         val token = userServices.getToken(username, password, mode)
-        if (servicesAreReal && token == null) {
+        return if (servicesAreReal && token == null) {
             homeServices as RealHomeDataServices
             val createTokenAction = homeServices.getCreateTokenAction()
-            return userServices.getToken(username, password, mode, createTokenAction)
+            userServices.getToken(username, password, mode, createTokenAction)
                 ?: throw IllegalStateException("Token creation failed")
-        }
-        return token
+        } else token ?: throw IllegalStateException("Token creation failed") // fake should never return null
     }
 
     suspend fun createGame(token: String, mode: Mode = Mode.AUTO) {
@@ -58,7 +53,8 @@ class UseCases(
     suspend fun fetchGame(token: String, mode: Mode = Mode.AUTO) =
         gameServices.getGame(token, mode = mode)
 
-    suspend fun rankings(mode: Mode): GameRanking =
+    @Throws(UnexpectedResponseException::class)
+    suspend fun fetchRankings(mode: Mode = Mode.AUTO): GameRanking =
         homeServices.getRankings(mode)
 
     suspend fun setFleet(

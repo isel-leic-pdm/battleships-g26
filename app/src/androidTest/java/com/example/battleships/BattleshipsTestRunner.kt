@@ -14,8 +14,8 @@ class BattleshipsTestApplication : DependenciesContainer, Application() {
 }
 
 @Suppress("unused")
-class QuoteOfDayTestRunner : AndroidJUnitRunner() {
+class BattleshipsTestRunner : AndroidJUnitRunner() {
     override fun newApplication(cl: ClassLoader, className: String, context: Context): Application {
-        return super.newApplication(cl, BattleshipsApplication::class.java.name, context)
+        return super.newApplication(cl, BattleshipsTestApplication::class.java.name, context)
     }
 }
