@@ -6,17 +6,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.battleships.DependenciesContainer
 import com.example.battleships.ErrorMessage
 import com.example.battleships.info.InfoActivity
-import com.example.battleships.services.ApiException
 import com.example.battleships.ui.NavigationHandlers
-import com.example.battleships.utils.ErrorAlert
-import pt.isel.battleships.R
-import java.io.IOException
+import com.example.battleships.ui.RefreshingState
 
 class RankingsActivity : ComponentActivity() {
 
@@ -45,31 +41,32 @@ class RankingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         vm.loadRankings()
-        val rankings = vm.rankings
+        val gameRankingResult = vm.rankings
+
+        val refreshingState: RefreshingState =
+            if (vm.isLoading) RefreshingState.Refreshing
+            else RefreshingState.Idle
+
         setContent {
-            if (rankings != null) {
-                if (rankings.isFailure) RankingsErrorMessage()
-                else {
-                    val rankingsList = rankings.getOrNull() ?: return@setContent
-                    RankingsScreen(
-                        rankingsList,
-                        onRefreshRequested = vm::loadRankings,
-                        NavigationHandlers(
-                            onInfoRequested = { InfoActivity.navigate(origin = this) },
-                            onBackRequested = { finish() }
-                        )
+            // if null, displays empty list of rankings
+            if (gameRankingResult == null || gameRankingResult.isSuccess) {
+                RankingsScreen(
+                    gameRankingResult?.getOrNull(),
+                    refreshingState,
+                    onRefresh = vm::loadRankings,
+                    NavigationHandlers(
+                        onInfoRequested = { InfoActivity.navigate(origin = this) },
+                        onBackRequested = { finish() }
                     )
-                }
+                )
+            }
+            else {
+                ErrorMessage(
+                    onNonError = { vm.rankings?.getOrThrow() },
+                    onIoExceptionDismiss = { vm.loadRankings() },
+                    onApiExceptionDismiss = { finishAndRemoveTask() }
+                )
             }
         }
-    }
-
-    @Composable
-    private fun RankingsErrorMessage() {
-        ErrorMessage(
-            onNonError = { vm.rankings?.getOrThrow() },
-            onIoExceptionDismiss = { vm.loadRankings() },
-            onApiExceptionDismiss = { finishAndRemoveTask() }
-        )
     }
 }

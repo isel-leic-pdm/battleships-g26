@@ -26,7 +26,7 @@ class RealHomeDataServices(
     var serverInfoLink: SirenLink? = null
 
     private suspend fun getHome(): Home {
-        val request = buildRequest(Get(battleshipsHome), Mode.FORCE_REMOTE)
+        val request = buildRequest(Get(battleshipsHome), Mode.AUTO)
 
         val homeDto = request.send(httpClient) { response ->
             handleResponse<HomeDto>(jsonEncoder, response, HomeDtoType.type)

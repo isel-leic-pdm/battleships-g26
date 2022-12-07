@@ -4,6 +4,9 @@ import android.app.Application
 import com.example.battleships.services.fake.FakeGameDataServices
 import com.example.battleships.services.fake.FakeHomeDataServices
 import com.example.battleships.services.fake.FakeUserDataServices
+import com.example.battleships.services.real.RealGamesDataServices
+import com.example.battleships.services.real.RealHomeDataServices
+import com.example.battleships.services.real.RealUserDataServices
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
@@ -15,7 +18,7 @@ interface DependenciesContainer {
     val useCases: UseCases
 }
 
-private val battleshipsAPIHome = URL("https://4216-2001-690-2008-df53-50eb-1e5c-b012-16d4.ngrok.io")
+private val battleshipsAPIHome = URL("http://10.0.2.2:9000")
 
 class BattleshipsApplication : DependenciesContainer, Application() {
     private val httpClient: OkHttpClient by lazy { OkHttpClient() }

@@ -1,8 +1,6 @@
 package com.example.battleships
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModel
-import com.example.battleships.rankings.RankingsViewModel
 import com.example.battleships.services.ApiException
 import com.example.battleships.utils.ErrorAlert
 import pt.isel.battleships.R

@@ -18,9 +18,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.battleships.ui.CenteredTopAppBar
-import com.example.battleships.ui.MarqueeText
-import com.example.battleships.ui.NavigationHandlers
+import com.example.battleships.ErrorMessage
+import com.example.battleships.ui.*
 import com.example.battleships.ui.theme.*
 import com.example.battleships.utils.SCREEN_HEIGHT
 import com.example.battleships.utils.SCREEN_WIDTH
@@ -29,31 +28,57 @@ import com.example.battleships.utils.SCREEN_WIDTH
 const val RankingListTestTag = "RankingList"
 const val RefreshButtonTestTag = "RefreshButton"
 
-
-
 @Composable
 fun RankingsScreen(
-    ranking: GameRanking,
-    onRefreshRequested: () -> Unit,
+    rankings: GameRanking?,
+    refreshingState: RefreshingState,
+    onRefresh: () -> Unit,
     onNavigationRequested: NavigationHandlers = NavigationHandlers()
+) {
+    RankingList(
+        rankings ?: GameRanking(emptyList()),
+        refreshingState,
+        onNavigationRequested,
+        onRefresh
+    )
+}
+
+@Composable
+private fun RankingList(
+    ranking: GameRanking,
+    refreshingState: RefreshingState,
+    onNavigationRequested: NavigationHandlers,
+    onRefreshRequested: () -> Unit
 ) {
     BattleshipsTheme {
         Scaffold(
-            topBar = { CenteredTopAppBar(
-                navigation = onNavigationRequested,
-                title = "Rankings"
-            ) }
+            topBar = {
+                CenteredTopAppBar(
+                    navigation = onNavigationRequested,
+                    title = "Rankings"
+                )
+            },
+            backgroundColor = MaterialTheme.colors.background,
+            floatingActionButton = {
+                RefreshButton(
+                    onClick = onRefreshRequested,
+                    state = refreshingState
+                )
+            },
+            floatingActionButtonPosition = FabPosition.Center,
         ) { padding ->
             Column(
-                Modifier.fillMaxSize().testTag("RankingsScreen"),
+                Modifier
+                    .fillMaxSize()
+                    .testTag("RankingsScreen"),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Column(
                     Modifier
                         .offset(y = -20.dp)
-                        .height(SCREEN_HEIGHT.dp/3 - 150.dp)
-                        .width(SCREEN_WIDTH.dp/3)
+                        .height(SCREEN_HEIGHT.dp / 3 - 150.dp)
+                        .width(SCREEN_WIDTH.dp / 3)
                         .clip(RoundedCornerShape(30.dp))
                         .background(Milk)
                         .padding(30.dp)
@@ -62,7 +87,7 @@ fun RankingsScreen(
                     verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Row (Modifier.offset(x = 17.dp)){
+                    Row(Modifier.offset(x = 17.dp)) {
                         Column { Text("NAME", fontSize = 25.sp) }
                         Spacer(Modifier.size(20.dp))
                         Column { Text("GAMES", fontSize = 25.sp) }
@@ -71,21 +96,12 @@ fun RankingsScreen(
                     }
                     Row(Modifier.height(20.dp)) {}
                     ranking.users.forEachIndexed { idx, it ->
-                        ListEntry(name = it.username,
+                        ListEntry(
+                            name = it.username,
                             games = it.gamesPlayed,
                             wins = it.wins, idx = idx + 1
                         )
                     }
-                }
-
-                Button(
-                    modifier = Modifier
-                        .testTag(RefreshButtonTestTag)
-                        .size(50.dp)
-                        .clip(CircleShape),
-                    onClick = onRefreshRequested
-                ) {
-                    Icon(Icons.Default.Refresh, null)
                 }
             }
         }
@@ -170,5 +186,10 @@ fun StartScreenPreview() {
             UserStats("Pedro", 0, 0),
         )
     )
-    RankingsScreen(ranking = fakeRankings, onRefreshRequested = { /*TODO*/ })
+    RankingsScreen(
+        fakeRankings,
+        RefreshingState.Idle,
+        onRefresh = {},
+        onNavigationRequested = NavigationHandlers()
+    )
 }
