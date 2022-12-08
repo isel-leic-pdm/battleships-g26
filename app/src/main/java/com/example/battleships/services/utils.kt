@@ -1,5 +1,6 @@
 package com.example.battleships.services
 
+import android.util.Log
 import com.example.battleships.utils.hypermedia.SirenMediaType
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
@@ -10,8 +11,6 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.lang.reflect.Type
 import java.net.URL
-
-data class RequestParams(val mode: Mode, val client: OkHttpClient, val jsonEncoder: Gson)
 
 sealed class RequestMethod(val url: URL)
 class Get(url: URL) : RequestMethod(url)
@@ -52,8 +51,8 @@ internal fun <T> handleResponse(jsonEncoder: Gson, response: Response, type: Typ
         try {
             val body = response.body?.string()
             jsonEncoder.fromJson<T>(body, type)
-        }
-        catch (e: JsonSyntaxException) {
+        } catch (e: JsonSyntaxException) {
+            Log.e("handleResponse", "Error parsing response", e)
             throw UnexpectedResponseException(response)
         }
     }

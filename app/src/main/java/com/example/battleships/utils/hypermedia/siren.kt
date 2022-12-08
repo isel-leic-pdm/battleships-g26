@@ -44,8 +44,8 @@ data class SirenAction(
     val title: String? = null,
     @SerializedName("class")
     val clazz: List<String>? = null,
-    val method: HttpMethod? = null,
-    val type: MediaType? = null,
+    val method: String? = null,
+    val type: String? = null,
     val fields: List<Field>? = null
 ) {
     /**
@@ -102,3 +102,5 @@ data class EmbeddedEntity<T>(
             object : TypeToken<EmbeddedEntity<T>>() { }
     }
 }
+
+fun URI.toApiURL() = URI("http://10.0.2.2:9000$this").toURL()

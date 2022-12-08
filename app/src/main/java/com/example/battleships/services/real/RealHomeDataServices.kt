@@ -1,5 +1,6 @@
 package com.example.battleships.services.real
 
+import android.util.Log
 import com.example.battleships.dtos.*
 import com.example.battleships.home.Home
 import com.example.battleships.info.ServerInfo
@@ -9,9 +10,11 @@ import com.example.battleships.rankings.rankings
 import com.example.battleships.services.*
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenLink
+import com.example.battleships.utils.hypermedia.toApiURL
 import com.example.battleships.utils.send
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
+import java.net.URI
 import java.net.URL
 
 class RealHomeDataServices(
@@ -41,6 +44,7 @@ class RealHomeDataServices(
         if (userCreateAction == null || userLoginAction == null || userHomeLink == null
             || rankingsLink == null || serverInfoLink == null)
             throw UnresolvedLinkException()
+                .also { Log.e("RealHomeDataServices", "Unresolved link", it) }
 
         return Home(homeDto)
     }
@@ -73,7 +77,7 @@ class RealHomeDataServices(
         home.actions?.find { it.name == "create-user" }
 
     private fun getUserLoginAction(home: HomeDto) =
-        home.actions?.find { it.name == "login" }
+        home.actions?.find { it.name == "create-token" }
 
     private fun getUserHomeLink(home: HomeDto) =
         home.links?.find { it.rel.contains("user-home") }
@@ -97,7 +101,8 @@ class RealHomeDataServices(
             getHome()
         }
         val action = rankingsLink ?: throw UnresolvedLinkException()
-        return action.href.toURL()
+            .also { Log.e("RealHomeDataServices", "Unresolved link", it) }
+        return action.href.toApiURL()
     }
 
     suspend fun getCreateUserAction(): SirenAction {

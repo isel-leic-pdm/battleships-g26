@@ -1,5 +1,6 @@
 package com.example.battleships.rankings
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -27,7 +28,10 @@ class RankingsViewModel(private val useCases: UseCases): ViewModel() {
                         if (forcedRefresh) Mode.FORCE_REMOTE
                         else Mode.AUTO
                     ))
-                } catch (e: Exception) { Result.failure(e) }
+                } catch (e: Exception) {
+                    Log.e("RankingsViewModel", "Error loading rankings", e)
+                    Result.failure(e)
+                }
             _isLoading = false
         }
     }

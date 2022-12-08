@@ -41,13 +41,12 @@ class RankingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         vm.loadRankings()
-        val gameRankingResult = vm.rankings
-
-        val refreshingState: RefreshingState =
-            if (vm.isLoading) RefreshingState.Refreshing
-            else RefreshingState.Idle
-
         setContent {
+            val gameRankingResult = vm.rankings
+            val refreshingState: RefreshingState =
+                if (vm.isLoading) RefreshingState.Refreshing
+                else RefreshingState.Idle
+
             // if null, displays empty list of rankings
             if (gameRankingResult == null || gameRankingResult.isSuccess) {
                 RankingsScreen(

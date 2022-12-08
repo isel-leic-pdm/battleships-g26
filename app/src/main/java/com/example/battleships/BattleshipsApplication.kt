@@ -25,17 +25,16 @@ class BattleshipsApplication : DependenciesContainer, Application() {
     private val jsonEncoder: Gson by lazy { GsonBuilder().create() }
 
     override val useCases: UseCases
-    /*
         get() = UseCases(
             RealHomeDataServices(battleshipsAPIHome, httpClient, jsonEncoder),
             RealUserDataServices(httpClient, jsonEncoder),
             RealGamesDataServices(httpClient, jsonEncoder)
         )
-
-     */
+    /*
         get() = UseCases(
             FakeHomeDataServices(),
             FakeUserDataServices(),
             FakeGameDataServices()
         )
+     */
 }
