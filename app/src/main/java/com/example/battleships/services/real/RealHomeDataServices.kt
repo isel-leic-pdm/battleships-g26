@@ -93,7 +93,7 @@ class RealHomeDataServices(
             getHome()
         }
         val action = serverInfoLink ?: throw UnresolvedLinkException()
-        return action.href.toURL()
+        return action.href.toApiURL()
     }
 
     private suspend fun ensureRankingsLink(): URL {

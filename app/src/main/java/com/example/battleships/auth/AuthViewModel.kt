@@ -1,5 +1,6 @@
 package com.example.battleships.auth
 
+import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,7 +11,7 @@ import kotlinx.coroutines.launch
 
 class AuthViewModel(private val useCases: UseCases): ViewModel() {
     private var _userId by mutableStateOf<Result<Int>?>(null)
-    val login: Result<Int>?
+    val userId: Result<Int>?
         get() = _userId
 
     private var _token by mutableStateOf<Result<String>?>(null)
@@ -31,7 +32,11 @@ class AuthViewModel(private val useCases: UseCases): ViewModel() {
             _userId =
                 try {
                     Result.success(useCases.createUser(username, password, Mode.FORCE_REMOTE))
-                } catch (e: Exception) { Result.failure(e) }
+                        .also { Log.i("AuthViewModel", "User created: $it") }
+                } catch (e: Exception) {
+                    Log.e("AuthViewModel", "Error creating user", e)
+                    Result.failure(e)
+                }
             _isCreateUserLoading.value = false
         }
     }
@@ -42,7 +47,11 @@ class AuthViewModel(private val useCases: UseCases): ViewModel() {
             _token =
                 try {
                     Result.success(useCases.createToken(username, password, Mode.FORCE_REMOTE))
-                } catch (e: Exception) { Result.failure(e) }
+                        .also { Log.i("AuthViewModel", "Token created: $it") }
+                } catch (e: Exception) {
+                    Log.e("AuthViewModel", "Error creating token", e)
+                    Result.failure(e)
+                }
             _isLoginLoading.value = false
         }
     }

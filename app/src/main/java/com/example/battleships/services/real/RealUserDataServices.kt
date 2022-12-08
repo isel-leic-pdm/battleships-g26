@@ -6,6 +6,7 @@ import com.example.battleships.user_home.UserHome
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenEntity
 import com.example.battleships.utils.hypermedia.SirenLink
+import com.example.battleships.utils.hypermedia.toApiURL
 import com.example.battleships.utils.send
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
@@ -32,12 +33,15 @@ class RealUserDataServices(
     ): Int? {
         val userCreateAction: SirenAction = newUserCreateAction?.also { userCreateAction = it }
             ?: this.userCreateAction ?: return null
-        val url = userCreateAction.href.toURL()
+        val url = userCreateAction.href.toApiURL()
 
         val request = buildRequest(
             Post(
                 url,
-                "{\"username\": \"$username\", \"password\": \"$password\"}"
+                "{\n" +
+                        "    \"username\": \"$username\",\n" +
+                        "    \"password\": \"$password\"\n" +
+                        "}"
             ), mode
         )
         val createUserDto = request.send(httpClient) { response ->
@@ -59,12 +63,15 @@ class RealUserDataServices(
     ): String? {
         val createTokenAction = newCreateTokenAction?.also { createTokenAction = it }
             ?: this.createTokenAction ?: return null
-        val url = createTokenAction.href.toURL()
+        val url = createTokenAction.href.toApiURL()
 
         val request = buildRequest(
             Post(
                 url,
-                "{\"username\": \"$username\", \"password\": \"$password\"}"
+                "{\n" +
+                        "    \"username\": \"$username\",\n" +
+                        "    \"password\": \"$password\"\n" +
+                        "}"
             ), mode
         )
         val createTokenDto = request.send(httpClient) { response ->
@@ -80,7 +87,7 @@ class RealUserDataServices(
         userHomeLink: SirenLink?
     ): UserHome {
         val userHomeLink = userHomeLink ?: this.userHomeLink ?: throw UnresolvedLinkException()
-        val url = userHomeLink.href.toURL()
+        val url = userHomeLink.href.toApiURL()
 
         val request = buildRequest(Get(url), mode)
         val userHomeDto = request.send(httpClient) { response ->
@@ -95,7 +102,7 @@ class RealUserDataServices(
         createTokenDto.links?.find { it.rel.contains("user-home") }
 
     private fun getCreateTokenAction(dto: CreateUserDto) =
-        dto.actions?.find { it.title == "create-token" }
+        dto.actions?.find { it.name == "create-token" }
 
     private fun getCreateGameAction(userHomeDto: SirenEntity<UserHomeDtoProperties>) =
         userHomeDto.actions?.find { it.name == "create-game" }
