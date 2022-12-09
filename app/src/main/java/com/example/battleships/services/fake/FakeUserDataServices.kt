@@ -36,7 +36,8 @@ class FakeUserDataServices : UserDataServices {
         password: String,
         mode: Mode,
         createTokenAction: SirenAction?
-    ) = users[UserCredentials(username, password)]?.let { tokens[it] } ?: throw UnexpectedResponseException()
+    ) = UserDataServices.Response(users[UserCredentials(username, password)]?.let { tokens[it] }
+        ?: throw UnexpectedResponseException())
 
     /*
     override suspend fun getToken(

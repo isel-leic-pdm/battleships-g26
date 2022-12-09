@@ -28,14 +28,13 @@ class UseCases(
         } else userId ?: throw IllegalStateException("User creation failed") // fake should never return null
     }
 
-    suspend fun createToken(username: String, password: String, mode: Mode = Mode.AUTO): String {
+    suspend fun createToken(username: String, password: String, mode: Mode = Mode.AUTO): String? {
         val token = userServices.getToken(username, password, mode)
         return if (servicesAreReal && token == null) {
             homeServices as RealHomeDataServices
             val createTokenAction = homeServices.getCreateTokenAction()
-            userServices.getToken(username, password, mode, createTokenAction)
-                ?: throw IllegalStateException("Token creation failed")
-        } else token ?: throw IllegalStateException("Token creation failed") // fake should never return null
+            userServices.getToken(username, password, mode, createTokenAction)?.token
+        } else token?.token ?: throw IllegalStateException("Token creation failed") // fake should never return null
     }
 
     suspend fun createGame(token: String, mode: Mode = Mode.AUTO) {

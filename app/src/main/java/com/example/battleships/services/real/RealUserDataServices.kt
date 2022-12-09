@@ -60,7 +60,7 @@ class RealUserDataServices(
         password: String,
         mode: Mode,
         newCreateTokenAction: SirenAction?
-    ): String? {
+    ): UserDataServices.Response? {
         val createTokenAction = newCreateTokenAction?.also { createTokenAction = it }
             ?: this.createTokenAction ?: return null
         val url = createTokenAction.href.toApiURL()
@@ -74,11 +74,17 @@ class RealUserDataServices(
                         "}"
             ), mode
         )
-        val createTokenDto = request.send(httpClient) { response ->
-            handleResponse<UserLoginDto>(jsonEncoder, response, UserLoginDtoType.type)
+        try {
+            val createTokenDto = request.send(httpClient) { response ->
+                handleResponse<UserLoginDto>(jsonEncoder, response, UserLoginDtoType.type)
+            }
+            userHomeLink = getUserHomeLink(createTokenDto) ?: throw UnresolvedLinkException()
+            return UserDataServices.Response(createTokenDto.toToken())
+        } catch (e: UnexpectedResponseException) {
+            if (e.response?.code == 403) // if credentials were wrong
+                return UserDataServices.Response(null)
+            throw e
         }
-        userHomeLink = getUserHomeLink(createTokenDto) ?: throw UnresolvedLinkException()
-        return createTokenDto.toToken()
     }
 
     override suspend fun getHome(

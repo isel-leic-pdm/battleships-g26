@@ -45,33 +45,42 @@ class AuthActivity : ComponentActivity() {
         setContent {
             val token = vm.token
             if (token != null) {
-                if (token.isFailure) AuthErrorMessage()
-                else{
-                    val tokenValue = token.getOrNull() ?: return@setContent
-                    UserHomeActivity.navigate(this, tokenValue)
+                if (token.isSuccess) {
+                    val tokenResult = token.getOrNull() ?: return@setContent
+                    if (tokenResult is AuthViewModel.Success) {
+                        UserHomeActivity.navigate(this, tokenResult.token)
+                    } else {
+                        AuthScreen()
+                    }
                 }
+                else AuthErrorMessage()
             }
             else {
-                val isCreateUserLoading =
-                    if (vm.isCreateUserLoading.value) LoadingState.Loading
-                    else LoadingState.Idle
-
-                val isLoginLoading =
-                    if (vm.isLoginLoading.value) LoadingState.Loading
-                    else LoadingState.Idle
-
-                LaunchScreen(
-                    isLogin = isLoginLoading,
-                    isRegister = isCreateUserLoading,
-                    onRegisterUser = { username, password -> vm.createUser(username, password) },
-                    onLoginUser = { username, password -> vm.login(username, password) },
-                    navigationHandlers = NavigationHandlers(
-                        onInfoRequested = { InfoActivity.navigate(this) },
-                        onBackRequested = { finish() }
-                    )
-                )
+                AuthScreen()
             }
         }
+    }
+
+    @Composable
+    private fun AuthScreen() {
+        val isCreateUserLoading =
+            if (vm.isCreateUserLoading.value) LoadingState.Loading
+            else LoadingState.Idle
+
+        val isLoginLoading =
+            if (vm.isLoginLoading.value) LoadingState.Loading
+            else LoadingState.Idle
+
+        LaunchScreen(
+            isLogin = isLoginLoading,
+            isRegister = isCreateUserLoading,
+            onRegisterUser = { username, password -> vm.createUser(username, password) },
+            onLoginUser = { username, password -> vm.login(username, password) },
+            navigationHandlers = NavigationHandlers(
+                onInfoRequested = { InfoActivity.navigate(this) },
+                onBackRequested = { finish() }
+            )
+        )
     }
 
     @Composable

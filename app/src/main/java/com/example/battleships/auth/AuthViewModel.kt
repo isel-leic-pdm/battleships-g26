@@ -8,14 +8,17 @@ import com.example.battleships.UseCases
 import com.example.battleships.services.Mode
 import kotlinx.coroutines.launch
 
-
 class AuthViewModel(private val useCases: UseCases): ViewModel() {
+    sealed class TokenResult
+    object InvalidCredentials: TokenResult()
+    data class Success(val token: String): TokenResult()
+
     private var _userId by mutableStateOf<Result<Int>?>(null)
     val userId: Result<Int>?
         get() = _userId
 
-    private var _token by mutableStateOf<Result<String>?>(null)
-    val token: Result<String>?
+    private var _token by mutableStateOf<Result<TokenResult>?>(null)
+    val token: Result<TokenResult>?
         get() = _token
 
     private val _isCreateUserLoading: MutableState<Boolean> = mutableStateOf(false)
@@ -46,8 +49,11 @@ class AuthViewModel(private val useCases: UseCases): ViewModel() {
             _isLoginLoading.value = true
             _token =
                 try {
-                    Result.success(useCases.createToken(username, password, Mode.FORCE_REMOTE))
-                        .also { Log.i("AuthViewModel", "Token created: $it") }
+                    val token = useCases.createToken(username, password, Mode.FORCE_REMOTE)
+                    Result.success(
+                        if (token == null) InvalidCredentials
+                        else Success(token)
+                    ).also { Log.i("AuthViewModel", "Token created: $it") }
                 } catch (e: Exception) {
                     Log.e("AuthViewModel", "Error creating token", e)
                     Result.failure(e)

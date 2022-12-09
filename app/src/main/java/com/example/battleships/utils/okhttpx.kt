@@ -26,7 +26,11 @@ suspend fun <T> Request.send(okHttpClient: OkHttpClient, handler: (Response) -> 
             }
 
             override fun onResponse(call: Call, response: Response) {
-                continuation.resume(handler(response))
+                try {
+                    continuation.resume(handler(response))
+                } catch (e: Exception) {
+                    continuation.resumeWithException(e)
+                }
             }
         })
     }
