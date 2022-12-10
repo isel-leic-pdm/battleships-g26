@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.battleships.UseCases
 import com.example.battleships.services.Mode
+import com.example.battleships.use_cases.UseCases
 import kotlinx.coroutines.launch
 
 class AuthViewModel(private val useCases: UseCases): ViewModel() {

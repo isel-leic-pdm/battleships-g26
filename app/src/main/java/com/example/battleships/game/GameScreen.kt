@@ -41,32 +41,36 @@ internal fun GameScreen(
                     .fillMaxSize(),
             ) {
                 var selected: Selection? = null
-                val curGame = activity.vm.game.value
-                val player = activity.vm.player
+                val gameResult = activity.vm.game?.getOrNull()
+                if (gameResult is GameViewModel.Started) {
+                    val game = gameResult.gameResultInternal.game
+                    val player = gameResult.gameResultInternal.player
 
-                if (curGame != null && player != null) {
                     GameView(
-                        game = curGame,
+                        game = game,
                         player = player,
                         onShipClick = {
                             selected = ShipOption(it)
                         },
                         onSquarePressed = {
-                            selected = onSquarePressed(selected, curGame, activity, it) ?: return@GameView
+                            selected = onSquarePressed(selected, game, player, activity, it)
+                                ?: return@GameView
                         },
                         onShotPlaced = {
-                            val game = activity.vm.game.value ?: return@GameView
-                            val playerId = if (player == Player.ONE) game.player1 else game.player2
-                            game.placeShot(playerId, it, player) ?: return@GameView // TODO -> shouldn't require playerId
+                            val playerId =
+                                if (player == Player.ONE) game.player1 else game.player2
+                            game.placeShot(playerId, it, player)
+                                ?: return@GameView // TODO -> shouldn't require playerId
                             activity.vm.placeShot(it)
                         },
                         onConfirmLayout = {
-                            val game = activity.vm.game.value ?: return@GameView
-                            game.confirmFleet(player) ?: return@GameView // checks if its possible to confirm the current fleet state
+                            game.confirmFleet(player)
+                                ?: return@GameView // checks if its possible to confirm the current fleet state
                             game.getBoard(player).getShips().map { ship ->
                                 Triple(
                                     ship.type,
-                                    ship.coordinates.sortedBy { (it.row * game.configuration.boardSize) + it.column }.first(), // this will choose the first/lower coordinate
+                                    ship.coordinates.sortedBy { (it.row * game.configuration.boardSize) + it.column }
+                                        .first(), // this will choose the first/lower coordinate
                                     ship.getOrientation()
                                 )
                             }.let { ships ->
@@ -91,6 +95,7 @@ internal fun GameScreen(
 private fun onSquarePressed(
     selected: Selection?,
     curGame: Game,
+    player: Player,
     activity: GameActivity,
     coordinate: Coordinate
 ): Selection? {
@@ -99,17 +104,17 @@ private fun onSquarePressed(
     } else {
         if (selected is ShipOption) {
             val newGame = curGame.placeShip(selected.shipType, coordinate, Orientation.HORIZONTAL) ?: return null // validates
-            activity.vm.setGame(newGame) // updates game locally
+            activity.vm.setGame(newGame, player) // updates game locally
             return null
         }
         if (selected is Square) {
             return if (coordinate == selected.coordinate) {
                 val newGame = curGame.rotateShip(coordinate) ?: return null // validates
-                activity.vm.setGame(newGame) // updates game locally
+                activity.vm.setGame(newGame, player) // updates game locally
                 null
             } else {
                 val newGame = curGame.moveShip(selected.coordinate, coordinate) ?: return null // validates
-                activity.vm.setGame(newGame) // updates game locally
+                activity.vm.setGame(newGame, player) // updates game locally
                 null
             }
         }

@@ -1,22 +1,18 @@
 package com.example.battleships.use_cases
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.rankings.GameRanking
 import com.example.battleships.services.*
 import com.example.battleships.services.fake.FakeGameDataServices
 import com.example.battleships.services.fake.FakeHomeDataServices
 import com.example.battleships.services.fake.FakeUserDataServices
-import com.example.battleships.services.real.RealGamesDataServices
-import com.example.battleships.services.real.RealHomeDataServices
-import com.example.battleships.services.real.RealUserDataServices
-import com.example.battleships.use_cases.UseCases
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
-import java.io.IOException
 
-// TODO -> optimize how the links and actions are obtained
 class FakeUseCases(
     private val homeServices: FakeHomeDataServices,
     private val userServices: FakeUserDataServices,
@@ -25,47 +21,32 @@ class FakeUseCases(
 
     override suspend fun createUser(username: String, password: String, mode: Mode): Int {
         val userId = userServices.createUser(username, password, mode)
-        when (userId) {
-            is Either.Left -> throw java.lang.IllegalStateException("Create game should not return Either.Left")
-            is Either.Right -> return userId.value
-        }
+        return getValueOrThrow(userId)
     }
 
     override suspend fun createToken(username: String, password: String, mode: Mode): String? {
         val token = userServices.getToken(username, password, mode)
-        return if (servicesAreReal && token == null) {
-            homeServices as RealHomeDataServices
-            val createTokenAction = homeServices.getCreateTokenAction()
-            userServices.getToken(username, password, mode, createTokenAction)?.token
-        } else token?.token ?: throw IllegalStateException("Token creation failed") // fake should never return null
+        return getValueOrThrow(token)
     }
 
     /**
      * Creates a game.
      * @return the game id, or null if the game is still pending another player
      */
-    override suspend fun createGame(token: String, mode: Mode): Int? {
+    @RequiresApi(Build.VERSION_CODES.O)
+    override suspend fun createGame(token: String, mode: Mode): Boolean {
         val gameId = gameServices.createGame(token, mode)
-        when (gameId) {
-            is Either.Left -> throw java.lang.IllegalStateException("Create game should not return Either.Left")
-            is Either.Right -> return gameId.value
-        }
+        return getValueOrThrow(gameId)
     }
 
     override suspend fun fetchCurrentGameId(token: String, mode: Mode): Int? {
         val gameId = gameServices.getCurrentGameId(token, null, mode)
-        when (gameId) {
-            is Either.Left -> throw java.lang.IllegalStateException("Create game should not return Either.Left")
-            is Either.Right -> return gameId.value
-        }
+        return getValueOrThrow(gameId)
     }
 
     override suspend fun fetchGame(token: String, mode: Mode): Pair<Game, Player>? {
         val game = gameServices.getGame(token, mode = mode)
-        when (game) {
-            is Either.Left -> throw java.lang.IllegalStateException("Create game should not return Either.Left")
-            is Either.Right -> return game.value
-        }
+        return getValueOrThrow(game)
     }
 
     @Throws(UnexpectedResponseException::class)
@@ -78,17 +59,14 @@ class FakeUseCases(
         mode: Mode
     ): Boolean {
         val result = gameServices.setFleet(token, ships, mode = mode)
-        when (result) {
-            is Either.Left -> throw java.lang.IllegalStateException("Create game should not return Either.Left")
-            is Either.Right -> return result.value
-        }
+        return getValueOrThrow(result)
     }
 
     override suspend fun placeShot(token: String, coordinate: Coordinate, mode: Mode): Boolean {
         val result = gameServices.placeShot(token, coordinate, mode = mode)
-        when (result) {
-            is Either.Left -> throw java.lang.IllegalStateException("Create game should not return Either.Left")
-            is Either.Right -> return result.value
-        }
+        return getValueOrThrow(result)
     }
+
+    private fun <T> getValueOrThrow(either: Either<Unit, T>): T =
+        getValueOrThrow(either, Exception("Should not have been Either.Left on FakeDataServices"))
 }

@@ -37,8 +37,11 @@ class FakeUserDataServices : UserDataServices {
         password: String,
         mode: Mode,
         createTokenAction: SirenAction?
-    ) = UserDataServices.Response(users[UserCredentials(username, password)]?.let { tokens[it] }
-        ?: throw UnexpectedResponseException())
+    ): Either<Unit, String> {
+        return Either.Right(users[UserCredentials(username, password)]?.let { tokens[it] }
+            ?: throw UnexpectedResponseException()
+        )
+    }
 
     /*
     override suspend fun getToken(
@@ -46,7 +49,7 @@ class FakeUserDataServices : UserDataServices {
         password: String,
         mode: Mode,
         createTokenAction: SirenAction?
-    ): String {
+    ): Either<Unit, String> {
         throw UnexpectedResponseException()
     }
      */

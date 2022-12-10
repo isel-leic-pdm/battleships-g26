@@ -14,7 +14,6 @@ import com.example.battleships.utils.hypermedia.toApiURL
 import com.example.battleships.utils.send
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
-import java.net.URI
 import java.net.URL
 
 class RealHomeDataServices(

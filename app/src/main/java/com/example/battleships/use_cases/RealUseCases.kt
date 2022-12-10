@@ -6,7 +6,6 @@ import com.example.battleships.services.*
 import com.example.battleships.services.real.RealGamesDataServices
 import com.example.battleships.services.real.RealHomeDataServices
 import com.example.battleships.services.real.RealUserDataServices
-import com.example.battleships.use_cases.UseCases
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
@@ -29,12 +28,12 @@ class RealUseCases(
         }
     }
 
-    override suspend fun createToken(username: String, password: String, mode: Mode = Mode.AUTO): String? {
+    override suspend fun createToken(username: String, password: String, mode: Mode): String? {
         val token = userServices.getToken(username, password, mode)
         return getValueOrExecute(token) {
             val createTokenAction = homeServices.getCreateTokenAction()
             val token = userServices.getToken(username, password, mode, createTokenAction)
-            return@getValueOrExecute getValueOrExecute(token)
+            return@getValueOrExecute getValueOrThrow(token)
         }
     }
 
@@ -42,12 +41,13 @@ class RealUseCases(
      * Creates a game.
      * @return the game id, or null if the game is still pending another player
      */
-    override suspend fun createGame(token: String, mode: Mode): Int? {
+    override suspend fun createGame(token: String, mode: Mode): Boolean {
         val gameId = gameServices.createGame(token, mode)
-        if (servicesAreReal && gameId == null) {
+        return getValueOrExecute(gameId) {
             val userHomeLink = homeServices.getUserHomeLink()
             val createGameAction = userServices.getCreateGameAction(token, userHomeLink)
-            gameServices.createGame(token, mode, createGameAction)
+            val game = gameServices.createGame(token, mode, createGameAction)
+            return@getValueOrExecute getValueOrThrow(game)
         }
     }
 
@@ -103,13 +103,6 @@ class RealUseCases(
         }
     }
 
-    private fun <T> getValueOrThrow(either: Either<Unit, T>): T {
-        when (either) {
-            is Either.Right -> return either.value
-            is Either.Left -> throw IOException()
-        }
-    }
-
     private suspend fun <T> getValueOrExecute(either: Either<Unit, T>, onEitherLeft: suspend () -> T): T {
         return when (either) {
             is Either.Left -> onEitherLeft()
@@ -117,4 +110,6 @@ class RealUseCases(
         }
     }
 
+    private fun <T> getValueOrThrow(either: Either<Unit, T>): T =
+        getValueOrThrow(either, IOException())
 }

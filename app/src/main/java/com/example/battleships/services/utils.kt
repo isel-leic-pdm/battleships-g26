@@ -4,8 +4,11 @@ import android.util.Log
 import com.example.battleships.utils.hypermedia.SirenMediaType
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
-import okhttp3.*
+import okhttp3.CacheControl
+import okhttp3.Headers
+import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import java.lang.reflect.Type
 import java.net.URL
 

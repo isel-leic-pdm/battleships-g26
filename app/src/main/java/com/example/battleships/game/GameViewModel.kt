@@ -1,12 +1,14 @@
 package com.example.battleships.game
 
 import android.util.Log
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.battleships.UseCases
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.game.domain.game.GameState
+import com.example.battleships.use_cases.UseCases
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
@@ -27,30 +29,50 @@ class GameViewModel(
     private val useCases: UseCases,
     private val token: String
 ) : ViewModel() {
-    class GameResult(val game: Game, val player: Player)
-    sealed class CreateGameResult
-    class Success(val gameId: Int) : CreateGameResult()
-    object Matchmaking : CreateGameResult()
+    sealed class GameResult
+    data class Started(val gameResultInternal: GameResultInternal) : GameResult()
+    object WaitingForOpponent : GameResult()
+    object Matchmaking : GameResult()
+
+    data class GameResultInternal(val game: Game, val player: Player)
 
     private var _game by mutableStateOf<Result<GameResult>?>(null)
-    val userId: Result<GameResult>?
+    val game: Result<GameResult>?
         get() = _game
-
-    private var _createGameResult by mutableStateOf<Result<CreateGameResult>?>(null)
-    val createGameResult: Result<CreateGameResult>?
-        get() = _createGameResult
 
     fun startGame() {
         viewModelScope.launch {
-            _createGameResult =
-                try {
-                    val gameId = useCases.createGame(token)
-                    if (gameId == null) Result.success(Matchmaking)
-                    else Result.success(Success(gameId))
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error starting game", e)
-                    Result.failure(e)
+            try {
+                val result = useCases.createGame(token)
+                if (result) {
+                    Result.success(Matchmaking)
+                    fetchWhileMatchmaking()
                 }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error starting game", e)
+                _game = Result.failure(e)
+            }
+        }
+    }
+
+    private fun fetchWhileMatchmaking() {
+        viewModelScope.launch {
+            while (true) {
+                try {
+                    val res = useCases.fetchCurrentGameId(token)
+                    if (res != null) {
+                        _game = Result.success(WaitingForOpponent)
+                        updateGame()
+                        break
+                    } else {
+                        delay(1000)
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error getting game", e)
+                    _game = Result.failure(e)
+                    break
+                }
+            }
         }
     }
 
@@ -58,7 +80,10 @@ class GameViewModel(
         viewModelScope.launch {
             _game = try {
                 val res = useCases.fetchGame(token)
-                Result.success(GameResult(res.first, res.second)).also { Log.i(TAG, "Game updated") }
+                if (res != null) {
+                    val (game, player) = res
+                    Result.success(Started(GameResultInternal(game, player)))
+                } else null
             } catch (e: Exception) {
                 Log.e(TAG, "Error getting game", e)
                 Result.failure(e)
@@ -76,7 +101,8 @@ class GameViewModel(
             Log.i(TAG, "Ships placed, and confirmed")
             while (true) {
                 updateGame()
-                if (game.value?.state === GameState.BATTLE) break
+                val game = getGameIfStartedOrNull()?.game ?: return@launch
+                if (game.state === GameState.BATTLE) break
                 delay(1000)
                 Log.d(TAG, "Waiting for opponent to place ships") // TODO: maybe, remove this later
             }
@@ -96,7 +122,14 @@ class GameViewModel(
 
     // private fun getMyBoard(game: Game) = if (myBoardDisplayed.value) game.board1 else game.board2
 
-    internal fun setGame(game: Game) {
-        _game.value = game
+    internal fun setGame(game: Game, player: Player) {
+        _game = Result.success(Started(GameResultInternal(game, player)))
+    }
+
+    private fun getGameIfStartedOrNull(): GameResultInternal? {
+        return game?.getOrNull()?.let {
+            if (it is Started) it.gameResultInternal
+            else null
+        }
     }
 }
