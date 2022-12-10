@@ -1,5 +1,6 @@
 package com.example.battleships.services.fake
 
+import com.example.battleships.services.Either
 import com.example.battleships.services.Mode
 import com.example.battleships.services.UnexpectedResponseException
 import com.example.battleships.services.UserDataServices
@@ -24,11 +25,11 @@ class FakeUserDataServices : UserDataServices {
         password: String,
         mode: Mode,
         userCreateAction: SirenAction?
-    ): Int {
+    ): Either<Unit, Int> {
         if (users.containsKey(UserCredentials(username, password))) throw UnexpectedResponseException()
         val id = users.size + 1
         users[UserCredentials(username, password)] = id
-        return id
+        return Either.Right(id)
     }
 
     override suspend fun getToken(

@@ -185,4 +185,28 @@ class RealGamesDataServices(
 
     private fun extractGetGameLinkFromGameIdDto(gameIdDto: GameIdDto) =
         gameIdDto.links?.find { it.rel.contains("game-info") }
+
+    suspend fun getGameLink(token: String, newGetCurrentGameIdLink: SirenLink): SirenLink {
+        if (getGameLink == null) {
+            getCurrentGameId(token, newGetCurrentGameIdLink, Mode.FORCE_REMOTE)
+            return getGameLink ?: throw UnresolvedLinkException()
+        }
+        return getGameLink ?: throw UnresolvedLinkException()
+    }
+
+    suspend fun getSetFleetAction(token: String, newGetGameLink: SirenLink): SirenAction {
+        if (placeShipsAction == null) {
+            getGame(token, newGetGameLink, Mode.FORCE_REMOTE)
+            return placeShipsAction ?: throw UnresolvedLinkException()
+        }
+        return placeShipsAction ?: throw UnresolvedLinkException()
+    }
+
+    suspend fun getPlaceShotAction(token: String, newGetGameLink: SirenLink): SirenAction {
+        if (placeShotAction == null) {
+            getGame(token, newGetGameLink, Mode.FORCE_REMOTE)
+            return placeShotAction ?: throw UnresolvedLinkException()
+        }
+        return placeShotAction ?: throw UnresolvedLinkException()
+    }
 }

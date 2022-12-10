@@ -30,9 +30,9 @@ class RealUserDataServices(
         password: String,
         mode: Mode,
         newUserCreateAction: SirenAction?,
-    ): Int? {
+    ): Either<Unit, Int> {
         val userCreateAction: SirenAction = newUserCreateAction?.also { userCreateAction = it }
-            ?: this.userCreateAction ?: return null
+            ?: this.userCreateAction ?: return Either.Left(Unit)
         val url = userCreateAction.href.toApiURL()
 
         val request = buildRequest(
@@ -52,7 +52,7 @@ class RealUserDataServices(
             )
         }
         createTokenAction = extractCreateTokenAction(createUserDto) ?: throw UnresolvedLinkException()
-        return createUserDto.toUserId()
+        return Either.Right(createUserDto.toUserId())
     }
 
     override suspend fun getToken(
@@ -60,9 +60,9 @@ class RealUserDataServices(
         password: String,
         mode: Mode,
         newCreateTokenAction: SirenAction?
-    ): UserDataServices.Response? {
+    ): Either<Unit, String?> {
         val createTokenAction = newCreateTokenAction?.also { createTokenAction = it }
-            ?: this.createTokenAction ?: return null
+            ?: this.createTokenAction ?: return Either.Left(Unit)
         val url = createTokenAction.href.toApiURL()
 
         val request = buildRequest(
@@ -79,10 +79,10 @@ class RealUserDataServices(
                 handleResponse<UserLoginDto>(jsonEncoder, response, UserLoginDtoType.type)
             }
             userHomeLink = extractUserHomeLink(createTokenDto) ?: throw UnresolvedLinkException()
-            return UserDataServices.Response(createTokenDto.toToken())
+            return Either.Right(createTokenDto.toToken())
         } catch (e: UnexpectedResponseException) {
             if (e.response?.code == 403) // if credentials were wrong
-                return UserDataServices.Response(null)
+                return Either.Right(null)
             throw e
         }
     }
