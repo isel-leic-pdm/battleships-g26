@@ -9,7 +9,7 @@ import pt.isel.daw.dawbattleshipgame.domain.board.Board
 import pt.isel.daw.dawbattleshipgame.domain.game.Configuration
 
 data class GameInfoDtoProperties(val state: String, val gameId: Int?)
-typealias GameInfoDto = SirenEntity<GameInfoDtoProperties>
+typealias CreateGameDto = SirenEntity<GameInfoDtoProperties>
 val GameInfoDtoType = SirenEntity.getType<GameInfoDtoProperties>()
 
 data class GameIdDtoProperties(val gameId: Int)
@@ -54,7 +54,7 @@ fun BoardDtoProperties.toBoard(): Board {
     return Board(cells, confirmed)
 }
 
-fun GameInfoDto.toGameInfo(): GameInfo {
+fun CreateGameDto.toGameInfo(): GameInfo {
     val properties = this.properties
     require(properties != null) { "GameActionDto properties are null" }
     return GameInfo(properties.state, properties.gameId)

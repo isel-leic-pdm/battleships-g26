@@ -51,7 +51,7 @@ class RealUserDataServices(
                 CreateUserDtoType.type
             )
         }
-        createTokenAction = getCreateTokenAction(createUserDto) ?: throw UnresolvedLinkException()
+        createTokenAction = extractCreateTokenAction(createUserDto) ?: throw UnresolvedLinkException()
         return createUserDto.toUserId()
     }
 
@@ -78,7 +78,7 @@ class RealUserDataServices(
             val createTokenDto = request.send(httpClient) { response ->
                 handleResponse<UserLoginDto>(jsonEncoder, response, UserLoginDtoType.type)
             }
-            userHomeLink = getUserHomeLink(createTokenDto) ?: throw UnresolvedLinkException()
+            userHomeLink = extractUserHomeLink(createTokenDto) ?: throw UnresolvedLinkException()
             return UserDataServices.Response(createTokenDto.toToken())
         } catch (e: UnexpectedResponseException) {
             if (e.response?.code == 403) // if credentials were wrong
@@ -87,7 +87,7 @@ class RealUserDataServices(
         }
     }
 
-    override suspend fun getHome(
+    override suspend fun getUserHome(
         token: String,
         mode: Mode,
         userHomeLink: SirenLink?
@@ -99,28 +99,36 @@ class RealUserDataServices(
         val userHomeDto = request.send(httpClient) { response ->
             handleResponse<UserHomeDto>(jsonEncoder, response, UserHomeDtoType.type)
         }
-        createGameAction = getCreateGameAction(userHomeDto) ?: throw UnresolvedLinkException()
-        getCurrentGameIdLink = getCurrentGameIdLink(userHomeDto) ?: throw UnresolvedLinkException()
+        createGameAction = extractCreateGameAction(userHomeDto) ?: throw UnresolvedLinkException()
+        getCurrentGameIdLink = extractCurrentGameIdLink(userHomeDto) ?: throw UnresolvedLinkException()
         return userHomeDto.toUserHome()
     }
 
-    private fun getUserHomeLink(createTokenDto: SirenEntity<UserLoginDtoProperties>) =
+    private fun extractUserHomeLink(createTokenDto: SirenEntity<UserLoginDtoProperties>) =
         createTokenDto.links?.find { it.rel.contains("user-home") }
 
-    private fun getCreateTokenAction(dto: CreateUserDto) =
+    private fun extractCreateTokenAction(dto: CreateUserDto) =
         dto.actions?.find { it.name == "create-token" }
 
-    private fun getCreateGameAction(userHomeDto: SirenEntity<UserHomeDtoProperties>) =
+    private fun extractCreateGameAction(userHomeDto: SirenEntity<UserHomeDtoProperties>) =
         userHomeDto.actions?.find { it.name == "create-game" }
 
-    private fun getCurrentGameIdLink(userHomeDto: SirenEntity<UserHomeDtoProperties>) =
+    private fun extractCurrentGameIdLink(userHomeDto: SirenEntity<UserHomeDtoProperties>) =
         userHomeDto.links?.find { it.rel.contains("game-id") }
 
     suspend fun getCreateGameAction(token: String, newUserHomeLink: SirenLink): SirenAction {
         if (createGameAction == null) {
-            getHome(token, Mode.FORCE_REMOTE, newUserHomeLink)
+            getUserHome(token, Mode.FORCE_REMOTE, newUserHomeLink)
             return createGameAction ?: throw UnresolvedLinkException()
         }
         return createGameAction ?: throw UnresolvedLinkException()
+    }
+
+    suspend fun getCurrentGameIdLink(token: String, newUserHomeLink: SirenLink): SirenLink {
+        if (getCurrentGameIdLink == null) {
+            getUserHome(token, Mode.FORCE_REMOTE, newUserHomeLink)
+            return getCurrentGameIdLink ?: throw UnresolvedLinkException()
+        }
+        return getCurrentGameIdLink ?: throw UnresolvedLinkException()
     }
 }

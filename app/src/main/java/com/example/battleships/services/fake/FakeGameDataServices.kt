@@ -3,6 +3,7 @@ package com.example.battleships.services.fake
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.battleships.game.domain.game.*
+import com.example.battleships.services.Either
 import com.example.battleships.services.GameDataServices
 import com.example.battleships.services.Mode
 import com.example.battleships.utils.hypermedia.SirenAction
@@ -40,7 +41,7 @@ class FakeGameDataServices : GameDataServices {
         token: String,
         mode: Mode,
         newCreateGameAction: SirenAction?
-    ): Boolean {
+    ): Either<Unit, Boolean> {
         val newGame = Game.newGame(
             GAME_ID,
             PLAYER1_ID,
@@ -48,7 +49,7 @@ class FakeGameDataServices : GameDataServices {
             configuration
         )
         game = setEnemyShipLayout(newGame)
-        return true
+        return Either.Right(true)
     }
 
     private fun setEnemyShipLayout(game: Game): Game {
@@ -66,10 +67,10 @@ class FakeGameDataServices : GameDataServices {
 
     override suspend fun getCurrentGameId(
         token: String,
-        mode: Mode,
-        newGetCurrentGameIdLink: SirenLink?
-    ): Int? {
-        return game?.id
+        newGetCurrentGameIdLink: SirenLink?,
+        mode: Mode
+    ): Either<Unit, Int?> {
+        return Either.Right(game?.id)
     }
 
     override suspend fun setFleet(
@@ -77,13 +78,13 @@ class FakeGameDataServices : GameDataServices {
         ships: List<Triple<ShipType, Coordinate, Orientation>>,
         newSetFleetAction: SirenAction?,
         mode: Mode
-    ): Boolean {
+    ): Either<Unit, Boolean> {
         var newGame = game
         ships.forEach { (shipType, coordinate, orientation) ->
-            newGame = newGame?.placeShip(shipType, coordinate, orientation, Player.ONE) ?: return false
+            newGame = newGame?.placeShip(shipType, coordinate, orientation, Player.ONE) ?: return Either.Right(false)
         }
         game = newGame?.confirmFleet(Player.ONE)
-        return true
+        return Either.Right(true)
     }
 
     override suspend fun placeShot(
@@ -91,14 +92,14 @@ class FakeGameDataServices : GameDataServices {
         coordinate: Coordinate,
         newPlaceShotAction: SirenAction?,
         mode: Mode
-    ): Boolean {
-        val game = game ?: return false
-        val newGame = game.placeShot(game.player1, coordinate, Player.ONE) ?: return false
+    ): Either<Unit, Boolean> {
+        val game = game ?: return Either.Right(false)
+        val newGame = game.placeShot(game.player1, coordinate, Player.ONE) ?: return Either.Right(false)
         this.game = newGame
-        if (newGame.state == GameState.FINISHED) return true
+        if (newGame.state == GameState.FINISHED) return Either.Right(true)
         delay(100)
         shootWithEnemy()
-        return true
+        return Either.Right(true)
     }
 
     private fun shootWithEnemy() {
@@ -121,7 +122,7 @@ class FakeGameDataServices : GameDataServices {
         token: String,
         newGetGameLink: SirenLink?,
         mode: Mode
-    ): Pair<Game, Player>? {
-        return game?.let { Pair(it, Player.ONE) }
+    ): Either<Unit, Pair<Game, Player>?> {
+        return Either.Right(game?.let { Pair(it, Player.ONE) })
     }
 }

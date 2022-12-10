@@ -50,7 +50,7 @@ class FakeUserDataServices : UserDataServices {
     }
      */
 
-    override suspend fun getHome(token: String, mode: Mode, userHomeLink: SirenLink?): UserHome {
+    override suspend fun getUserHome(token: String, mode: Mode, userHomeLink: SirenLink?): UserHome {
         TODO("Not yet implemented")
     }
 

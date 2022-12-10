@@ -33,9 +33,9 @@ class RealGamesDataServices(
      * Creates a new game.
      * @return true if the game was created successfully, if [newCreateGameAction] is needed.
      */
-    override suspend fun createGame(token: String, mode: Mode, newGameCreateAction: SirenAction?): Boolean {
+    override suspend fun createGame(token: String, mode: Mode, newGameCreateAction: SirenAction?): Either<Unit, Boolean> {
         val createGameAction = newGameCreateAction?.also { createGameAction = it }
-            ?: this.createGameAction ?: return false
+            ?: this.createGameAction ?: return Either.Left(Unit)
         val url = createGameAction.href.toURL()
 
         // TODO -> parameterize the game configuration
@@ -54,37 +54,16 @@ class RealGamesDataServices(
         val request = buildRequest(Post(url, requestBody), mode)
 
         val gameCreatedDto = request.send(httpClient) { response ->
-            handleResponse<GameInfoDto>(
+            handleResponse<CreateGameDto>(
                 jsonEncoder,
                 response,
                 CreateUserDtoType.type
             )
         }
-        getCurrentGameIdLink = getGetCurrentGameIdLink(gameCreatedDto) // could be null if game is already started
-        getGameLink = getGetGameLinkByGameInfoDto(gameCreatedDto) // could be null if game still hasn't started
-        return true
-    }
-
-    override suspend fun getCurrentGameId(
-        token: String,
-        mode: Mode,
-        newGetCurrentGameIdLink: SirenLink?
-    ): Int? {
-        val getCurrentGameIdLink = newGetCurrentGameIdLink?.also { getCurrentGameIdLink = it }
-            ?: this.getCurrentGameIdLink ?: return null
-        val url = getCurrentGameIdLink.href.toURL()
-
-        val request = buildRequest(Get(url), mode)
-
-        val gameIdDto = request.send(httpClient) { response ->
-            handleResponse<GameIdDto>(
-                jsonEncoder,
-                response,
-                GameIdDtoType.type
-            )
-        }
-        getGameLink = getGetGameLinkByGameIdDto(gameIdDto)
-        return gameIdDto.toGameId()
+        getCurrentGameIdLink = extractGetCurrentGameIdLink(gameCreatedDto) // could be null if game is already started
+        getGameLink =
+            extractGetGameLinkFromCreateGameDto(gameCreatedDto) // could be null if game still hasn't started
+        return Either.Right(true)
     }
 
     override suspend fun setFleet(
@@ -92,9 +71,9 @@ class RealGamesDataServices(
         ships: List<Triple<ShipType, Coordinate, Orientation>>,
         newSetFleetAction: SirenAction?,
         mode: Mode
-    ): Boolean {
+    ): Either<Unit, Boolean> {
         val placeFleetLayout = newSetFleetAction?.also { placeShipsAction = it }
-            ?: this.placeShipsAction ?: return false
+            ?: this.placeShipsAction ?: return Either.Left(Unit)
         val placeShipsUrl = placeFleetLayout.href.toURL()
 
         val requestBody = ships.joinToString(prefix = "[", postfix = "]") { (shipType, coordinate) ->
@@ -115,7 +94,7 @@ class RealGamesDataServices(
                 Unit.javaClass
             )
         }
-        return true
+        return Either.Right(true)
     }
 
     override suspend fun placeShot(
@@ -123,9 +102,9 @@ class RealGamesDataServices(
         coordinate: Coordinate,
         newPlaceShotAction: SirenAction?,
         mode: Mode
-    ): Boolean {
+    ): Either<Unit, Boolean> {
         val placeShotAction = newPlaceShotAction?.also { placeShotAction = it }
-            ?: this.placeShotAction ?: return false
+            ?: this.placeShotAction ?: return Either.Left(Unit)
         val placeShotUrl = placeShotAction.href.toURL()
 
         val body = "{\n" +
@@ -142,16 +121,39 @@ class RealGamesDataServices(
                 Unit.javaClass
             )
         }
-        return true
+        return Either.Right(true)
+    }
+
+    override suspend fun getCurrentGameId(
+        token: String,
+        newGetCurrentGameIdLink: SirenLink?,
+        mode: Mode
+    ): Either<Unit, Int> {
+        val getCurrentGameIdLink = newGetCurrentGameIdLink?.also { getCurrentGameIdLink = it }
+            ?: this.getCurrentGameIdLink ?: return Either.Left(Unit)
+        val url = getCurrentGameIdLink.href.toURL()
+
+        val request = buildRequest(Get(url), mode)
+
+        // TODO -> try catch to know if the game has already started
+        val gameIdDto = request.send(httpClient) { response ->
+            handleResponse<GameIdDto>(
+                jsonEncoder,
+                response,
+                GameIdDtoType.type
+            )
+        }
+        getGameLink = extractGetGameLinkFromGameIdDto(gameIdDto)
+        return Either.Right(gameIdDto.toGameId())
     }
 
     override suspend fun getGame(
         token: String,
         newGetGameLink: SirenLink?,
         mode: Mode
-    ): Pair<Game, Player>? {
+    ): Either<Unit, Pair<Game, Player>?> {
         val getGameInfoLink = newGetGameLink?.also { getGameLink = it }
-            ?: this.getGameLink ?: return null
+            ?: this.getGameLink ?: return Either.Left(Unit)
         val url = getGameInfoLink.href.toURL()
 
         val request = buildRequest(Get(url), mode)
@@ -175,12 +177,12 @@ class RealGamesDataServices(
     private fun getPlaceFleetLayout(gameDto: GameDto) =
         gameDto.actions?.find { it.name == "place-fleet" }
 
-    private fun getGetCurrentGameIdLink(gameCreatedDto: GameInfoDto) =
+    private fun extractGetCurrentGameIdLink(gameCreatedDto: CreateGameDto) =
         gameCreatedDto.links?.find { it.rel.contains("game-id") }
 
-    private fun getGetGameLinkByGameInfoDto(gameCreatedDto: GameInfoDto) =
+    private fun extractGetGameLinkFromCreateGameDto(gameCreatedDto: CreateGameDto) =
         gameCreatedDto.links?.find { it.rel.contains("game-info") }
 
-    private fun getGetGameLinkByGameIdDto(gameIdDto: GameIdDto) =
+    private fun extractGetGameLinkFromGameIdDto(gameIdDto: GameIdDto) =
         gameIdDto.links?.find { it.rel.contains("game-info") }
 }

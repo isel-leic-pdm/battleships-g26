@@ -1,9 +1,7 @@
 package com.example.battleships.game
 
 import android.util.Log
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.battleships.UseCases
@@ -29,37 +27,42 @@ class GameViewModel(
     private val useCases: UseCases,
     private val token: String
 ) : ViewModel() {
-    private var _game: MutableState<Game?> = mutableStateOf(null)
-    val game: State<Game?>
+    class GameResult(val game: Game, val player: Player)
+    sealed class CreateGameResult
+    class Success(val gameId: Int) : CreateGameResult()
+    object Matchmaking : CreateGameResult()
+
+    private var _game by mutableStateOf<Result<GameResult>?>(null)
+    val userId: Result<GameResult>?
         get() = _game
 
-    /*
-    private val _myBoardDisplayed: MutableState<Boolean> = mutableStateOf(true)
-    val myBoardDisplayed: State<Boolean>
-        get() = _myBoardDisplayed
-     */
-
-    var player: Player? = null
+    private var _createGameResult by mutableStateOf<Result<CreateGameResult>?>(null)
+    val createGameResult: Result<CreateGameResult>?
+        get() = _createGameResult
 
     fun startGame() {
         viewModelScope.launch {
-            useCases.createGame(token) // requests to start a new game
-            Log.i(TAG, "Game started")
-            updateGame() // asserts game
+            _createGameResult =
+                try {
+                    val gameId = useCases.createGame(token)
+                    if (gameId == null) Result.success(Matchmaking)
+                    else Result.success(Success(gameId))
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error starting game", e)
+                    Result.failure(e)
+                }
         }
     }
 
     private fun updateGame() {
         viewModelScope.launch {
-            val res = useCases.fetchGame(token)
-            Log.i(TAG, "Game updated")
-            if (res == null) {
-                Log.e(TAG, "Tried to update game but it was null")
-                return@launch
+            _game = try {
+                val res = useCases.fetchGame(token)
+                Result.success(GameResult(res.first, res.second)).also { Log.i(TAG, "Game updated") }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error getting game", e)
+                Result.failure(e)
             }
-            _game.value = res.first
-            player = res.second
-            Log.i(TAG, "Game updated")
         }
     }
 

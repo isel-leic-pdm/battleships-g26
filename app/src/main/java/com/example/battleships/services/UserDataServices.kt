@@ -11,5 +11,5 @@ interface UserDataServices {
 
     class Response(val token: String?)
     suspend fun getToken(username: String, password: String, mode: Mode, createTokenAction: SirenAction? = null): Response?
-    suspend fun getHome(token: String, mode: Mode, userHomeLink: SirenLink? = null): UserHome
+    suspend fun getUserHome(token: String, mode: Mode, userHomeLink: SirenLink? = null): UserHome
 }
