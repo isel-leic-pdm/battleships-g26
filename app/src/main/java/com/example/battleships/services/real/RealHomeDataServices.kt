@@ -28,7 +28,7 @@ class RealHomeDataServices(
     var serverInfoLink: SirenLink? = null
 
     private suspend fun getHome(): Home {
-        val request = buildRequest(Get(battleshipsHome), Mode.AUTO)
+        val request = buildRequest(Get(battleshipsHome), null, Mode.AUTO)
 
         val homeDto = request.send(httpClient) { response ->
             handleResponse<HomeDto>(jsonEncoder, response, HomeDtoType.type)
@@ -50,7 +50,7 @@ class RealHomeDataServices(
 
     override suspend fun getServerInfo(mode: Mode): ServerInfo {
         val serverInfoURL: URL = ensureServerInfoLink()
-        val request = buildRequest(Get(serverInfoURL), mode)
+        val request = buildRequest(Get(serverInfoURL), null, mode)
 
         val serverInfoDto = request.send(httpClient) { response ->
             handleResponse<ServerInfoDto>(jsonEncoder, response, HomeDtoType.type)
@@ -62,7 +62,7 @@ class RealHomeDataServices(
 
     override suspend fun getRankings(mode: Mode): GameRanking {
         val rankingsURL: URL = ensureRankingsLink()
-        val request = buildRequest(Get(rankingsURL), mode)
+        val request = buildRequest(Get(rankingsURL), null, mode)
 
         val rankingsDto = request.send(httpClient) { response ->
             handleResponse<RankingsDto>(jsonEncoder, response, RankingsDtoType.type)

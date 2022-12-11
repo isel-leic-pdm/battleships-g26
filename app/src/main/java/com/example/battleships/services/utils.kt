@@ -21,8 +21,12 @@ class Delete(url: URL) : RequestMethod(url)
 /**
  * Builds a request.
  */
-internal fun buildRequest(requestMethod: RequestMethod, mode: Mode) =
-    with(Request.Builder()) {
+internal fun buildRequest(requestMethod: RequestMethod, token: String? = null, mode: Mode): Request {
+    val headers =
+        if (token != null) Headers.Builder().add("Authorization", "Bearer $token")
+        else Headers.Builder()
+
+    return with(Request.Builder()) {
         when (mode) {
             Mode.FORCE_REMOTE -> cacheControl(CacheControl.FORCE_NETWORK)
             Mode.FORCE_LOCAL -> cacheControl(CacheControl.FORCE_CACHE)
@@ -41,11 +45,12 @@ internal fun buildRequest(requestMethod: RequestMethod, mode: Mode) =
         }
     ).headers(
         when (requestMethod) {
-            is Post -> Headers.headersOf("Content-Type", "application/json")
-            is Put -> Headers.headersOf("Content-Type", "application/json")
-            else -> Headers.headersOf()
+            is Post -> headers.add("Content-Type", "application/json").build()
+            is Put -> headers.add("Content-Type", "application/json").build()
+            else -> headers.build()
         }
     ).build()
+}
 
 /**
  * This method's usefulness is circumstantial. In more realistic scenarios

@@ -42,7 +42,7 @@ class RealUserDataServices(
                         "    \"username\": \"$username\",\n" +
                         "    \"password\": \"$password\"\n" +
                         "}"
-            ), mode
+            ), null, mode
         )
         val createUserDto = request.send(httpClient) { response ->
             handleResponse<CreateUserDto>(
@@ -72,7 +72,7 @@ class RealUserDataServices(
                         "    \"username\": \"$username\",\n" +
                         "    \"password\": \"$password\"\n" +
                         "}"
-            ), mode
+            ), null, mode
         )
         try {
             val createTokenDto = request.send(httpClient) { response ->
@@ -95,7 +95,7 @@ class RealUserDataServices(
         val userHomeLink = userHomeLink ?: this.userHomeLink ?: throw UnresolvedLinkException()
         val url = userHomeLink.href.toApiURL()
 
-        val request = buildRequest(Get(url), mode)
+        val request = buildRequest(Get(url), token, mode)
         val userHomeDto = request.send(httpClient) { response ->
             handleResponse<UserHomeDto>(jsonEncoder, response, UserHomeDtoType.type)
         }

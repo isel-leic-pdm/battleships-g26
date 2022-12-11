@@ -7,13 +7,13 @@ import com.example.battleships.game.domain.game.GameState
 import com.example.battleships.utils.hypermedia.SirenEntity
 import pt.isel.daw.dawbattleshipgame.domain.board.Board
 import pt.isel.daw.dawbattleshipgame.domain.game.Configuration
+import pt.isel.daw.dawbattleshipgame.domain.player.Player
 
-data class GameInfoDtoProperties(val state: String, val gameId: Int?)
-typealias CreateGameDto = SirenEntity<GameInfoDtoProperties>
-val GameInfoDtoType = SirenEntity.getType<GameInfoDtoProperties>()
+data class CreateGameDtoProperties(val state: String, val gameId: Int?)
+typealias CreateGameDto = SirenEntity<CreateGameDtoProperties>
+val GameInfoDtoType = SirenEntity.getType<CreateGameDtoProperties>()
 
 data class GameIdDtoProperties(val gameId: Int)
-
 typealias GameIdDto = SirenEntity<GameIdDtoProperties>
 val GameIdDtoType = SirenEntity.getType<GameIdDtoProperties>()
 
@@ -22,15 +22,15 @@ data class GameDtoProperties(
     val configuration: Configuration,
     val player1: Int,
     val player2: Int,
-    val state: GameState,
+    val state: String,
     val board1: BoardDtoProperties,
     val board2: BoardDtoProperties,
+    val myPlayer: String
 )
-
 typealias GameDto = SirenEntity<GameDtoProperties>
 val GameDtoType = SirenEntity.getType<GameDtoProperties>()
 
-fun GameDto.toGame(): Game {
+fun GameDto.toGameAndPlayer(): Pair<Game, Player> {
     val game = this.properties
     require(game != null) { "GameDto properties are null" }
     return Game(
@@ -40,8 +40,8 @@ fun GameDto.toGame(): Game {
         game.player2,
         game.board1.toBoard(),
         game.board2.toBoard(),
-        game.state
-    )
+        GameState.valueOf(game.state.uppercase()),
+    ) to Player.valueOf(game.myPlayer.uppercase())
 }
 
 data class BoardDtoProperties(
