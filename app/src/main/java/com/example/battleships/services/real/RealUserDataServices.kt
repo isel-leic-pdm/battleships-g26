@@ -3,10 +3,7 @@ package com.example.battleships.services.real
 import com.example.battleships.dtos.*
 import com.example.battleships.services.*
 import com.example.battleships.user_home.UserHome
-import com.example.battleships.utils.hypermedia.SirenAction
-import com.example.battleships.utils.hypermedia.SirenEntity
-import com.example.battleships.utils.hypermedia.SirenLink
-import com.example.battleships.utils.hypermedia.toApiURL
+import com.example.battleships.utils.hypermedia.*
 import com.example.battleships.utils.send
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
@@ -42,13 +39,14 @@ class RealUserDataServices(
                         "    \"username\": \"$username\",\n" +
                         "    \"password\": \"$password\"\n" +
                         "}"
-            ), mode
+            ), null, mode
         )
         val createUserDto = request.send(httpClient) { response ->
             handleResponse<CreateUserDto>(
                 jsonEncoder,
                 response,
-                CreateUserDtoType.type
+                CreateUserDtoType.type,
+                JsonMediaType
             )
         }
         createTokenAction = extractCreateTokenAction(createUserDto) ?: throw UnresolvedLinkException()
@@ -72,11 +70,11 @@ class RealUserDataServices(
                         "    \"username\": \"$username\",\n" +
                         "    \"password\": \"$password\"\n" +
                         "}"
-            ), mode
+            ), null, mode
         )
         try {
             val createTokenDto = request.send(httpClient) { response ->
-                handleResponse<UserLoginDto>(jsonEncoder, response, UserLoginDtoType.type)
+                handleResponse<UserLoginDto>(jsonEncoder, response, UserLoginDtoType.type, SirenMediaType)
             }
             userHomeLink = extractUserHomeLink(createTokenDto) ?: throw UnresolvedLinkException()
             return Either.Right(createTokenDto.toToken())
@@ -95,9 +93,9 @@ class RealUserDataServices(
         val userHomeLink = userHomeLink ?: this.userHomeLink ?: throw UnresolvedLinkException()
         val url = userHomeLink.href.toApiURL()
 
-        val request = buildRequest(Get(url), mode)
+        val request = buildRequest(Get(url), token, mode)
         val userHomeDto = request.send(httpClient) { response ->
-            handleResponse<UserHomeDto>(jsonEncoder, response, UserHomeDtoType.type)
+            handleResponse<UserHomeDto>(jsonEncoder, response, UserHomeDtoType.type, SirenMediaType)
         }
         createGameAction = extractCreateGameAction(userHomeDto) ?: throw UnresolvedLinkException()
         getCurrentGameIdLink = extractCurrentGameIdLink(userHomeDto) ?: throw UnresolvedLinkException()

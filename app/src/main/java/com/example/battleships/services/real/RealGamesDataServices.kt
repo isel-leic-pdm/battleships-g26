@@ -3,9 +3,7 @@ package com.example.battleships.services.real
 import com.example.battleships.dtos.*
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.services.*
-import com.example.battleships.utils.hypermedia.SirenAction
-import com.example.battleships.utils.hypermedia.SirenEntity
-import com.example.battleships.utils.hypermedia.SirenLink
+import com.example.battleships.utils.hypermedia.*
 import com.example.battleships.utils.send
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
@@ -19,15 +17,11 @@ class RealGamesDataServices(
     private val jsonEncoder: Gson
 ): GameDataServices {
 
-    /**
-     * @see rankingsLink
-     */
     private var createGameAction: SirenAction? = null
     private var getCurrentGameIdLink: SirenLink? = null
     private var getGameLink: SirenLink? = null
     private var placeShipsAction: SirenAction? = null
     private var placeShotAction: SirenAction? = null
-    private var confirmFleetLayoutAction: SirenAction? = null
 
     /**
      * Creates a new game.
@@ -36,7 +30,7 @@ class RealGamesDataServices(
     override suspend fun createGame(token: String, mode: Mode, newGameCreateAction: SirenAction?): Either<Unit, Boolean> {
         val createGameAction = newGameCreateAction?.also { createGameAction = it }
             ?: this.createGameAction ?: return Either.Left(Unit)
-        val url = createGameAction.href.toURL()
+        val url = createGameAction.href.toApiURL()
 
         // TODO -> parameterize the game configuration
         val requestBody = "{\n" +
@@ -51,13 +45,14 @@ class RealGamesDataServices(
                 "    \"nShotsPerRound\": 10,\n" +
                 "    \"roundTimeout\": 10\n" +
                 "}"
-        val request = buildRequest(Post(url, requestBody), mode)
+        val request = buildRequest(Post(url, requestBody), token, mode)
 
         val gameCreatedDto = request.send(httpClient) { response ->
             handleResponse<CreateGameDto>(
                 jsonEncoder,
                 response,
-                CreateUserDtoType.type
+                CreateUserDtoType.type,
+                SirenMediaType
             )
         }
         getCurrentGameIdLink = extractGetCurrentGameIdLink(gameCreatedDto) // could be null if game is already started
@@ -74,24 +69,32 @@ class RealGamesDataServices(
     ): Either<Unit, Boolean> {
         val placeFleetLayout = newSetFleetAction?.also { placeShipsAction = it }
             ?: this.placeShipsAction ?: return Either.Left(Unit)
-        val placeShipsUrl = placeFleetLayout.href.toURL()
+        val placeShipsUrl = placeFleetLayout.href.toApiURL()
 
-        val requestBody = ships.joinToString(prefix = "[", postfix = "]") { (shipType, coordinate) ->
-            "{\n" +
-                    "    \"type\": \"${shipType.name}\",\n" +
-                    "    \"position\": {\n" +
-                    "        \"x\": ${coordinate.row},\n" +
-                    "        \"y\": ${coordinate.column}\n" +
-                    "    }\n" +
+        val requestBody = "{\n" +
+            "\"operation\": \"place-ships\",\n" +
+                    "    \"ships\": [\n" +
+                    ships.joinToString(",\n") { ship ->
+                        "        {\n" +
+                                "            \"shipType\": \"${ship.first}\",\n" +
+                                "            \"position\": {\n" +
+                                "                \"row\": ${ship.second.row},\n" +
+                                "                \"column\": ${ship.second.column}\n" +
+                                "            },\n" +
+                                "            \"orientation\": \"${ship.third}\"\n" +
+                                "        }"
+                    } +
+                    "    ],\n" +
+                    "\"fleetConfirmed\": \"true\"" +
                     "}"
-        }
-        val request = buildRequest(Post(placeShipsUrl, requestBody), mode)
+        val request = buildRequest(Post(placeShipsUrl, requestBody), token, mode)
 
         request.send(httpClient) { response ->
             handleResponse<Unit>(
                 jsonEncoder,
                 response,
-                Unit.javaClass
+                Unit.javaClass,
+                JsonMediaType
             )
         }
         return Either.Right(true)
@@ -112,13 +115,14 @@ class RealGamesDataServices(
                 "\t\"y\": ${coordinate.column}\n" +
                 "}"
 
-        val request = buildRequest(Post(placeShotUrl, body), mode)
+        val request = buildRequest(Post(placeShotUrl, body), token, mode)
 
         request.send(httpClient) { response ->
             handleResponse<Unit>(
                 jsonEncoder,
                 response,
-                Unit.javaClass
+                Unit.javaClass,
+                JsonMediaType
             )
         }
         return Either.Right(true)
@@ -131,16 +135,17 @@ class RealGamesDataServices(
     ): Either<Unit, Int> {
         val getCurrentGameIdLink = newGetCurrentGameIdLink?.also { getCurrentGameIdLink = it }
             ?: this.getCurrentGameIdLink ?: return Either.Left(Unit)
-        val url = getCurrentGameIdLink.href.toURL()
+        val url = getCurrentGameIdLink.href.toApiURL()
 
-        val request = buildRequest(Get(url), mode)
+        val request = buildRequest(Get(url), token, mode)
 
         // TODO -> try catch to know if the game has already started
         val gameIdDto = request.send(httpClient) { response ->
             handleResponse<GameIdDto>(
                 jsonEncoder,
                 response,
-                GameIdDtoType.type
+                GameIdDtoType.type,
+                SirenMediaType
             )
         }
         getGameLink = extractGetGameLinkFromGameIdDto(gameIdDto)
@@ -154,28 +159,24 @@ class RealGamesDataServices(
     ): Either<Unit, Pair<Game, Player>?> {
         val getGameInfoLink = newGetGameLink?.also { getGameLink = it }
             ?: this.getGameLink ?: return Either.Left(Unit)
-        val url = getGameInfoLink.href.toURL()
+        val url = getGameInfoLink.href.toApiURL()
 
-        val request = buildRequest(Get(url), mode)
+        val request = buildRequest(Get(url), token, mode)
 
         val gameDto = request.send(httpClient) { response ->
             handleResponse<GameDto>(
                 jsonEncoder,
                 response,
-                GameInfoDtoType.type
+                GameDtoType.type,
+                SirenMediaType
             )
         }
         placeShipsAction = getPlaceFleetLayout(gameDto)
-        confirmFleetLayoutAction = getConfirmFleetLayout(gameDto)
-        TODO("Not yet implemented: needs to know wich player is acossiated withe token")
-        // return gameDto.toGame()
+        return Either.Right(gameDto.toGameAndPlayer())
     }
 
-    private fun getConfirmFleetLayout(gameDto: SirenEntity<GameDtoProperties>) =
-        gameDto.actions?.find { it.name == "confirm-fleet-layout" }
-
     private fun getPlaceFleetLayout(gameDto: GameDto) =
-        gameDto.actions?.find { it.name == "place-fleet" }
+        gameDto.actions?.find { it.name == "place-ships" }
 
     private fun extractGetCurrentGameIdLink(gameCreatedDto: CreateGameDto) =
         gameCreatedDto.links?.find { it.rel.contains("game-id") }

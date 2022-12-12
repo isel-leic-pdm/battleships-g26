@@ -4,11 +4,9 @@ import android.util.Log
 import com.example.battleships.utils.hypermedia.SirenMediaType
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
-import okhttp3.CacheControl
-import okhttp3.Headers
-import okhttp3.Request
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
 import java.lang.reflect.Type
 import java.net.URL
 
@@ -21,8 +19,12 @@ class Delete(url: URL) : RequestMethod(url)
 /**
  * Builds a request.
  */
-internal fun buildRequest(requestMethod: RequestMethod, mode: Mode) =
-    with(Request.Builder()) {
+internal fun buildRequest(requestMethod: RequestMethod, token: String? = null, mode: Mode): Request {
+    val headers =
+        if (token != null) Headers.Builder().add("Authorization", "Bearer $token")
+        else Headers.Builder()
+
+    return with(Request.Builder()) {
         when (mode) {
             Mode.FORCE_REMOTE -> cacheControl(CacheControl.FORCE_NETWORK)
             Mode.FORCE_LOCAL -> cacheControl(CacheControl.FORCE_CACHE)
@@ -41,19 +43,22 @@ internal fun buildRequest(requestMethod: RequestMethod, mode: Mode) =
         }
     ).headers(
         when (requestMethod) {
-            is Post -> Headers.headersOf("Content-Type", "application/json")
-            is Put -> Headers.headersOf("Content-Type", "application/json")
-            else -> Headers.headersOf()
+            is Post -> headers.add("Content-Type", "application/json").build()
+            is Put -> headers.add("Content-Type", "application/json").build()
+            else -> headers.build()
         }
     ).build()
+}
+
+val JsonMediaType = "application/json".toMediaType()
 
 /**
  * This method's usefulness is circumstantial. In more realistic scenarios
  * we will not be handling API responses with this simplistic approach.
  */
-internal fun <T> handleResponse(jsonEncoder: Gson, response: Response, type: Type): T {
+internal fun <T> handleResponse(jsonEncoder: Gson, response: Response, type: Type, mediaType: MediaType): T {
     val contentType = response.body?.contentType()
-    return if (response.isSuccessful && contentType != null && contentType == SirenMediaType) {
+    return if (response.isSuccessful && contentType != null && contentType == mediaType) {
         try {
             val body = response.body?.string()
             jsonEncoder.fromJson<T>(body, type)

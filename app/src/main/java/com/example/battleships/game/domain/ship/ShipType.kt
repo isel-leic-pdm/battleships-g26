@@ -15,7 +15,7 @@ enum class ShipType(private val icon: Char) {
         else this.icon
 
     companion object {
-        fun get(icon: Char) = ShipType.values().first {
+        fun get(icon: Char) = values().first {
             it.icon == icon.uppercaseChar()
         }
     }
