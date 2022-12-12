@@ -10,6 +10,7 @@ import com.example.battleships.rankings.rankings
 import com.example.battleships.services.*
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenLink
+import com.example.battleships.utils.hypermedia.SirenMediaType
 import com.example.battleships.utils.hypermedia.toApiURL
 import com.example.battleships.utils.send
 import com.google.gson.Gson
@@ -31,7 +32,7 @@ class RealHomeDataServices(
         val request = buildRequest(Get(battleshipsHome), null, Mode.AUTO)
 
         val homeDto = request.send(httpClient) { response ->
-            handleResponse<HomeDto>(jsonEncoder, response, HomeDtoType.type)
+            handleResponse<HomeDto>(jsonEncoder, response, HomeDtoType.type, SirenMediaType)
         }
 
         userCreateAction = getCreateUserAction(homeDto)
@@ -53,7 +54,7 @@ class RealHomeDataServices(
         val request = buildRequest(Get(serverInfoURL), null, mode)
 
         val serverInfoDto = request.send(httpClient) { response ->
-            handleResponse<ServerInfoDto>(jsonEncoder, response, HomeDtoType.type)
+            handleResponse<ServerInfoDto>(jsonEncoder, response, HomeDtoType.type, SirenMediaType)
         }
         val serverInfoProperties = serverInfoDto.properties
         require(serverInfoProperties != null) { "ServerInfoDto properties should not have been null" }
@@ -65,7 +66,7 @@ class RealHomeDataServices(
         val request = buildRequest(Get(rankingsURL), null, mode)
 
         val rankingsDto = request.send(httpClient) { response ->
-            handleResponse<RankingsDto>(jsonEncoder, response, RankingsDtoType.type)
+            handleResponse<RankingsDto>(jsonEncoder, response, RankingsDtoType.type, SirenMediaType)
         }
         val rankingsProperties = rankingsDto.properties
         require(rankingsProperties != null) { "ServerInfoDto properties should not have been null" }
