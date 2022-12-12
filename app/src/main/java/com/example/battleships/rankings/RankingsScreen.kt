@@ -76,7 +76,7 @@ private fun RankingList(
             ) {
                 Column(
                     Modifier
-                        .offset(y = -20.dp)
+                        .offset(y = (-20).dp)
                         .height(SCREEN_HEIGHT.dp / 3 - 150.dp)
                         .width(SCREEN_WIDTH.dp / 3)
                         .clip(RoundedCornerShape(30.dp))

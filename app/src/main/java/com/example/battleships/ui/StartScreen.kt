@@ -1,5 +1,6 @@
 package com.example.battleships.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -9,10 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.example.battleships.home.NavigateToAuthenticationButtonTestTag
 import com.example.battleships.home.NavigateToRankingsButtonTestTag
 import com.example.battleships.ui.theme.BattleshipsTheme
+import com.example.battleships.utils.SCREEN_HEIGHT
+import pt.isel.battleships.R
 
 data class Handler(val name: String, val tag: String, val handler: () -> Unit)
 const val REGISTER_BUTTON_TAG = "REGBUTTON"
@@ -62,16 +67,12 @@ fun StartScreenNew(
     tag: String? = null,
     onSignIn : () -> Unit = {},
     onRanking : () -> Unit = {},
-    onAppInfo : () -> Unit = {},
-    onNavigationRequested: NavigationHandlers = NavigationHandlers(),
+    onAppInfo : () -> Unit = {}
 ) {
     BattleshipsTheme {
         val modifier = if (tag != null) Modifier.testTag(tag) else Modifier
         Scaffold(
             modifier = modifier.fillMaxSize(),
-            topBar = {
-                TopBar(navigation = onNavigationRequested)
-            },
             bottomBar = { BottomAppBar(
                 content = {
                     BottomAppNavigation(onRanking, onAppInfo)
@@ -79,12 +80,17 @@ fun StartScreenNew(
             ) },
         ) { innerPadding ->
             Column(
-                verticalArrangement = Arrangement.SpaceAround,
+                verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize(),
             ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ship_logo),
+                    contentDescription = null,
+                    modifier = Modifier.size((SCREEN_HEIGHT/12).dp)
+                )
                 Button(
                     modifier = Modifier.testTag(NavigateToAuthenticationButtonTestTag),
                     onClick = onSignIn

@@ -19,6 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.battleships.ui.CenteredTopAppBar
 import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
@@ -32,9 +33,11 @@ fun InfoScreen(
 ){
     BattleshipsTheme {
         Scaffold(
-            modifier = Modifier.fillMaxSize().testTag("InfoScreen"),
+            modifier = Modifier
+                .fillMaxSize()
+                .testTag("InfoScreen"),
             backgroundColor = MaterialTheme.colors.background,
-            topBar = { TopBar(navigationHandlers) },
+            topBar = { CenteredTopAppBar(title = "Info", navigationHandlers) },
         ) { innerPadding ->
             Column(
                 verticalArrangement = Arrangement.SpaceAround,

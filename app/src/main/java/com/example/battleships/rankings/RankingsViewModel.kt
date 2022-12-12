@@ -6,8 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.battleships.UseCases
 import com.example.battleships.services.Mode
+import com.example.battleships.use_cases.UseCases
 import kotlinx.coroutines.launch
 
 class RankingsViewModel(private val useCases: UseCases): ViewModel() {
