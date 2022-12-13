@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.battleships.DependenciesContainer
 import com.example.battleships.ErrorMessage
 import com.example.battleships.auth.views.LoadingState
+import com.example.battleships.home.HomeActivity
 import com.example.battleships.info.InfoActivity
 import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.user_home.UserHomeActivity
@@ -48,7 +49,7 @@ class AuthActivity : ComponentActivity() {
                 if (token.isSuccess) {
                     val tokenResult = token.getOrNull() ?: return@setContent
                     if (tokenResult is AuthViewModel.Success) {
-                        UserHomeActivity.navigate(this, tokenResult.token)
+                        HomeActivity.navigate(this, tokenResult.token)
                     } else {
                         AuthScreen()
                     }
@@ -77,7 +78,6 @@ class AuthActivity : ComponentActivity() {
             onRegisterUser = { username, password -> vm.createUser(username, password) },
             onLoginUser = { username, password -> vm.login(username, password) },
             navigationHandlers = NavigationHandlers(
-                onInfoRequested = { InfoActivity.navigate(this) },
                 onBackRequested = { finish() }
             )
         )

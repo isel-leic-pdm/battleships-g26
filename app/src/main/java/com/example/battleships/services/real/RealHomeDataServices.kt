@@ -54,7 +54,7 @@ class RealHomeDataServices(
         val request = buildRequest(Get(serverInfoURL), null, mode)
 
         val serverInfoDto = request.send(httpClient) { response ->
-            handleResponse<ServerInfoDto>(jsonEncoder, response, HomeDtoType.type, SirenMediaType)
+            handleResponse<ServerInfoDto>(jsonEncoder, response, ServerInfoDtoType.type, SirenMediaType)
         }
         val serverInfoProperties = serverInfoDto.properties
         require(serverInfoProperties != null) { "ServerInfoDto properties should not have been null" }
@@ -72,6 +72,7 @@ class RealHomeDataServices(
         require(rankingsProperties != null) { "ServerInfoDto properties should not have been null" }
         return rankings(rankingsProperties)
     }
+
 
     private fun getCreateUserAction(home: HomeDto) =
         home.actions?.find { it.name == "create-user" }

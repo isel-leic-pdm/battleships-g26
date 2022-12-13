@@ -3,6 +3,7 @@ package com.example.battleships.use_cases
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.battleships.game.domain.game.Game
+import com.example.battleships.info.ServerInfo
 import com.example.battleships.rankings.GameRanking
 import com.example.battleships.services.*
 import com.example.battleships.services.fake.FakeGameDataServices
@@ -65,6 +66,10 @@ class FakeUseCases(
     override suspend fun placeShot(token: String, coordinate: Coordinate, mode: Mode): Boolean {
         val result = gameServices.placeShot(token, coordinate, mode = mode)
         return getValueOrThrow(result)
+    }
+
+    override suspend fun fetchServerInfo(mode: Mode): ServerInfo {
+        TODO("Not yet implemented")
     }
 
     private fun <T> getValueOrThrow(either: Either<Unit, T>): T =

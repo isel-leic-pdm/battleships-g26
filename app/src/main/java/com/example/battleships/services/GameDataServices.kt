@@ -12,9 +12,9 @@ import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
  * This interface is responsible for providing the options that interact with the game.
  */
 interface GameDataServices {
-    suspend fun createGame(token: String, mode: Mode, newCreateGameAction: SirenAction? = null): Either<Unit, Boolean>
+    suspend fun createGame(token: String, mode: Mode, CreateGameAction: SirenAction? = null): Either<Unit, Boolean>
 
-    suspend fun getCurrentGameId(token: String, newGetCurrentGameIdLink: SirenLink? = null, mode: Mode): Either<Unit, Int?>
+    suspend fun getCurrentGameId(token: String, GetCurrentGameIdLink: SirenLink? = null, mode: Mode): Either<Unit, Int?>
 
     /**
      * Sets a fleet of ships for the player.
@@ -27,11 +27,11 @@ interface GameDataServices {
         mode: Mode
     ): Either<Unit, Boolean>
 
-    suspend fun placeShot(token: String, coordinate: Coordinate, newPlaceShotAction: SirenAction? = null, mode: Mode): Either<Unit, Boolean>
+    suspend fun placeShot(token: String, coordinate: Coordinate, PlaceShotAction: SirenAction? = null, mode: Mode): Either<Unit, Boolean>
 
     /**
      * This function is responsible for getting the game state.
      * @return an object representing the current game state, and the player associated with the token.
      */
-    suspend fun getGame(token: String, newGetGameLink: SirenLink? = null, mode: Mode): Either<Unit, Pair<Game, Player>?>
+    suspend fun getGame(token: String, GetGameLink: SirenLink? = null, mode: Mode): Either<Unit, Pair<Game, Player>?>
 }

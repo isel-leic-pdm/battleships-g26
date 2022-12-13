@@ -1,6 +1,7 @@
 package com.example.battleships.use_cases
 
 import com.example.battleships.game.domain.game.Game
+import com.example.battleships.info.ServerInfo
 import com.example.battleships.rankings.GameRanking
 import com.example.battleships.services.Mode
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
@@ -28,4 +29,6 @@ interface UseCases{
     ): Boolean
 
     suspend fun placeShot(token: String, coordinate: Coordinate, mode: Mode = Mode.AUTO): Boolean
+
+    suspend fun fetchServerInfo(mode : Mode = Mode.AUTO) : ServerInfo
 }

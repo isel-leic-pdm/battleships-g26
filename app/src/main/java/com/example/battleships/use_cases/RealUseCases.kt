@@ -1,6 +1,7 @@
 package com.example.battleships.use_cases
 
 import com.example.battleships.game.domain.game.Game
+import com.example.battleships.info.ServerInfo
 import com.example.battleships.rankings.GameRanking
 import com.example.battleships.services.*
 import com.example.battleships.services.real.RealGamesDataServices
@@ -20,7 +21,7 @@ class RealUseCases(
 ): UseCases {
 
     override suspend fun createUser(username: String, password: String, mode: Mode): Int {
-        val userId = userServices.createUser(username, password, mode)
+        val userId= userServices.createUser(username, password, mode)
         return getValueOrExecute(userId) {
             val userCreateAction = homeServices.getCreateUserAction()
             val userId = userServices.createUser(username, password, mode, userCreateAction)
@@ -102,6 +103,11 @@ class RealUseCases(
             return@getValueOrExecute getValueOrThrow(result)
         }
     }
+
+    @Throws(UnexpectedResponseException::class)
+    override suspend fun fetchServerInfo(mode: Mode) =
+        homeServices.getServerInfo(mode)
+
 
     private suspend fun <T> getValueOrExecute(either: Either<Unit, T>, onEitherLeft: suspend () -> T): T {
         return when (either) {

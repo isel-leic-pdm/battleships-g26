@@ -18,6 +18,10 @@ class RealUserDataServices(
     private var createGameAction: SirenAction? = null
     private var getCurrentGameIdLink: SirenLink? = null
 
+    private data class UserCreateModel(val username: String, val password: String){
+        fun toJson(encoder : Gson): String = encoder.toJson(this)
+    }
+
     /**
      * Creates a new user with the given username and password.
      * @return The id of the newly created user, or null if needs [userCreateAction].
@@ -26,20 +30,14 @@ class RealUserDataServices(
         username: String,
         password: String,
         mode: Mode,
-        newUserCreateAction: SirenAction?,
+        userCreateAction: SirenAction?,
     ): Either<Unit, Int> {
-        val userCreateAction: SirenAction = newUserCreateAction?.also { userCreateAction = it }
+        val auxUserCreateAction: SirenAction = userCreateAction?.also { this.userCreateAction = it }
             ?: this.userCreateAction ?: return Either.Left(Unit)
-        val url = userCreateAction.href.toApiURL()
+        val url = auxUserCreateAction.href.toApiURL()
 
         val request = buildRequest(
-            Post(
-                url,
-                "{\n" +
-                        "    \"username\": \"$username\",\n" +
-                        "    \"password\": \"$password\"\n" +
-                        "}"
-            ), null, mode
+            Post(url, UserCreateModel(username, password).toJson(jsonEncoder)), null, mode
         )
         val createUserDto = request.send(httpClient) { response ->
             handleResponse<CreateUserDto>(
@@ -57,20 +55,14 @@ class RealUserDataServices(
         username: String,
         password: String,
         mode: Mode,
-        newCreateTokenAction: SirenAction?
+        createTokenAction: SirenAction?
     ): Either<Unit, String?> {
-        val createTokenAction = newCreateTokenAction?.also { createTokenAction = it }
+        val auxCreateTokenAction = createTokenAction?.also { this.createTokenAction = it }
             ?: this.createTokenAction ?: return Either.Left(Unit)
-        val url = createTokenAction.href.toApiURL()
+        val url = auxCreateTokenAction.href.toApiURL()
 
         val request = buildRequest(
-            Post(
-                url,
-                "{\n" +
-                        "    \"username\": \"$username\",\n" +
-                        "    \"password\": \"$password\"\n" +
-                        "}"
-            ), null, mode
+            Post(url, UserCreateModel(username, password).toJson(jsonEncoder)), null, mode
         )
         try {
             val createTokenDto = request.send(httpClient) { response ->
@@ -90,8 +82,8 @@ class RealUserDataServices(
         mode: Mode,
         userHomeLink: SirenLink?
     ): UserHome {
-        val userHomeLink = userHomeLink ?: this.userHomeLink ?: throw UnresolvedLinkException()
-        val url = userHomeLink.href.toApiURL()
+        val auxUserHomeLink = userHomeLink ?: this.userHomeLink ?: throw UnresolvedLinkException()
+        val url = auxUserHomeLink.href.toApiURL()
 
         val request = buildRequest(Get(url), token, mode)
         val userHomeDto = request.send(httpClient) { response ->
