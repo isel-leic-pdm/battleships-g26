@@ -163,16 +163,20 @@ class RealGamesDataServices(
 
         val request = buildRequest(Get(url), token, mode)
 
-        val gameDto = request.send(httpClient) { response ->
-            handleResponse<GameDto>(
-                jsonEncoder,
-                response,
-                GameDtoType.type,
-                SirenMediaType
-            )
+        try {
+            val gameDto = request.send(httpClient) { response ->
+                handleResponse<GameDto>(
+                    jsonEncoder,
+                    response,
+                    GameDtoType.type,
+                    SirenMediaType
+                )
+            }
+            placeShipsAction = getPlaceFleetLayout(gameDto)
+            return Either.Right(gameDto.toGameAndPlayer())
+        } catch (e: Exception) {
+            return Either.Right(null)
         }
-        placeShipsAction = getPlaceFleetLayout(gameDto)
-        return Either.Right(gameDto.toGameAndPlayer())
     }
 
     private fun getPlaceFleetLayout(gameDto: GameDto) =

@@ -44,11 +44,12 @@ internal fun GameScreen(
                     .padding(padding)
                     .fillMaxSize(),
             ) {
-                val game = activity.vm.game
-                if (game == null) {
-                    InitScreen(activity)
-                } else {
-                    PlayScreen(game, activity)
+                val game = activity.vm.game.getOrNull() ?: throw IllegalStateException("Game is null") // TODO handle this
+                when (game) {
+                    is GameViewModel.NotCreated -> InitScreen(activity)
+                    is GameViewModel.Creating -> CreatingGame()
+                    is GameViewModel.Matchmaking -> Matchmaking()
+                    is GameViewModel.Started -> PlayScreen(activity, game)
                 }
             }
         }
@@ -57,48 +58,45 @@ internal fun GameScreen(
 
 @Composable
 private fun PlayScreen(
-    game: Result<GameViewModel.GameResult>,
-    activity: GameActivity
+    activity: GameActivity,
+    gameState: GameViewModel.Started
 ) {
     var selected: Selection? = null
-    val gameResult = game.getOrNull()
-    if (gameResult is GameViewModel.Started) {
-        val game = gameResult.gameResultInternal.game
-        val player = gameResult.gameResultInternal.player
+    val game = gameState.gameResultInternal.game
+    val player = gameState.gameResultInternal.player
 
-        GameView(
-            game = game,
-            player = player,
-            onShipClick = {
-                selected = ShipOption(it)
-            },
-            onSquarePressed = {
-                selected = onSquarePressed(selected, game, player, activity, it)
-                    ?: return@GameView
-            },
-            onShotPlaced = {
-                val playerId =
-                    if (player == Player.ONE) game.player1 else game.player2
-                game.placeShot(playerId, it, player)
-                    ?: return@GameView // TODO -> shouldn't require playerId
-                activity.vm.placeShot(it)
-            },
-            onConfirmLayout = {
-                game.confirmFleet(player)
-                    ?: return@GameView // checks if its possible to confirm the current fleet state
-                game.getBoard(player).getShips().map { ship ->
-                    Triple(
-                        ship.type,
-                        ship.coordinates.sortedBy { (it.row * game.configuration.boardSize) + it.column }
-                            .first(), // this will choose the first/lower coordinate
-                        ship.getOrientation()
-                    )
-                }.let { ships ->
-                    activity.vm.setFleet(ships)
-                }
+    GameView(
+        game = game,
+        player = player,
+        onShipClick = {
+            selected = ShipOption(it)
+        },
+        onSquarePressed = {
+            selected = onSquarePressed(selected, game, player, activity, it)
+                ?: return@GameView
+        },
+        onShotPlaced = {
+            val playerId =
+                if (player == Player.ONE) game.player1 else game.player2
+            game.placeShot(playerId, it, player)
+                ?: return@GameView // TODO -> shouldn't require playerId
+            activity.vm.placeShot(it)
+        },
+        onConfirmLayout = {
+            game.confirmFleet(player)
+                ?: return@GameView // checks if its possible to confirm the current fleet state
+            game.getBoard(player).getShips().map { ship ->
+                Triple(
+                    ship.type,
+                    ship.coordinates.sortedBy { (it.row * game.configuration.boardSize) + it.column }
+                        .first(), // this will choose the first/lower coordinate
+                    ship.getOrientation()
+                )
+            }.let { ships ->
+                activity.vm.setFleet(ships)
             }
-        )
-    }
+        }
+    )
 }
 
 @Composable
@@ -106,9 +104,19 @@ private fun InitScreen(activity: GameActivity) {
     Button(onClick = { activity.vm.startGame() }) {
         Text("Start New Game")
     }
-    Button(onClick = { activity.vm.reloadGameIfStarted() }) {
-        Text("Re-Join Game")
+    Button(onClick = { activity.vm.restoreGame() }) {
+        Text("Restore Previous Game")
     }
+}
+
+@Composable
+private fun CreatingGame() {
+    Text("Creating Game...")
+}
+
+@Composable
+private fun Matchmaking() {
+    Text("Matchmaking...")
 }
 
 /**

@@ -47,17 +47,11 @@ fun GameDto.toGameAndPlayer(): Pair<Game, Player> {
 data class BoardDtoProperties(
     val cells: String,
     val nCells: Int,
-    val confirmed: Boolean
+    val isConfirmed: Boolean
 )
 
 fun BoardDtoProperties.toBoard(): Board {
-    return Board(cells, confirmed)
-}
-
-fun CreateGameDto.toGameInfo(): GameInfo {
-    val properties = this.properties
-    require(properties != null) { "GameActionDto properties are null" }
-    return GameInfo(properties.state, properties.gameId)
+    return Board(cells, isConfirmed)
 }
 
 fun GameIdDto.toGameId(): Int {
