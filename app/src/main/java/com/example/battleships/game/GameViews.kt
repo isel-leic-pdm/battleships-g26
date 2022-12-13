@@ -36,7 +36,6 @@ const val BattleshipShipButtonTestTag = "BattleshipShipButton"
 const val CruiserShipButtonTestTag = "CruiserShipButton"
 const val SubmarineShipButtonTestTag = "SubmarineShipButton"
 const val DestroyerShipButtonTestTag = "DestroyerShipButton"
-
 const val ConfirmFleetButtonTestTag = "ConfirmFleetButton"
 
 
@@ -61,8 +60,7 @@ fun GameView(
                         onShipClick,
                         onConfirmLayout
                     )
-                else
-                    PreparationPhase(board, game.configuration, null, null, null)
+                else WaitingForOpponentToConfirm(board)
             }
             game.state === GameState.BATTLE -> {
                 val playerIdTurn = game.playerTurn ?: return
@@ -85,25 +83,32 @@ fun GameView(
 private fun PreparationPhase(
     board: Board,
     configuration: Configuration,
-    onPanelClick: ((Coordinate) -> Unit)?,
-    onShipClick: ((ShipType) -> Unit)?,
-    onConfirmLayout: (() -> Unit)?
+    onPanelClick: ((Coordinate) -> Unit),
+    onShipClick: ((ShipType) -> Unit),
+    onConfirmLayout: (() -> Unit)
 ) {
-    val isClickable = onConfirmLayout != null
-    BoardView(board, if (isClickable) onPanelClick else null)
+    BoardView(board, onPanelClick)
     Row {
         Box(modifier = Modifier.weight(1f)) {
-            ShipOptionView(configuration, if (isClickable) onShipClick else null)
+            ShipOptionView(configuration, onShipClick)
         }
         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
             TextButton(
-                modifier = Modifier.padding(top = 16.dp).testTag(ConfirmFleetButtonTestTag),
-                onClick = onConfirmLayout ?: {},
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .testTag(ConfirmFleetButtonTestTag),
+                onClick = onConfirmLayout,
             ) {
-                Text(if (onConfirmLayout != null) "Confirm" else "Confirmed", fontSize = 40.sp)
+                Text("Confirm", fontSize = 40.sp)
             }
         }
     }
+}
+
+@Composable
+private fun WaitingForOpponentToConfirm(board: Board) {
+    BoardView(board, null)
+    Text("Waiting for opponent to confirm", fontSize = 40.sp)
 }
 
 @Composable

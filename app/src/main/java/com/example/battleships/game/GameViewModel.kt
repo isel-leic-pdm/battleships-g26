@@ -10,6 +10,7 @@ import com.example.battleships.game.domain.game.Game
 import com.example.battleships.game.domain.game.GameState
 import com.example.battleships.services.Mode
 import com.example.battleships.use_cases.UseCases
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
@@ -30,24 +31,41 @@ class GameViewModel(
     private val useCases: UseCases,
     private val token: String
 ) : ViewModel() {
+
+    /** The state of the Game View */
     sealed class GameResult
-    data class Started(val gameResultInternal: GameResultInternal) : GameResult()
-    object WaitingForOpponent : GameResult()
+
+    /** The game is being initialized */
+    object NotCreated : GameResult()
+
+    /** The game is being created */
+    object Creating : GameResult()
+
+    /** The Game was created but didn't start yet */
     object Matchmaking : GameResult()
 
+    /** The Game is in progress */
+    data class Started(val gameResultInternal: GameResultInternal) : GameResult()
     data class GameResultInternal(val game: Game, val player: Player)
 
-    private var _game by mutableStateOf<Result<GameResult>?>(null)
-    val game: Result<GameResult>?
+    private var _game by mutableStateOf<Result<GameResult>>(Result.success(NotCreated))
+    val game: Result<GameResult>
         get() = _game
 
     fun startGame() {
         viewModelScope.launch {
+            _game = Result.success(Creating)
             try {
                 val result = useCases.createGame(token)
                 if (result) {
-                    Result.success(Matchmaking)
-                    fetchWhileMatchmaking()
+                    _game = Result.success(Matchmaking)
+                    keepOnFetchingGameUntil {
+                        val gameAux = game.getOrNull()
+                        gameAux != null && gameAux is Started
+                    }
+                }
+                else {
+                    _game = Result.failure(Exception("Game already created"))
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error starting game", e)
@@ -56,76 +74,60 @@ class GameViewModel(
         }
     }
 
-    fun reloadGameIfStarted() {
+    fun restoreGame() {
         viewModelScope.launch {
-            try {
-                val game = useCases.fetchCurrentGameId(token, Mode.FORCE_REMOTE)
-                if (game != null) {
-                    _game = Result.success(Matchmaking)
-                    fetchWhileMatchmaking()
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error getting game", e)
-                _game = Result.failure(e)
+            _game = Result.success(Matchmaking)
+            keepOnFetchingGameUntil {
+                val gameAux = game.getOrNull()
+                gameAux != null && gameAux is Started
             }
         }
     }
 
-    private fun fetchWhileMatchmaking() {
+    private fun keepOnFetchingGameUntil(stop: () -> Boolean) {
         viewModelScope.launch {
-            while (true) {
-                try {
-                    val res = useCases.fetchCurrentGameId(token)
-                    if (res != null) {
-                        _game = Result.success(WaitingForOpponent)
-                        updateGame()
-                        break
-                    } else {
-                        delay(1000)
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error getting game", e)
-                    _game = Result.failure(e)
-                    break
-                }
+            while (!stop()) {
+                updateGame()
+                delay(1000)
             }
         }
     }
 
-    private fun updateGame() {
-        viewModelScope.launch {
-            _game = try {
-                val res = useCases.fetchGame(token)
-                if (res != null) {
-                    val (game, player) = res
-                    Result.success(Started(GameResultInternal(game, player)))
-                } else null
-            } catch (e: Exception) {
-                Log.e(TAG, "Error getting game", e)
-                Result.failure(e)
+    private suspend fun updateGame() {
+        try {
+            val res = useCases.fetchGame(token)
+            if (res != null) {
+                val (game, player) = res
+                _game = Result.success(Started(GameResultInternal(game, player)))
             }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting game", e)
+            _game = Result.failure(e)
         }
     }
 
     fun setFleet(ships: List<Triple<ShipType, Coordinate, Orientation>>) {
+        val game = game.getOrNull() as? Started ?: return
+        if (game.gameResultInternal.game.state != GameState.FLEET_SETUP) return
         viewModelScope.launch {
-            val res = useCases.setFleet(token, ships)
-            if (!res) {
-                Log.e(TAG, "Tried to place ships but an error occurred")
-                return@launch
-            }
-            Log.i(TAG, "Ships placed, and confirmed")
-            while (true) {
-                updateGame()
-                val game = getGameIfStartedOrNull()?.game ?: return@launch
-                if (game.state === GameState.BATTLE) break
-                delay(1000)
-                Log.d(TAG, "Waiting for opponent to place ships") // TODO: maybe, remove this later
+            try {
+                val res = useCases.setFleet(token, ships)
+                if (res) {
+                    keepOnFetchingGameUntil { // updates game until player's fleet is confirmed
+                        val gameAux = _game.getOrNull()
+                        gameAux != null && gameAux is Started
+                                && gameAux.gameResultInternal.game.getBoard(gameAux.gameResultInternal.player).isConfirmed()
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error setting fleet", e)
             }
         }
     }
 
     fun placeShot(coordinate: Coordinate) {
+        val game = game.getOrNull() as? Started ?: return
+        if (game.gameResultInternal.game.state != GameState.BATTLE) return
         viewModelScope.launch {
             val res = useCases.placeShot(token, coordinate)
             if (!res) {
@@ -143,7 +145,7 @@ class GameViewModel(
     }
 
     private fun getGameIfStartedOrNull(): GameResultInternal? {
-        return game?.getOrNull()?.let {
+        return game.getOrNull()?.let {
             if (it is Started) it.gameResultInternal
             else null
         }

@@ -33,11 +33,12 @@ class BattleshipsApplication : DependenciesContainer, Application() {
             RealUserDataServices(httpClient, jsonEncoder),
             RealGamesDataServices(httpClient, jsonEncoder)
         )
-    /*
+/*
         get() = FakeUseCases(
             FakeHomeDataServices(),
             FakeUserDataServices(),
             FakeGameDataServices()
         )
-     */
+
+ */
 }
