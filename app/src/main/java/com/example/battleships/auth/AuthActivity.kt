@@ -49,7 +49,7 @@ class AuthActivity : ComponentActivity() {
                 if (token.isSuccess) {
                     val tokenResult = token.getOrNull() ?: return@setContent
                     if (tokenResult is AuthViewModel.Success) {
-                        HomeActivity.navigate(this, tokenResult.token)
+                        UserHomeActivity.navigate(this, tokenResult.token)
                     } else {
                         AuthScreen()
                     }

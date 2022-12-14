@@ -189,7 +189,7 @@ class RealGamesDataServices(
         gameCreatedDto.links?.find { it.rel.contains("game-info") }
 
     private fun extractGetGameLinkFromGameIdDto(gameIdDto: GameIdDto) =
-        gameIdDto.links?.find { it.rel.contains("game-info") }
+        gameIdDto.links?.find { it.rel.contains("game") }
 
     suspend fun getGameLink(token: String, newGetCurrentGameIdLink: SirenLink): SirenLink {
         if (getGameLink == null) {

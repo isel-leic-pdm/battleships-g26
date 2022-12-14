@@ -44,8 +44,8 @@ class InfoActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        vm.loadServerInfo()
         setContent {
-            vm.loadServerInfo()
             val authors = vm.rankings
             InfoScreen(
                 navigationHandlers = NavigationHandlers(

@@ -116,7 +116,8 @@ class GameViewModel(
                     keepOnFetchingGameUntil { // updates game until player's fleet is confirmed
                         val gameAux = _game.getOrNull()
                         gameAux != null && gameAux is Started
-                                && gameAux.gameResultInternal.game.getBoard(gameAux.gameResultInternal.player).isConfirmed()
+                                && gameAux.gameResultInternal.game.state == GameState.BATTLE
+
                     }
                 }
             } catch (e: Exception) {
