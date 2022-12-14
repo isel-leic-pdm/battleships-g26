@@ -2,6 +2,7 @@ package com.example.battleships.services
 
 import com.example.battleships.services.Mode.*
 import okhttp3.Response
+import okhttp3.ResponseBody
 
 /**
  * Used to identify how implementations SHOULD behave:
@@ -26,5 +27,7 @@ class UnresolvedLinkException(msg: String = "") : ApiException(msg)
  * Exception throw when an unexpected response was received from the API.
  */
 class UnexpectedResponseException(
-    val response: Response? = null
-) : ApiException("Unexpected ${response?.code} response from the API.")
+    val response: Response? = null,
+    body: String? = null,
+) : ApiException("Unexpected ${response?.code} response from the API.\n" +
+        "body = $body")

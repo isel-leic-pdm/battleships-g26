@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.battleships.services.Mode
 import com.example.battleships.use_cases.UseCases
 import kotlinx.coroutines.launch
+import kotlin.math.log
 
 class AuthViewModel(private val useCases: UseCases): ViewModel() {
     sealed class TokenResult
@@ -14,7 +15,7 @@ class AuthViewModel(private val useCases: UseCases): ViewModel() {
     data class Success(val token: String): TokenResult()
 
     private var _userId by mutableStateOf<Result<Int>?>(null)
-    val userId: Result<Int>?
+    private val userId: Result<Int>?
         get() = _userId
 
     private var _token by mutableStateOf<Result<TokenResult>?>(null)
@@ -41,6 +42,7 @@ class AuthViewModel(private val useCases: UseCases): ViewModel() {
                     Result.failure(e)
                 }
             _isCreateUserLoading.value = false
+            if(userId?.getOrNull() != null) login(username, password)
         }
     }
 

@@ -1,10 +1,8 @@
 package com.example.battleships.game
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -88,19 +86,18 @@ private fun PreparationPhase(
     onConfirmLayout: (() -> Unit)
 ) {
     BoardView(board, onPanelClick)
-    Row {
+    Column (
+        modifier = Modifier
+            .fillMaxHeight()
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         Box(modifier = Modifier.weight(1f)) {
             ShipOptionView(configuration, onShipClick)
         }
-        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
-            TextButton(
-                modifier = Modifier
-                    .padding(top = 16.dp)
-                    .testTag(ConfirmFleetButtonTestTag),
-                onClick = onConfirmLayout,
-            ) {
-                Text("Confirm", fontSize = 40.sp)
-            }
+        Button(modifier = Modifier.padding(top = 16.dp),
+                onClick = onConfirmLayout) {
+                Text("Confirm", fontSize = 30.sp)
         }
     }
 }
@@ -234,12 +231,9 @@ private fun ShipType.toTestTag() = when (this) {
  */
 @Composable
 private fun ShipOptionView(configuration: Configuration, onShipClick: ((ShipType) -> Unit)?) {
-    Column(
-        modifier = Modifier
-            .width(200.dp)
-            .background(Color.Black)
-            .fillMaxHeight()
-    ) {
+    Row(
+        modifier = Modifier.horizontalScroll(rememberScrollState())
+    ){
         configuration.fleet.forEach { ship ->
             Text(
                 AnnotatedString(ship.first.name),
