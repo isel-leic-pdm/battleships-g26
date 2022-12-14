@@ -64,8 +64,8 @@ private fun NavigationButton(title: String, tagName: String, onClick: () -> Unit
 
 @Composable
 fun StartScreenNew(
+    vararg handlers: Handler,
     tag: String? = null,
-    onSignIn : () -> Unit = {},
     onRanking : () -> Unit = {},
     onAppInfo : () -> Unit = {}
 ) {
@@ -91,11 +91,8 @@ fun StartScreenNew(
                     contentDescription = null,
                     modifier = Modifier.size((SCREEN_HEIGHT/12).dp)
                 )
-                Button(
-                    modifier = Modifier.testTag(NavigateToAuthenticationButtonTestTag),
-                    onClick = onSignIn
-                ) {
-                    Text("Sign In")
+                handlers.forEach { handler ->
+                    NavigationButton(title = handler.name, tagName = handler.tag) { handler.handler() }
                 }
             }
         }

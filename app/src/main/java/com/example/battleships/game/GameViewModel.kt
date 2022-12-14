@@ -8,9 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.game.domain.game.GameState
-import com.example.battleships.services.Mode
 import com.example.battleships.use_cases.UseCases
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate

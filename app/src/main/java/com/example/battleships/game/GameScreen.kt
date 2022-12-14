@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.example.battleships.game.domain.game.*
 import com.example.battleships.game.domain.ship.getOrientation
+import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
@@ -27,7 +28,8 @@ internal class Square(val coordinate: Coordinate) : Selection()
 
 @Composable
 internal fun GameScreen(
-    activity: GameActivity
+    activity: GameActivity,
+    onBackRequest: () -> Unit,
 ) {
     BattleshipsTheme {
         Scaffold(
@@ -35,7 +37,11 @@ internal fun GameScreen(
                 .fillMaxSize()
                 .testTag("GameScreen"),
             backgroundColor = MaterialTheme.colors.background,
-            topBar = { TopBar() }
+            topBar = { TopBar(
+                navigation = NavigationHandlers(
+                    onBackRequested = onBackRequest
+                )
+            ) }
         ) { padding ->
             Column(
                 verticalArrangement = Arrangement.SpaceAround,
