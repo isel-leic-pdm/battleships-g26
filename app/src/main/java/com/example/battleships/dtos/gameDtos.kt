@@ -4,6 +4,7 @@ package com.example.battleships.dtos
 import com.example.battleships.game.GameInfo
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.game.domain.game.GameState
+import com.example.battleships.game.domain.game.Instants
 import com.example.battleships.utils.hypermedia.SirenEntity
 import pt.isel.daw.dawbattleshipgame.domain.board.Board
 import pt.isel.daw.dawbattleshipgame.domain.game.Configuration
@@ -25,6 +26,7 @@ data class GameDtoProperties(
     val state: String,
     val board1: BoardDtoProperties,
     val board2: BoardDtoProperties,
+    val playerTurn: Int,
     val myPlayer: String
 )
 typealias GameDto = SirenEntity<GameDtoProperties>
@@ -41,6 +43,9 @@ fun GameDto.toGameAndPlayer(): Pair<Game, Player> {
         game.board1.toBoard(),
         game.board2.toBoard(),
         GameState.valueOf(game.state.uppercase()),
+        instants = Instants(), // TODO -> review this
+        game.playerTurn,
+        winner = null // TODO -> review this
     ) to Player.valueOf(game.myPlayer.uppercase())
 }
 

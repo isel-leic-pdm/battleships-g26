@@ -108,11 +108,11 @@ class RealGamesDataServices(
     ): Either<Unit, Boolean> {
         val placeShotAction = newPlaceShotAction?.also { placeShotAction = it }
             ?: this.placeShotAction ?: return Either.Left(Unit)
-        val placeShotUrl = placeShotAction.href.toURL()
+        val placeShotUrl = placeShotAction.href.toApiURL()
 
         val body = "{\n" +
-                "\t\"x\": ${coordinate.row},\n" +
-                "\t\"y\": ${coordinate.column}\n" +
+                "\t\"row\": ${coordinate.row},\n" +
+                "\t\"column\": ${coordinate.column}\n" +
                 "}"
 
         val request = buildRequest(Post(placeShotUrl, body), token, mode)
@@ -172,14 +172,15 @@ class RealGamesDataServices(
                     SirenMediaType
                 )
             }
-            placeShipsAction = getPlaceFleetLayout(gameDto)
+            placeShipsAction = extractPlaceFleetLayout(gameDto)
+            placeShotAction = extractPlaceShotAction(gameDto)
             return Either.Right(gameDto.toGameAndPlayer())
         } catch (e: Exception) {
             return Either.Right(null)
         }
     }
 
-    private fun getPlaceFleetLayout(gameDto: GameDto) =
+    private fun extractPlaceFleetLayout(gameDto: GameDto) =
         gameDto.actions?.find { it.name == "place-ships" }
 
     private fun extractGetCurrentGameIdLink(gameCreatedDto: CreateGameDto) =
@@ -190,6 +191,9 @@ class RealGamesDataServices(
 
     private fun extractGetGameLinkFromGameIdDto(gameIdDto: GameIdDto) =
         gameIdDto.links?.find { it.rel.contains("game") }
+
+    private fun extractPlaceShotAction(gameDto: GameDto) =
+        gameDto.actions?.find { it.name == "place-shot" }
 
     suspend fun getGameLink(token: String, newGetCurrentGameIdLink: SirenLink): SirenLink {
         if (getGameLink == null) {
