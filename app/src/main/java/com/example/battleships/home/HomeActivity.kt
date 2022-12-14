@@ -13,10 +13,7 @@ import com.example.battleships.game.GameActivity
 import com.example.battleships.info.InfoActivity
 import com.example.battleships.rankings.RankingsActivity
 import com.example.battleships.ui.Handler
-import com.example.battleships.ui.NavigationHandlers
-import com.example.battleships.ui.StartScreen
 import com.example.battleships.ui.StartScreenNew
-import com.example.battleships.user_home.UserHomeActivity
 
 const val NavigateToAuthenticationButtonTestTag = "NavigateToAuthenticationButton"
 const val NavigateToRankingsButtonTestTag = "NavigateToRankingsButton"
@@ -24,13 +21,13 @@ const val NavigateToRankingsButtonTestTag = "NavigateToRankingsButton"
 class HomeActivity : ComponentActivity() {
 
     companion object {
-        var TOKEN_EXTRA : String? = null
+        val HOME_TOKEN_EXTRA : String? = null
         fun navigate(origin: Activity, token: String) {
             with(origin) {
                 val intent = Intent(this, HomeActivity::class.java)
-                intent.putExtra(TOKEN_EXTRA, token)
+                Log.e(TAG, "token = $token")
+                intent.putExtra(HOME_TOKEN_EXTRA, token)
                 startActivity(intent)
-
             }
         }
     }
@@ -39,37 +36,30 @@ class HomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Log.e(TAG, "user home token = $TOKEN_EXTRA")
-            if(TOKEN_EXTRA == null){
-                StartScreenNew(
-                    tag = "HomeScreen",
-                    onSignIn = { AuthActivity.navigate(this) },
-                    onRanking = { RankingsActivity.navigate(this) },
-                    onAppInfo = { InfoActivity.navigate(this) }
-                )
+            Log.e(TAG, "user home token = $token")
+            val handler = if(token == null){
+                Handler("Sign In", "sign-in"){
+                    AuthActivity.navigate(this)
+                }
+            }else Handler("Start Game", "start-game") {
+                GameActivity.navigate(this, token!!)
             }
-            else {
-                StartScreen(
-                    Handler("Start Game", "start-game") {
-                        GameActivity.navigate(this, token)
-                    },
-                    tag = "UserHomeScreen",
-                    onNavigationRequested = NavigationHandlers(
-                        onInfoRequested = { InfoActivity.navigate(origin = this) },
-                        onBackRequested = { finish() }
-                    )
-                )
-            }
+            StartScreenNew(
+                handler,
+                tag = "HomeScreen",
+                onRanking = { RankingsActivity.navigate(this) },
+                onAppInfo = { InfoActivity.navigate(this) }
+            )
         }
     }
 
 
-    private val token: String
+    private val token: String?
         get() =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                intent.getParcelableExtra(TOKEN_EXTRA, String::class.java) ?: TODO("Token is null")
+                intent.getParcelableExtra(HOME_TOKEN_EXTRA, String::class.java)
             else
-                intent.getStringExtra(TOKEN_EXTRA) ?: TODO("Token is null")
+                intent.getStringExtra(HOME_TOKEN_EXTRA)
 
 
 }

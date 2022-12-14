@@ -63,11 +63,13 @@ internal fun <T> handleResponse(jsonEncoder: Gson, response: Response, type: Typ
             val body = response.body?.string()
             jsonEncoder.fromJson<T>(body, type)
         } catch (e: JsonSyntaxException) {
+            val body = response.body?.string()
             Log.e("handleResponse", "Error parsing response", e)
-            throw UnexpectedResponseException(response)
+            throw UnexpectedResponseException(response, body)
         }
     }
     else {
-        throw UnexpectedResponseException(response = response)
+        val body = response.body?.string()
+        throw UnexpectedResponseException(response = response, body)
     }
 }

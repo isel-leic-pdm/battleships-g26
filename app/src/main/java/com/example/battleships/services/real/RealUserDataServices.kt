@@ -44,7 +44,7 @@ class RealUserDataServices(
                 jsonEncoder,
                 response,
                 CreateUserDtoType.type,
-                JsonMediaType
+                SirenMediaType
             )
         }
         createTokenAction = extractCreateTokenAction(createUserDto) ?: throw UnresolvedLinkException()

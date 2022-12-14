@@ -1,5 +1,7 @@
 package com.example.battleships.game
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,9 +13,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import com.example.battleships.game.domain.game.*
 import com.example.battleships.game.domain.ship.getOrientation
+import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
@@ -27,15 +31,21 @@ internal class Square(val coordinate: Coordinate) : Selection()
 
 @Composable
 internal fun GameScreen(
-    activity: GameActivity
+    activity: GameActivity,
+    onBackRequest: () -> Unit,
 ) {
+    val mContext = LocalContext.current
     BattleshipsTheme {
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
                 .testTag("GameScreen"),
             backgroundColor = MaterialTheme.colors.background,
-            topBar = { TopBar() }
+            topBar = { TopBar(
+                navigation = NavigationHandlers(
+                    onBackRequested = onBackRequest
+                )
+            ) }
         ) { padding ->
             Column(
                 verticalArrangement = Arrangement.SpaceAround,
@@ -44,7 +54,8 @@ internal fun GameScreen(
                     .padding(padding)
                     .fillMaxSize(),
             ) {
-                val game = activity.vm.game.getOrNull() ?: throw IllegalStateException("Game is null") // TODO handle this
+                val game = activity.vm.game.getOrNull() ?:
+                    Toast.makeText(mContext, "Something went wrong", Toast.LENGTH_SHORT).show()
                 when (game) {
                     is GameViewModel.NotCreated -> InitScreen(activity)
                     is GameViewModel.Creating -> CreatingGame()
