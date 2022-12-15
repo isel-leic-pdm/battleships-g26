@@ -13,9 +13,9 @@ class RealUserDataServices(
     private val httpClient: OkHttpClient,
     private val jsonEncoder: Gson
 ): UserDataServices {
-    var userCreateAction: SirenAction? = null
-    var createTokenAction: SirenAction? = null
-    var userHomeLink: SirenLink? = null
+    private var userCreateAction: SirenAction? = null
+    private var createTokenAction: SirenAction? = null
+    private var userHomeLink: SirenLink? = null
     private var createGameAction: SirenAction? = null
     private var getCurrentGameIdLink: SirenLink? = null
 

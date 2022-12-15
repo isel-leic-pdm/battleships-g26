@@ -4,6 +4,7 @@ import com.example.battleships.dtos.*
 import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.services.*
+import com.example.battleships.services.models.ConfigurationOutputModel
 import com.example.battleships.services.models.PlaceShipOutputModel
 import com.example.battleships.services.models.ShipOutputModel
 import com.example.battleships.utils.hypermedia.*
@@ -40,7 +41,9 @@ class RealGamesDataServices(
         val createGameAction = CreateGameAction?.also { createGameAction = it }
             ?: this.createGameAction ?: return Either.Left(Unit)
         val url = createGameAction.href.toApiURL()
-        val requestBody = jsonEncoder.toJson(configuration)
+        val requestBody = ConfigurationOutputModel.transform(
+            configuration
+        ).toJson(jsonEncoder)
         val request = buildRequest(Post(url, requestBody), token, mode)
 
         val gameCreatedDto = request.send(httpClient) { response ->
@@ -197,19 +200,4 @@ class RealGamesDataServices(
         }
         return placeShotAction ?: throw UnresolvedLinkException()
     }
-}
-
-
-@TestOnly
-fun main() {
-    println(Gson().toJson(Configuration(
-        10, setOf(
-            ShipType.CARRIER to 5,
-            ShipType.BATTLESHIP to 4,
-            ShipType.CRUISER to 3,
-            ShipType.SUBMARINE to 3,
-            ShipType.DESTROYER to 2,
-        ),
-        10,10
-    )).toString())
 }

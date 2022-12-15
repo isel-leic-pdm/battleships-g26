@@ -13,9 +13,7 @@ import com.example.battleships.DependenciesContainer
 import com.example.battleships.ErrorMessage
 import com.example.battleships.auth.views.LoadingState
 import com.example.battleships.home.HomeActivity
-import com.example.battleships.info.InfoActivity
 import com.example.battleships.ui.NavigationHandlers
-import com.example.battleships.user_home.UserHomeActivity
 
 class AuthActivity : ComponentActivity() {
 
@@ -49,7 +47,7 @@ class AuthActivity : ComponentActivity() {
                 if (token.isSuccess) {
                     val tokenResult = token.getOrNull() ?: return@setContent
                     if (tokenResult is AuthViewModel.Success) {
-                        UserHomeActivity.navigate(this, tokenResult.token)
+                        HomeActivity.navigate(this, tokenResult.token)
                     } else {
                         AuthScreen()
                     }

@@ -12,6 +12,7 @@ import com.example.battleships.ui.Handler
 import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.StartScreen
 
+@Deprecated("Moved to single class homeActivity")
 class UserHomeActivity : ComponentActivity() {
 
     companion object {

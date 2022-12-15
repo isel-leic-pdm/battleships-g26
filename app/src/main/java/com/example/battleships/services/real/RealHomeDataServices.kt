@@ -22,11 +22,11 @@ class RealHomeDataServices(
     private val httpClient: OkHttpClient,
     private val jsonEncoder: Gson
 ): HomeDataServices {
-    var userCreateAction: SirenAction? = null
-    var userLoginAction: SirenAction? = null
-    var userHomeLink: SirenLink? = null
-    var rankingsLink: SirenLink? = null
-    var serverInfoLink: SirenLink? = null
+    private var userCreateAction: SirenAction? = null
+    private var userLoginAction: SirenAction? = null
+    private var userHomeLink: SirenLink? = null
+    private var rankingsLink: SirenLink? = null
+    private var serverInfoLink: SirenLink? = null
 
     private suspend fun getHome(): Home {
         val request = buildRequest(Get(battleshipsHome), null, Mode.AUTO)
@@ -34,13 +34,7 @@ class RealHomeDataServices(
         val homeDto = request.send(httpClient) { response ->
             handleResponse<HomeDto>(jsonEncoder, response, HomeDtoType.type, SirenMediaType)
         }
-
-        userCreateAction = getCreateUserAction(homeDto)
-        userLoginAction = getUserLoginAction(homeDto)
-        userHomeLink = getUserHomeLink(homeDto)
-        rankingsLink = getRankingsLink(homeDto)
-        serverInfoLink = getServerInfoLink(homeDto)
-
+        getLinksAndActions(homeDto)
         if (userCreateAction == null || userLoginAction == null || userHomeLink == null
             || rankingsLink == null || serverInfoLink == null)
             throw UnresolvedLinkException()
@@ -73,21 +67,13 @@ class RealHomeDataServices(
         return rankings(rankingsProperties)
     }
 
-
-    private fun getCreateUserAction(home: HomeDto) =
-        home.actions?.find { it.name == "create-user" }
-
-    private fun getUserLoginAction(home: HomeDto) =
-        home.actions?.find { it.name == "create-token" }
-
-    private fun getUserHomeLink(home: HomeDto) =
-        home.links?.find { it.rel.contains("user-home") }
-
-    private fun getRankingsLink(home: HomeDto) =
-        home.links?.find { it.rel.contains("user-stats") }
-
-    private fun getServerInfoLink(home: HomeDto) =
-        home.links?.find { it.rel.contains("server-info") }
+    private fun getLinksAndActions(home : HomeDto){
+        userCreateAction = home.actions?.find("create-user")
+        userLoginAction = home.actions?.find("create-token")
+        userHomeLink = home.links?.find("user-home")
+        serverInfoLink = home.links?.find("server-info")
+        rankingsLink = home.links?.find("user-stats")
+    }
 
     private suspend fun ensureServerInfoLink(): URL {
         if (serverInfoLink == null) {

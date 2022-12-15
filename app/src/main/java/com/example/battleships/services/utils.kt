@@ -1,6 +1,8 @@
 package com.example.battleships.services
 
 import android.util.Log
+import com.example.battleships.utils.hypermedia.SirenAction
+import com.example.battleships.utils.hypermedia.SirenLink
 import com.example.battleships.utils.hypermedia.SirenMediaType
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
@@ -75,3 +77,7 @@ internal fun <T> handleResponse(jsonEncoder: Gson, response: Response, type: Typ
         throw UnexpectedResponseException(response = response, body)
     }
 }
+
+internal fun List<SirenAction>.find(name : String) = this.first{ it.name == name}
+
+internal fun List<SirenLink>.find(name : String) = this.first { it.rel.contains(name) }
