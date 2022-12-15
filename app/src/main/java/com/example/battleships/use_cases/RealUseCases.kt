@@ -21,7 +21,7 @@ class RealUseCases(
 ): UseCases {
 
     override suspend fun createUser(username: String, password: String, mode: Mode): Int {
-        val userId= userServices.createUser(username, password, mode)
+        val userId = userServices.createUser(username, password, mode)
         return getValueOrExecute(userId) {
             val userCreateAction = homeServices.getCreateUserAction()
             val userId = userServices.createUser(username, password, mode, userCreateAction)

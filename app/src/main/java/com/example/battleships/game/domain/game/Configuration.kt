@@ -1,5 +1,4 @@
-package pt.isel.daw.dawbattleshipgame.domain.game
-
+package com.example.battleships.game.domain.game
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 
 /**

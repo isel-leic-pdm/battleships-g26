@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class InfoViewModel(private val useCases: UseCases): ViewModel() {
     private var _serverInfo by mutableStateOf<Result<ServerInfo>?>(null)
-    val rankings: Result<ServerInfo>?
+    val serverInfo: Result<ServerInfo>?
         get() = _serverInfo
 
     fun loadServerInfo(forcedRefresh: Boolean = false) {

@@ -40,7 +40,8 @@ class FakeGameDataServices : GameDataServices {
     override suspend fun createGame(
         token: String,
         mode: Mode,
-        newCreateGameAction: SirenAction?
+        CreateGameAction: SirenAction?,
+        configuration: Configuration
     ): Either<Unit, Boolean> {
         val newGame = Game.newGame(
             GAME_ID,
@@ -67,7 +68,7 @@ class FakeGameDataServices : GameDataServices {
 
     override suspend fun getCurrentGameId(
         token: String,
-        newGetCurrentGameIdLink: SirenLink?,
+        GetCurrentGameIdLink: SirenLink?,
         mode: Mode
     ): Either<Unit, Int?> {
         return Either.Right(game?.id)
@@ -90,7 +91,7 @@ class FakeGameDataServices : GameDataServices {
     override suspend fun placeShot(
         token: String,
         coordinate: Coordinate,
-        newPlaceShotAction: SirenAction?,
+        PlaceShotAction: SirenAction?,
         mode: Mode
     ): Either<Unit, Boolean> {
         val game = game ?: return Either.Right(false)
@@ -120,7 +121,7 @@ class FakeGameDataServices : GameDataServices {
 
     override suspend fun getGame(
         token: String,
-        newGetGameLink: SirenLink?,
+        GetGameLink: SirenLink?,
         mode: Mode
     ): Either<Unit, Pair<Game, Player>?> {
         return Either.Right(game?.let { Pair(it, Player.ONE) })

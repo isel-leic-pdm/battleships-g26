@@ -2,6 +2,7 @@ package com.example.battleships.services.real
 
 import com.example.battleships.dtos.*
 import com.example.battleships.services.*
+import com.example.battleships.services.models.UserCreateOutputModel
 import com.example.battleships.user_home.UserHome
 import com.example.battleships.utils.hypermedia.*
 import com.example.battleships.utils.send
@@ -18,10 +19,6 @@ class RealUserDataServices(
     private var createGameAction: SirenAction? = null
     private var getCurrentGameIdLink: SirenLink? = null
 
-    private data class UserCreateModel(val username: String, val password: String){
-        fun toJson(encoder : Gson): String = encoder.toJson(this)
-    }
-
     /**
      * Creates a new user with the given username and password.
      * @return The id of the newly created user, or null if needs [userCreateAction].
@@ -37,7 +34,7 @@ class RealUserDataServices(
         val url = auxUserCreateAction.href.toApiURL()
 
         val request = buildRequest(
-            Post(url, UserCreateModel(username, password).toJson(jsonEncoder)), null, mode
+            Post(url, UserCreateOutputModel(username, password).toJson(jsonEncoder)), null, mode
         )
         val createUserDto = request.send(httpClient) { response ->
             handleResponse<CreateUserDto>(
@@ -62,7 +59,7 @@ class RealUserDataServices(
         val url = auxCreateTokenAction.href.toApiURL()
 
         val request = buildRequest(
-            Post(url, UserCreateModel(username, password).toJson(jsonEncoder)), null, mode
+            Post(url, UserCreateOutputModel(username, password).toJson(jsonEncoder)), null, mode
         )
         try {
             val createTokenDto = request.send(httpClient) { response ->

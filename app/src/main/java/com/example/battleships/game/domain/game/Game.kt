@@ -3,7 +3,6 @@ package com.example.battleships.game.domain.game
 import com.example.battleships.game.domain.game.GameState.*
 import com.example.battleships.game.utils.RealClock
 import pt.isel.daw.dawbattleshipgame.domain.board.Board
-import pt.isel.daw.dawbattleshipgame.domain.game.Configuration
 import pt.isel.daw.dawbattleshipgame.domain.game.checkNull
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import java.time.Duration

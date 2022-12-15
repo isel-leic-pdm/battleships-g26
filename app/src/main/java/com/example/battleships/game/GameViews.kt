@@ -21,7 +21,7 @@ import com.example.battleships.game.domain.game.GameState
 import pt.isel.daw.dawbattleshipgame.domain.board.Board
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.board.Panel
-import pt.isel.daw.dawbattleshipgame.domain.game.Configuration
+import com.example.battleships.game.domain.game.Configuration
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 

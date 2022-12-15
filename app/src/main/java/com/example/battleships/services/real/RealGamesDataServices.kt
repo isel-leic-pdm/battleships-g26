@@ -1,12 +1,16 @@
 package com.example.battleships.services.real
 
 import com.example.battleships.dtos.*
+import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.services.*
+import com.example.battleships.services.models.PlaceShipOutputModel
+import com.example.battleships.services.models.ShipOutputModel
 import com.example.battleships.utils.hypermedia.*
 import com.example.battleships.utils.send
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
+import org.jetbrains.annotations.TestOnly
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
@@ -25,26 +29,18 @@ class RealGamesDataServices(
 
     /**
      * Creates a new game.
-     * @return true if the game was created successfully, if [newCreateGameAction] is needed.
+     * @return true if the game was created successfully, if [CreateGameAction] is needed.
      */
-    override suspend fun createGame(token: String, mode: Mode, newGameCreateAction: SirenAction?): Either<Unit, Boolean> {
-        val createGameAction = newGameCreateAction?.also { createGameAction = it }
+    override suspend fun createGame(
+        token: String,
+        mode: Mode,
+        CreateGameAction: SirenAction?,
+        configuration: Configuration
+    ): Either<Unit, Boolean> {
+        val createGameAction = CreateGameAction?.also { createGameAction = it }
             ?: this.createGameAction ?: return Either.Left(Unit)
         val url = createGameAction.href.toApiURL()
-
-        // TODO -> parameterize the game configuration
-        val requestBody = "{\n" +
-                "    \"boardSize\": 10,\n" +
-                "    \"fleet\": {\n" +
-                "        \"CARRIER\": 5,\n" +
-                "        \"BATTLESHIP\": 4,\n" +
-                "        \"CRUISER\": 3,\n" +
-                "        \"SUBMARINE\": 3,\n" +
-                "        \"DESTROYER\": 2\n" +
-                "    },\n" +
-                "    \"nShotsPerRound\": 10,\n" +
-                "    \"roundTimeout\": 10\n" +
-                "}"
+        val requestBody = jsonEncoder.toJson(configuration)
         val request = buildRequest(Post(url, requestBody), token, mode)
 
         val gameCreatedDto = request.send(httpClient) { response ->
@@ -61,6 +57,7 @@ class RealGamesDataServices(
         return Either.Right(true)
     }
 
+
     override suspend fun setFleet(
         token: String,
         ships: List<Triple<ShipType, Coordinate, Orientation>>,
@@ -71,22 +68,9 @@ class RealGamesDataServices(
             ?: this.placeShipsAction ?: return Either.Left(Unit)
         val placeShipsUrl = placeFleetLayout.href.toApiURL()
 
-        val requestBody = "{\n" +
-            "\"operation\": \"place-ships\",\n" +
-                    "    \"ships\": [\n" +
-                    ships.joinToString(",\n") { ship ->
-                        "        {\n" +
-                                "            \"shipType\": \"${ship.first}\",\n" +
-                                "            \"position\": {\n" +
-                                "                \"row\": ${ship.second.row},\n" +
-                                "                \"column\": ${ship.second.column}\n" +
-                                "            },\n" +
-                                "            \"orientation\": \"${ship.third}\"\n" +
-                                "        }"
-                    } +
-                    "    ],\n" +
-                    "\"fleetConfirmed\": \"true\"" +
-                    "}"
+        val requestBody = PlaceShipOutputModel(ships.map {
+            ShipOutputModel(it.first, it.second, it.third)
+        }).toJson(jsonEncoder)
         val request = buildRequest(Post(placeShipsUrl, requestBody), token, mode)
 
         request.send(httpClient) { response ->
@@ -103,18 +87,13 @@ class RealGamesDataServices(
     override suspend fun placeShot(
         token: String,
         coordinate: Coordinate,
-        newPlaceShotAction: SirenAction?,
+        PlaceShotAction: SirenAction?,
         mode: Mode
     ): Either<Unit, Boolean> {
-        val placeShotAction = newPlaceShotAction?.also { placeShotAction = it }
+        val placeShotAction = PlaceShotAction?.also { placeShotAction = it }
             ?: this.placeShotAction ?: return Either.Left(Unit)
         val placeShotUrl = placeShotAction.href.toApiURL()
-
-        val body = "{\n" +
-                "\t\"row\": ${coordinate.row},\n" +
-                "\t\"column\": ${coordinate.column}\n" +
-                "}"
-
+        val body = jsonEncoder.toJson(coordinate)
         val request = buildRequest(Post(placeShotUrl, body), token, mode)
 
         request.send(httpClient) { response ->
@@ -130,10 +109,10 @@ class RealGamesDataServices(
 
     override suspend fun getCurrentGameId(
         token: String,
-        newGetCurrentGameIdLink: SirenLink?,
+        GetCurrentGameIdLink: SirenLink?,
         mode: Mode
     ): Either<Unit, Int> {
-        val getCurrentGameIdLink = newGetCurrentGameIdLink?.also { getCurrentGameIdLink = it }
+        val getCurrentGameIdLink = GetCurrentGameIdLink?.also { getCurrentGameIdLink = it }
             ?: this.getCurrentGameIdLink ?: return Either.Left(Unit)
         val url = getCurrentGameIdLink.href.toApiURL()
 
@@ -154,16 +133,16 @@ class RealGamesDataServices(
 
     override suspend fun getGame(
         token: String,
-        newGetGameLink: SirenLink?,
+        GetGameLink: SirenLink?,
         mode: Mode
     ): Either<Unit, Pair<Game, Player>?> {
-        val getGameInfoLink = newGetGameLink?.also { getGameLink = it }
+        val getGameInfoLink = GetGameLink?.also { getGameLink = it }
             ?: this.getGameLink ?: return Either.Left(Unit)
         val url = getGameInfoLink.href.toApiURL()
 
         val request = buildRequest(Get(url), token, mode)
 
-        try {
+        return try {
             val gameDto = request.send(httpClient) { response ->
                 handleResponse<GameDto>(
                     jsonEncoder,
@@ -174,9 +153,9 @@ class RealGamesDataServices(
             }
             placeShipsAction = extractPlaceFleetLayout(gameDto)
             placeShotAction = extractPlaceShotAction(gameDto)
-            return Either.Right(gameDto.toGameAndPlayer())
+            Either.Right(gameDto.toGameAndPlayer())
         } catch (e: Exception) {
-            return Either.Right(null)
+            Either.Right(null)
         }
     }
 
@@ -218,4 +197,19 @@ class RealGamesDataServices(
         }
         return placeShotAction ?: throw UnresolvedLinkException()
     }
+}
+
+
+@TestOnly
+fun main() {
+    println(Gson().toJson(Configuration(
+        10, setOf(
+            ShipType.CARRIER to 5,
+            ShipType.BATTLESHIP to 4,
+            ShipType.CRUISER to 3,
+            ShipType.SUBMARINE to 3,
+            ShipType.DESTROYER to 2,
+        ),
+        10,10
+    )).toString())
 }

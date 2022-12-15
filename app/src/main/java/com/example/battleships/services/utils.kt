@@ -70,6 +70,8 @@ internal fun <T> handleResponse(jsonEncoder: Gson, response: Response, type: Typ
     }
     else {
         val body = response.body?.string()
+        Log.e("contentType", contentType.toString())
+        Log.e("Mediatype", mediaType.toString())
         throw UnexpectedResponseException(response = response, body)
     }
 }

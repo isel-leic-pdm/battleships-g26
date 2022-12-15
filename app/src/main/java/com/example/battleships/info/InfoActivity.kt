@@ -10,11 +10,11 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.battleships.DependenciesContainer
 import com.example.battleships.TAG
-import com.example.battleships.rankings.RankingsViewModel
 import com.example.battleships.ui.NavigationHandlers
 import pt.isel.battleships.R
 
@@ -46,20 +46,14 @@ class InfoActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         vm.loadServerInfo()
         setContent {
-            val authors = vm.rankings
+            val serverInfo = vm.serverInfo?.getOrNull()
+            val authors = serverInfo?.authors?.map { it.email }?.toTypedArray()
             InfoScreen(
                 navigationHandlers = NavigationHandlers(
                     onBackRequested = { finish() }
                 ),
                 onOpenUrlRequested = { uri -> openURL(uri)},
-                onSendEmailRequested = {
-                    (authors?.getOrNull()?.authors?.map { it.email }
-                        ?.toTypedArray())?.let {
-                        openSendEmail(
-                            authorsEmails = it
-                        )
-                    }
-                }
+                onSendEmailRequested = {  if(authors != null) openSendEmail(authors) }
             )
         }
     }
@@ -89,7 +83,6 @@ class InfoActivity : ComponentActivity() {
                 putExtra(Intent.EXTRA_EMAIL, authorsEmails)
                 putExtra(Intent.EXTRA_SUBJECT, emailSubject)
             }
-
             startActivity(intent)
         }
         catch (e: ActivityNotFoundException) {
