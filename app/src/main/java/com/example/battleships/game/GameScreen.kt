@@ -20,6 +20,9 @@ import com.example.battleships.game.domain.ship.getOrientation
 import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
+import com.example.battleships.utils.ErrorAlert
+import com.example.battleships.utils.getWith
+import pt.isel.battleships.R
 import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
@@ -54,13 +57,17 @@ internal fun GameScreen(
                     .padding(padding)
                     .fillMaxSize(),
             ) {
-                val game = activity.vm.game.getOrNull() ?:
-                    Toast.makeText(mContext, "Something went wrong", Toast.LENGTH_SHORT).show()
-                when (game) {
+                when (val game = activity.vm.game.getWith(mContext)) {
                     is GameViewModel.NotCreated -> InitScreen(activity)
                     is GameViewModel.Creating -> CreatingGame()
                     is GameViewModel.Matchmaking -> Matchmaking()
                     is GameViewModel.Started -> PlayScreen(activity, game)
+                    else -> ErrorAlert(
+                        title = R.string.error_api_title,
+                        message = R.string.error_could_not_reach_api,
+                        buttonText = R.string.error_retry_button_text,
+                        onDismiss = { onBackRequest() }
+                    )
                 }
             }
         }
@@ -99,8 +106,9 @@ private fun PlayScreen(
             game.getBoard(player).getShips().map { ship ->
                 Triple(
                     ship.type,
-                    ship.coordinates.sortedBy { (it.row * game.configuration.boardSize) + it.column }
-                        .first(), // this will choose the first/lower coordinate
+                    ship.coordinates.minByOrNull {
+                        (it.row * game.configuration.boardSize) + it.column
+                    }!!, // this will choose the first/lower coordinate
                     ship.getOrientation()
                 )
             }.let { ships ->

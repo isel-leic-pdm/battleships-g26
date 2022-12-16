@@ -15,7 +15,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.battleships.DependenciesContainer
 import com.example.battleships.TAG
+import com.example.battleships.services.ApiException
 import com.example.battleships.ui.NavigationHandlers
+import com.example.battleships.utils.getWith
 import pt.isel.battleships.R
 
 class InfoActivity : ComponentActivity() {
@@ -46,14 +48,15 @@ class InfoActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         vm.loadServerInfo()
         setContent {
-            val serverInfo = vm.serverInfo?.getOrNull()
+            val context = LocalContext.current
+            val serverInfo = vm.serverInfo?.getWith(context)
             val authors = serverInfo?.authors?.map { it.email }?.toTypedArray()
             InfoScreen(
                 navigationHandlers = NavigationHandlers(
                     onBackRequested = { finish() }
                 ),
-                onOpenUrlRequested = { uri -> openURL(uri)},
-                onSendEmailRequested = {  if(authors != null) openSendEmail(authors) }
+                onOpenUrlRequested = { uri -> openURL(uri) },
+                onSendEmailRequested = { if (authors != null) openSendEmail(authors) }
             )
         }
     }

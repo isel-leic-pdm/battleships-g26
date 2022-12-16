@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.battleships.DependenciesContainer
@@ -14,6 +15,7 @@ import com.example.battleships.ErrorMessage
 import com.example.battleships.auth.views.LoadingState
 import com.example.battleships.home.HomeActivity
 import com.example.battleships.ui.NavigationHandlers
+import com.example.battleships.utils.getWith
 
 class AuthActivity : ComponentActivity() {
 
@@ -45,7 +47,7 @@ class AuthActivity : ComponentActivity() {
             val token = vm.token
             if (token != null) {
                 if (token.isSuccess) {
-                    val tokenResult = token.getOrNull() ?: return@setContent
+                    val tokenResult = token.getWith(LocalContext.current) ?: return@setContent
                     if (tokenResult is AuthViewModel.Success) {
                         HomeActivity.navigate(this, tokenResult.token)
                     } else {

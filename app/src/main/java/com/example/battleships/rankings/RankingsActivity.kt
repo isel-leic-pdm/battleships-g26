@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.battleships.DependenciesContainer
@@ -13,6 +14,7 @@ import com.example.battleships.ErrorMessage
 import com.example.battleships.info.InfoActivity
 import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.RefreshingState
+import com.example.battleships.utils.getWith
 
 class RankingsActivity : ComponentActivity() {
 
@@ -42,30 +44,22 @@ class RankingsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         vm.loadRankings()
         setContent {
+            val context = LocalContext.current
             val gameRankingResult = vm.rankings
             val refreshingState: RefreshingState =
                 if (vm.isLoading) RefreshingState.Refreshing
                 else RefreshingState.Idle
 
-            // if null, displays empty list of rankings
-            if (gameRankingResult == null || gameRankingResult.isSuccess) {
-                RankingsScreen(
-                    gameRankingResult?.getOrNull(),
-                    refreshingState,
-                    onRefresh = vm::loadRankings,
-                    NavigationHandlers(
-                        onInfoRequested = { InfoActivity.navigate(origin = this) },
-                        onBackRequested = { finish() }
-                    )
+            RankingsScreen(
+                gameRankingResult?.getWith(context),
+                refreshingState,
+                onRefresh = vm::loadRankings,
+                NavigationHandlers(
+                    onInfoRequested = { InfoActivity.navigate(origin = this) },
+                    onBackRequested = { finish() }
                 )
-            }
-            else {
-                ErrorMessage(
-                    onNonError = { vm.rankings?.getOrThrow() },
-                    onIoExceptionDismiss = { vm.loadRankings() },
-                    onApiExceptionDismiss = { finishAndRemoveTask() }
-                )
-            }
+            )
+
         }
     }
 }

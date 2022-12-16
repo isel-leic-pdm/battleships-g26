@@ -11,6 +11,8 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.lang.reflect.Type
 import java.net.URL
+import kotlin.reflect.javaType
+import kotlin.reflect.typeOf
 
 sealed class RequestMethod(val url: URL)
 class Get(url: URL) : RequestMethod(url)
@@ -60,21 +62,26 @@ val JsonMediaType = "application/json".toMediaType()
  */
 internal fun <T> handleResponse(jsonEncoder: Gson, response: Response, type: Type, mediaType: MediaType): T {
     val contentType = response.body?.contentType()
-    return if (response.isSuccessful && contentType != null && contentType == mediaType) {
+
+    if(contentType != null && contentType == mediaType)
+        throw UnexpectedResponseException(response, toast = "Content type does not match")
+
+    val body = response.body?.string()
+    return if (response.isSuccessful) {
         try {
-            val body = response.body?.string()
             jsonEncoder.fromJson<T>(body, type)
         } catch (e: JsonSyntaxException) {
-            val body = response.body?.string()
-            Log.e("handleResponse", "Error parsing response", e)
-            throw UnexpectedResponseException(response, body)
+            throw UnexpectedResponseException(response, body, "Error parsing JSON")
         }
     }
     else {
-        val body = response.body?.string()
-        Log.e("contentType", contentType.toString())
-        Log.e("Mediatype", mediaType.toString())
-        throw UnexpectedResponseException(response = response, body)
+        try{
+           val problem = jsonEncoder.fromJson<Problem>(body, problemType)
+           throw UnexpectedResponseException(response, body, problem.detail)
+        }
+        catch (e : Exception){
+            throw UnexpectedResponseException(response, body, "An error has occurred")
+        }
     }
 }
 
