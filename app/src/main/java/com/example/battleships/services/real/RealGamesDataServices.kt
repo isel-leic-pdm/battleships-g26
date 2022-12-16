@@ -37,9 +37,10 @@ class RealGamesDataServices(
         mode: Mode,
         CreateGameAction: SirenAction?,
         configuration: Configuration
-    ): Either<Unit, Boolean> {
+    ): Either<ApiException, Boolean> {
         val createGameAction = CreateGameAction?.also { createGameAction = it }
-            ?: this.createGameAction ?: return Either.Left(Unit)
+            ?: this.createGameAction ?: return Either.Left(UnresolvedActionException())
+
         val url = createGameAction.href.toApiURL()
         val requestBody = ConfigurationOutputModel.transform(
             configuration
@@ -66,9 +67,9 @@ class RealGamesDataServices(
         ships: List<Triple<ShipType, Coordinate, Orientation>>,
         newSetFleetAction: SirenAction?,
         mode: Mode
-    ): Either<Unit, Boolean> {
+    ): Either<ApiException, Boolean> {
         val placeFleetLayout = newSetFleetAction?.also { placeShipsAction = it }
-            ?: this.placeShipsAction ?: return Either.Left(Unit)
+            ?: this.placeShipsAction ?: return Either.Left(UnresolvedActionException())
         val placeShipsUrl = placeFleetLayout.href.toApiURL()
 
         val requestBody = PlaceShipOutputModel(ships.map {
@@ -92,9 +93,9 @@ class RealGamesDataServices(
         coordinate: Coordinate,
         PlaceShotAction: SirenAction?,
         mode: Mode
-    ): Either<Unit, Boolean> {
+    ): Either<ApiException, Boolean> {
         val placeShotAction = PlaceShotAction?.also { placeShotAction = it }
-            ?: this.placeShotAction ?: return Either.Left(Unit)
+            ?: this.placeShotAction ?: return Either.Left(UnresolvedActionException())
         val placeShotUrl = placeShotAction.href.toApiURL()
         val body = jsonEncoder.toJson(coordinate)
         val request = buildRequest(Post(placeShotUrl, body), token, mode)
@@ -114,9 +115,9 @@ class RealGamesDataServices(
         token: String,
         GetCurrentGameIdLink: SirenLink?,
         mode: Mode
-    ): Either<Unit, Int> {
+    ): Either<ApiException, Int?> {
         val getCurrentGameIdLink = GetCurrentGameIdLink?.also { getCurrentGameIdLink = it }
-            ?: this.getCurrentGameIdLink ?: return Either.Left(Unit)
+            ?: this.getCurrentGameIdLink ?: return Either.Left(UnresolvedActionException())
         val url = getCurrentGameIdLink.href.toApiURL()
 
         val request = buildRequest(Get(url), token, mode)
@@ -138,9 +139,9 @@ class RealGamesDataServices(
         token: String,
         GetGameLink: SirenLink?,
         mode: Mode
-    ): Either<Unit, Pair<Game, Player>?> {
+    ): Either<ApiException, Pair<Game, Player>?> {
         val getGameInfoLink = GetGameLink?.also { getGameLink = it }
-            ?: this.getGameLink ?: return Either.Left(Unit)
+            ?: this.getGameLink ?: return Either.Left(UnresolvedActionException())
         val url = getGameInfoLink.href.toApiURL()
 
         val request = buildRequest(Get(url), token, mode)

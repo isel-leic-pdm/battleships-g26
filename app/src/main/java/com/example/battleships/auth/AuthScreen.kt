@@ -45,7 +45,8 @@ internal fun LaunchScreen(
     isRegister: LoadingState,
     onRegisterUser: (String, String) -> Unit,
     onLoginUser: (String, String) -> Unit,
-    navigationHandlers: NavigationHandlers? = null
+    navigationHandlers: NavigationHandlers? = null,
+    action: Action
 ) {
     val username = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
@@ -72,7 +73,10 @@ internal fun LaunchScreen(
                         .background(Milk)
                 )
                 {
-                    InputView(username, password, isLogin, isRegister, onRegisterUser, onLoginUser)
+                    InputView(username, password, isLogin,
+                        isRegister, onRegisterUser, onLoginUser,
+                        action
+                    )
                 }
             }
         }
@@ -97,9 +101,10 @@ fun InputView(
     isRegister: LoadingState,
     onRegister: (String, String) -> Unit,
     onLogin: (String, String) -> Unit,
+    action: Action
 ) {
     val mContext = LocalContext.current
-    val buttonAction = remember { mutableStateOf(Action.REGISTER) }
+    val buttonAction = remember { mutableStateOf(action) }
     val retypedPassword = remember { mutableStateOf("") }
     val passwordVisible = remember { mutableStateOf(false) }
     val retypePasswordVisible = remember { mutableStateOf(false) }
@@ -113,7 +118,7 @@ fun InputView(
         passwordVisible = passwordVisible)
 
     if(buttonAction.value == Action.REGISTER) {
-        PasswordOutlinedTextField(label = "Retype Password", password = retypedPassword,
+        PasswordOutlinedTextField(label = "Re-type Password", password = retypedPassword,
             passwordVisible = retypePasswordVisible)
     }
 
@@ -170,5 +175,5 @@ fun InputView(
 @Preview
 @Composable
 fun LaunchScreenPreview(){
-    LaunchScreen(LoadingState.Idle, LoadingState.Idle, { _, _ -> }, { _, _ ->})
+    LaunchScreen(LoadingState.Idle, LoadingState.Idle, { _, _ -> }, { _, _ ->}, null, Action.REGISTER)
 }

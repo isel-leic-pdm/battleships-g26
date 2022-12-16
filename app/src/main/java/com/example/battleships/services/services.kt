@@ -24,6 +24,9 @@ abstract class ApiException(msg: String, val toast : String) : Exception("$msg \
  */
 class UnresolvedLinkException(msg: String = "", toast : String = "Unresolved link") : ApiException(msg,toast)
 
+class UnresolvedActionException(msg: String = "", toast : String = "Unresolved action") : ApiException(msg,toast)
+
+
 /**
  * Exception throw when an unexpected response was received from the API.
  */

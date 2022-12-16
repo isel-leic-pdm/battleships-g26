@@ -26,9 +26,9 @@ interface GameDataServices {
                                ),
                                10,10
                            )
-    ): Either<Unit, Boolean>
+    ): Either<ApiException, Boolean>
 
-    suspend fun getCurrentGameId(token: String, GetCurrentGameIdLink: SirenLink? = null, mode: Mode): Either<Unit, Int?>
+    suspend fun getCurrentGameId(token: String, GetCurrentGameIdLink: SirenLink? = null, mode: Mode): Either<ApiException, Int?>
 
     /**
      * Sets a fleet of ships for the player.
@@ -39,13 +39,13 @@ interface GameDataServices {
         ships: List<Triple<ShipType, Coordinate, Orientation>>,
         newSetFleetAction: SirenAction? = null,
         mode: Mode
-    ): Either<Unit, Boolean>
+    ): Either<ApiException, Boolean>
 
-    suspend fun placeShot(token: String, coordinate: Coordinate, PlaceShotAction: SirenAction? = null, mode: Mode): Either<Unit, Boolean>
+    suspend fun placeShot(token: String, coordinate: Coordinate, PlaceShotAction: SirenAction? = null, mode: Mode): Either<ApiException, Boolean>
 
     /**
      * This function is responsible for getting the game state.
      * @return an object representing the current game state, and the player associated with the token.
      */
-    suspend fun getGame(token: String, GetGameLink: SirenLink? = null, mode: Mode): Either<Unit, Pair<Game, Player>?>
+    suspend fun getGame(token: String, GetGameLink: SirenLink? = null, mode: Mode): Either<ApiException, Pair<Game, Player>?>
 }

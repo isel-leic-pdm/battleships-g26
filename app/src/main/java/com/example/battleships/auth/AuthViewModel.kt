@@ -1,25 +1,23 @@
 package com.example.battleships.auth
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.battleships.services.Mode
 import com.example.battleships.use_cases.UseCases
+import com.example.battleships.utils.getWith
 import kotlinx.coroutines.launch
 import kotlin.math.log
 
 class AuthViewModel(private val useCases: UseCases): ViewModel() {
-    sealed class TokenResult
-    object InvalidCredentials: TokenResult()
-    data class Success(val token: String): TokenResult()
-
     private var _userId by mutableStateOf<Result<Int>?>(null)
-    private val userId: Result<Int>?
+    val userId: Result<Int>?
         get() = _userId
 
-    private var _token by mutableStateOf<Result<TokenResult>?>(null)
-    val token: Result<TokenResult>?
+    private var _token by mutableStateOf<Result<String>?>(null)
+    val token: Result<String>?
         get() = _token
 
     private val _isCreateUserLoading: MutableState<Boolean> = mutableStateOf(false)
@@ -30,7 +28,7 @@ class AuthViewModel(private val useCases: UseCases): ViewModel() {
     val isLoginLoading: State<Boolean>
         get() = _isLoginLoading
 
-    fun createUser(username: String, password: String) {
+    fun createUser(username: String, password: String, login : Boolean = false) {
         viewModelScope.launch {
             _isCreateUserLoading.value = true
             _userId =
@@ -42,7 +40,7 @@ class AuthViewModel(private val useCases: UseCases): ViewModel() {
                     Result.failure(e)
                 }
             _isCreateUserLoading.value = false
-            if(userId?.getOrNull() != null) login(username, password)
+            if(login) login(username, password)
         }
     }
 
@@ -51,11 +49,9 @@ class AuthViewModel(private val useCases: UseCases): ViewModel() {
             _isLoginLoading.value = true
             _token =
                 try {
-                    val token = useCases.createToken(username, password, Mode.FORCE_REMOTE)
-                    Result.success(
-                        if (token == null) InvalidCredentials
-                        else Success(token)
-                    ).also { Log.i("AuthViewModel", "Token created: $it") }
+                    Result.success(useCases.createToken(username, password, Mode.FORCE_REMOTE)).also {
+                        Log.i("AuthViewModel", "Token created: $it")
+                    }
                 } catch (e: Exception) {
                     Log.e("AuthViewModel", "Error creating token", e)
                     Result.failure(e)

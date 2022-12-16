@@ -3,6 +3,7 @@ package com.example.battleships.services.fake
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.battleships.game.domain.game.*
+import com.example.battleships.services.ApiException
 import com.example.battleships.services.Either
 import com.example.battleships.services.GameDataServices
 import com.example.battleships.services.Mode
@@ -42,7 +43,7 @@ class FakeGameDataServices : GameDataServices {
         mode: Mode,
         CreateGameAction: SirenAction?,
         configuration: Configuration
-    ): Either<Unit, Boolean> {
+    ): Either<ApiException, Boolean> {
         val newGame = Game.newGame(
             GAME_ID,
             PLAYER1_ID,
@@ -70,7 +71,7 @@ class FakeGameDataServices : GameDataServices {
         token: String,
         GetCurrentGameIdLink: SirenLink?,
         mode: Mode
-    ): Either<Unit, Int?> {
+    ): Either<ApiException, Int?> {
         return Either.Right(game?.id)
     }
 
@@ -79,7 +80,7 @@ class FakeGameDataServices : GameDataServices {
         ships: List<Triple<ShipType, Coordinate, Orientation>>,
         newSetFleetAction: SirenAction?,
         mode: Mode
-    ): Either<Unit, Boolean> {
+    ): Either<ApiException, Boolean> {
         var newGame = game
         ships.forEach { (shipType, coordinate, orientation) ->
             newGame = newGame?.placeShip(shipType, coordinate, orientation, Player.ONE) ?: return Either.Right(false)
@@ -93,7 +94,7 @@ class FakeGameDataServices : GameDataServices {
         coordinate: Coordinate,
         PlaceShotAction: SirenAction?,
         mode: Mode
-    ): Either<Unit, Boolean> {
+    ): Either<ApiException, Boolean> {
         val game = game ?: return Either.Right(false)
         val newGame = game.placeShot(game.player1, coordinate, Player.ONE) ?: return Either.Right(false)
         this.game = newGame
@@ -123,7 +124,7 @@ class FakeGameDataServices : GameDataServices {
         token: String,
         GetGameLink: SirenLink?,
         mode: Mode
-    ): Either<Unit, Pair<Game, Player>?> {
+    ): Either<ApiException, Pair<Game, Player>?> {
         return Either.Right(game?.let { Pair(it, Player.ONE) })
     }
 }

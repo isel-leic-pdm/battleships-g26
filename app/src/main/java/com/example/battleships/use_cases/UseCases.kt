@@ -12,7 +12,7 @@ import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 interface UseCases{
     suspend fun createUser(username: String, password: String, mode: Mode = Mode.AUTO): Int
 
-    suspend fun createToken(username: String, password: String, mode: Mode = Mode.AUTO): String?
+    suspend fun createToken(username: String, password: String, mode: Mode = Mode.AUTO): String
 
     suspend fun createGame(token: String, mode: Mode = Mode.AUTO): Boolean
 

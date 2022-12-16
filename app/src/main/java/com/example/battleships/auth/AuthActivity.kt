@@ -3,6 +3,7 @@ package com.example.battleships.auth
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -16,6 +17,7 @@ import com.example.battleships.auth.views.LoadingState
 import com.example.battleships.home.HomeActivity
 import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.utils.getWith
+import okhttp3.internal.wait
 
 class AuthActivity : ComponentActivity() {
 
@@ -46,24 +48,16 @@ class AuthActivity : ComponentActivity() {
         setContent {
             val token = vm.token
             if (token != null) {
-                if (token.isSuccess) {
-                    val tokenResult = token.getWith(LocalContext.current) ?: return@setContent
-                    if (tokenResult is AuthViewModel.Success) {
-                        HomeActivity.navigate(this, tokenResult.token)
-                    } else {
-                        AuthScreen()
-                    }
-                }
-                else AuthErrorMessage()
-            }
-            else {
-                AuthScreen()
-            }
+                val tokenResult = token.getWith(LocalContext.current)
+                if (tokenResult != null)
+                    HomeActivity.navigate(this, tokenResult)
+                else AuthScreen(Action.LOGIN)
+            } else AuthScreen()
         }
     }
 
     @Composable
-    private fun AuthScreen() {
+    private fun AuthScreen(action: Action = Action.REGISTER) {
         val isCreateUserLoading =
             if (vm.isCreateUserLoading.value) LoadingState.Loading
             else LoadingState.Idle
@@ -75,20 +69,16 @@ class AuthActivity : ComponentActivity() {
         LaunchScreen(
             isLogin = isLoginLoading,
             isRegister = isCreateUserLoading,
-            onRegisterUser = { username, password -> vm.createUser(username, password) },
-            onLoginUser = { username, password -> vm.login(username, password) },
+            onRegisterUser = { username, password ->
+                vm.createUser(username, password, true)
+            },
+            onLoginUser = { username, password ->
+                vm.login(username, password)
+            },
             navigationHandlers = NavigationHandlers(
                 onBackRequested = { finish() }
-            )
-        )
-    }
-
-    @Composable
-    private fun AuthErrorMessage() {
-        ErrorMessage(
-            onNonError = { vm.token?.getOrThrow() },
-            onIoExceptionDismiss = { TODO("Not yet implemented") },
-            onApiExceptionDismiss = { finishAndRemoveTask() }
+            ),
+            action = action
         )
     }
 }

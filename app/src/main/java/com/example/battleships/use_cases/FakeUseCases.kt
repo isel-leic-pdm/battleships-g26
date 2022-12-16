@@ -25,7 +25,7 @@ class FakeUseCases(
         return getValueOrThrow(userId)
     }
 
-    override suspend fun createToken(username: String, password: String, mode: Mode): String? {
+    override suspend fun createToken(username: String, password: String, mode: Mode): String {
         val token = userServices.getToken(username, password, mode)
         return getValueOrThrow(token)
     }

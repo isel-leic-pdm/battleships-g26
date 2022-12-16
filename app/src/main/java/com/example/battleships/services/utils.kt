@@ -9,6 +9,7 @@ import com.google.gson.JsonSyntaxException
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.jetbrains.annotations.TestOnly
 import java.lang.reflect.Type
 import java.net.URL
 import kotlin.reflect.javaType
@@ -63,8 +64,11 @@ val JsonMediaType = "application/json".toMediaType()
 internal fun <T> handleResponse(jsonEncoder: Gson, response: Response, type: Type, mediaType: MediaType): T {
     val contentType = response.body?.contentType()
 
-    if(contentType != null && contentType == mediaType)
-        throw UnexpectedResponseException(response, toast = "Content type does not match")
+    if(contentType != ProblemMediaType && contentType != mediaType)
+        throw UnexpectedResponseException(response, toast = "Content type does not match").also {
+            Log.e("content type" , contentType.toString())
+            Log.e("media type" , mediaType.toString())
+        }
 
     val body = response.body?.string()
     return if (response.isSuccessful) {
@@ -75,13 +79,14 @@ internal fun <T> handleResponse(jsonEncoder: Gson, response: Response, type: Typ
         }
     }
     else {
+        val problem: Problem
         try{
-           val problem = jsonEncoder.fromJson<Problem>(body, problemType)
-           throw UnexpectedResponseException(response, body, problem.detail)
+            problem = jsonEncoder.fromJson(body, problemType)
         }
         catch (e : Exception){
             throw UnexpectedResponseException(response, body, "An error has occurred")
         }
+        throw UnexpectedResponseException(response, body, problem.detail)
     }
 }
 

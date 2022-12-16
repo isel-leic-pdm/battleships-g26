@@ -12,7 +12,7 @@ import java.net.URI
  * For details regarding the Siren media type, see <a href="https://github.com/kevinswiber/siren">Siren</a>
  */
 
-private const val APPLICATION_TYPE = "application"
+const val APPLICATION_TYPE = "application"
 private const val SIREN_SUBTYPE = "vnd.siren+json"
 
 val SirenMediaType = "$APPLICATION_TYPE/$SIREN_SUBTYPE".toMediaType()

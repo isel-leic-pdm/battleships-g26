@@ -1,9 +1,6 @@
 package com.example.battleships.services.fake
 
-import com.example.battleships.services.Either
-import com.example.battleships.services.Mode
-import com.example.battleships.services.UnexpectedResponseException
-import com.example.battleships.services.UserDataServices
+import com.example.battleships.services.*
 import com.example.battleships.user_home.UserHome
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenLink
@@ -25,7 +22,7 @@ class FakeUserDataServices : UserDataServices {
         password: String,
         mode: Mode,
         userCreateAction: SirenAction?
-    ): Either<Unit, Int> {
+    ): Either<ApiException, Int> {
         if (users.containsKey(UserCredentials(username, password))) throw UnexpectedResponseException()
         val id = users.size + 1
         users[UserCredentials(username, password)] = id
@@ -37,7 +34,7 @@ class FakeUserDataServices : UserDataServices {
         password: String,
         mode: Mode,
         createTokenAction: SirenAction?
-    ): Either<Unit, String> {
+    ): Either<ApiException, String?> {
         return Either.Right(users[UserCredentials(username, password)]?.let { tokens[it] }
             ?: throw UnexpectedResponseException()
         )

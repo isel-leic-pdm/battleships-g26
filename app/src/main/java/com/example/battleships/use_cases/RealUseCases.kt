@@ -1,7 +1,6 @@
 package com.example.battleships.use_cases
 
 import com.example.battleships.game.domain.game.Game
-import com.example.battleships.info.ServerInfo
 import com.example.battleships.rankings.GameRanking
 import com.example.battleships.services.*
 import com.example.battleships.services.real.RealGamesDataServices
@@ -11,7 +10,6 @@ import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
-import java.io.IOException
 
 // TODO -> optimize how the links and actions are obtained
 class RealUseCases(
@@ -24,17 +22,17 @@ class RealUseCases(
         val userId = userServices.createUser(username, password, mode)
         return getValueOrExecute(userId) {
             val userCreateAction = homeServices.getCreateUserAction()
-            val userId = userServices.createUser(username, password, mode, userCreateAction)
-            return@getValueOrExecute getValueOrThrow(userId)
+            val resUserId = userServices.createUser(username, password, mode, userCreateAction)
+            return@getValueOrExecute getValueOrThrow(resUserId)
         }
     }
 
-    override suspend fun createToken(username: String, password: String, mode: Mode): String? {
+    override suspend fun createToken(username: String, password: String, mode: Mode): String {
         val token = userServices.getToken(username, password, mode)
         return getValueOrExecute(token) {
             val createTokenAction = homeServices.getCreateTokenAction()
-            val token = userServices.getToken(username, password, mode, createTokenAction)
-            return@getValueOrExecute getValueOrThrow(token)
+            val resToken = userServices.getToken(username, password, mode, createTokenAction)
+            return@getValueOrExecute getValueOrThrow(resToken)
         }
     }
 
@@ -57,8 +55,8 @@ class RealUseCases(
         return getValueOrExecute(gameId) {
             val userHomeLink = homeServices.getUserHomeLink()
             val getCurrentGameIdLink = userServices.getCurrentGameIdLink(token, userHomeLink)
-            val gameId = gameServices.getCurrentGameId(token, getCurrentGameIdLink, mode)
-            return@getValueOrExecute getValueOrThrow(gameId)
+            val resGameId = gameServices.getCurrentGameId(token, getCurrentGameIdLink, mode)
+            return@getValueOrExecute getValueOrThrow(resGameId)
         }
     }
 
@@ -67,8 +65,8 @@ class RealUseCases(
         return getValueOrExecute(game) {
             val userHomeLink = homeServices.getUserHomeLink()
             val getCurrentGameIdLink = userServices.getCurrentGameIdLink(token, userHomeLink)
-            val game = gameServices.getGame(token, getCurrentGameIdLink, mode)
-            return@getValueOrExecute getValueOrThrow(game)
+            val resGame = gameServices.getGame(token, getCurrentGameIdLink, mode)
+            return@getValueOrExecute getValueOrThrow(resGame)
         }
     }
 
@@ -87,8 +85,8 @@ class RealUseCases(
             val getCurrentGameIdLink = userServices.getCurrentGameIdLink(token, userHomeLink)
             val getGameLink = gameServices.getGameLink(token, getCurrentGameIdLink)
             val placeShipsAction = gameServices.getSetFleetAction(token, getGameLink)
-            val result = gameServices.setFleet(token, ships, placeShipsAction, mode)
-            return@getValueOrExecute getValueOrThrow(result)
+            val res = gameServices.setFleet(token, ships, placeShipsAction, mode)
+            return@getValueOrExecute getValueOrThrow(res)
         }
     }
 
@@ -99,8 +97,8 @@ class RealUseCases(
             val getCurrentGameIdLink = userServices.getCurrentGameIdLink(token, userHomeLink)
             val getGameLink = gameServices.getGameLink(token, getCurrentGameIdLink)
             val placeShotAction = gameServices.getPlaceShotAction(token, getGameLink)
-            val result = gameServices.placeShot(token, coordinate, placeShotAction, mode)
-            return@getValueOrExecute getValueOrThrow(result)
+            val res = gameServices.placeShot(token, coordinate, placeShotAction, mode)
+            return@getValueOrExecute getValueOrThrow(res)
         }
     }
 
@@ -109,13 +107,13 @@ class RealUseCases(
         homeServices.getServerInfo(mode)
 
 
-    private suspend fun <T> getValueOrExecute(either: Either<Unit, T>, onEitherLeft: suspend () -> T): T {
+    private suspend fun <T> getValueOrExecute(either: Either<ApiException, T>, onEitherLeft: suspend () -> T): T {
         return when (either) {
             is Either.Left -> onEitherLeft()
             is Either.Right -> either.value
         }
     }
 
-    private fun <T> getValueOrThrow(either: Either<Unit, T>): T =
-        getValueOrThrow(either, IOException())
+    private fun <T> getValueOrThrow(either: Either<ApiException, T>): T =
+        getOrThrowValue(either)
 }
