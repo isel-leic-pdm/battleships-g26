@@ -21,7 +21,7 @@ internal class PlaceShipOutputModel(val ships : List<ShipOutputModel>) :OutputMo
 internal data class ConfigurationOutputModel(
     val boardSize: Int,
     val fleet: Map<ShipType, Int>,
-    val nShotsPerRound: Int,
+    val shots: Long,
     val roundTimeout: Long
 ) : OutputModel {
     companion object{

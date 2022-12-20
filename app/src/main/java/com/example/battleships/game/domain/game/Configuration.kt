@@ -7,7 +7,7 @@ import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 data class Configuration(
     val boardSize: Int,
     val fleet: Map<ShipType, Int>, // List<Ship:Occupation>
-    val shots: Int,
+    val shots: Long,
     val roundTimeout: Long
 ) {
     fun isShipValid(shipType: ShipType) = fleet[shipType]  != null

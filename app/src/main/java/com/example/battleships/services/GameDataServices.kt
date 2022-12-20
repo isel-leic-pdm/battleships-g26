@@ -24,7 +24,7 @@ interface GameDataServices {
                                    SUBMARINE to 3,
                                    DESTROYER to 2,
                                ),
-                               1,10
+                               1L,10
                            )
     ): Either<ApiException, Boolean>
 
