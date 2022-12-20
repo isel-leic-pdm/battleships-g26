@@ -29,7 +29,7 @@ internal data class ConfigurationOutputModel(
             ConfigurationOutputModel(
                 configuration.boardSize,
                 configuration.fleet.toMap(),
-                configuration.nShotsPerRound,
+                configuration.shots,
                 configuration.roundTimeout
             )
     }

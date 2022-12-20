@@ -1,5 +1,6 @@
 package com.example.battleships.use_cases
 
+import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.rankings.GameRanking
 import com.example.battleships.services.*

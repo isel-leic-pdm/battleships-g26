@@ -120,6 +120,10 @@ private fun PlayScreen(
 
 @Composable
 private fun InitScreen(activity: GameActivity) {
+    Button(onClick = { /*TODO*/ }) {
+        Text("Quick Game")
+    }
+
     Button(onClick = { activity.vm.startGame() }) {
         Text("Start New Game")
     }

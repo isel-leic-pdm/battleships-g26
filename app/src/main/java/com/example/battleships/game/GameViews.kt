@@ -236,14 +236,14 @@ private fun ShipOptionView(configuration: Configuration, onShipClick: ((ShipType
     ){
         configuration.fleet.forEach { ship ->
             Text(
-                AnnotatedString(ship.first.name),
+                AnnotatedString(ship.key.name),
                 style = TextStyle(
                     fontSize = 26.sp,
                     color = Color.White
                 )
             )
             Spacer(modifier = Modifier.size(10.dp))
-            ShipOptionView(configuration, ship.first) { if (onShipClick != null) onShipClick(ship.first) }
+            ShipOptionView(configuration, ship.key) { if (onShipClick != null) onShipClick(ship.key) }
         }
     }
 }

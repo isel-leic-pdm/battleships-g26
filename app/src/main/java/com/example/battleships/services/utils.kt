@@ -17,7 +17,7 @@ import kotlin.reflect.typeOf
 
 sealed class RequestMethod(val url: URL)
 class Get(url: URL) : RequestMethod(url)
-class Post(url: URL, val body: String) : RequestMethod(url)
+class Post(url: URL, val body: String?) : RequestMethod(url)
 class Put(url: URL, val body: String) : RequestMethod(url)
 class Delete(url: URL) : RequestMethod(url)
 
@@ -42,7 +42,7 @@ internal fun buildRequest(requestMethod: RequestMethod, token: String? = null, m
             is Put -> "PUT"
             is Delete -> "DELETE"
         }, body = when (requestMethod) {
-            is Post -> requestMethod.body.toRequestBody()
+            is Post -> requestMethod.body?.toRequestBody()
             is Put -> requestMethod.body.toRequestBody()
             else -> null
         }

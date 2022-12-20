@@ -19,20 +19,19 @@ import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 const val GAME_ID = 333
 const val PLAYER1_ID = 1
 const val PLAYER2_ID = 2
-const val TIMEOUT = 10000L
 
 class FakeGameDataServices : GameDataServices {
     private val configuration = Configuration(
         boardSize = 10,
-        fleet = setOf(
+        fleet = mapOf(
             Pair(ShipType.CARRIER, 5),
             Pair(ShipType.BATTLESHIP, 4),
             Pair(ShipType.CRUISER, 3),
             Pair(ShipType.SUBMARINE, 3),
             Pair(ShipType.DESTROYER, 2)
         ),
-        nShotsPerRound = 10,
-        roundTimeout = TIMEOUT
+        shots = 10,
+        roundTimeout = 10
     )
 
     var game: Game? = null
@@ -42,13 +41,13 @@ class FakeGameDataServices : GameDataServices {
         token: String,
         mode: Mode,
         CreateGameAction: SirenAction?,
-        configuration: Configuration
+        configuration: Configuration?
     ): Either<ApiException, Boolean> {
         val newGame = Game.newGame(
             GAME_ID,
             PLAYER1_ID,
             PLAYER2_ID,
-            configuration
+            configuration!!
         )
         game = setEnemyShipLayout(newGame)
         return Either.Right(true)
@@ -56,9 +55,9 @@ class FakeGameDataServices : GameDataServices {
 
     private fun setEnemyShipLayout(game: Game): Game {
         var newGame = game
-        val ships = game.configuration.fleet
+        val ships = game.configuration.fleet.entries
         ships.forEachIndexed { idx, ship ->
-            val shipType = ship.first
+            val shipType = ship.key
             val shipOrientation = Orientation.HORIZONTAL
             val shipPosition = Coordinate((idx+1) * 2, 1)
             newGame = newGame.placeShip(shipType, shipPosition, shipOrientation, Player.TWO)

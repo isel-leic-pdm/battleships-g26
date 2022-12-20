@@ -72,6 +72,6 @@ class FakeUseCases(
         TODO("Not yet implemented")
     }
 
-    private fun <T> getValueOrThrow(either: Either<Unit, T>): T =
-        getValueOrThrow(either, Exception("Should not have been Either.Left on FakeDataServices"))
+    private fun <T> getValueOrThrow(either: Either<ApiException, T?>): T =
+        getValueOrThrow(either)
 }

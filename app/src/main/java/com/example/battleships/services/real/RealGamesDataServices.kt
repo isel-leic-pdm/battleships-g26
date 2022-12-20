@@ -36,15 +36,14 @@ class RealGamesDataServices(
         token: String,
         mode: Mode,
         CreateGameAction: SirenAction?,
-        configuration: Configuration
+        configuration: Configuration?
     ): Either<ApiException, Boolean> {
         val createGameAction = CreateGameAction?.also { createGameAction = it }
             ?: this.createGameAction ?: return Either.Left(UnresolvedActionException())
 
         val url = createGameAction.href.toApiURL()
-        val requestBody = ConfigurationOutputModel.transform(
-            configuration
-        ).toJson(jsonEncoder)
+        val requestBody = if(configuration == null) null
+            else ConfigurationOutputModel.transform(configuration).toJson(jsonEncoder)
         val request = buildRequest(Post(url, requestBody), token, mode)
 
         val gameCreatedDto = request.send(httpClient) { response ->
