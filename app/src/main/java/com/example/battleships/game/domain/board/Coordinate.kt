@@ -1,4 +1,4 @@
-package pt.isel.daw.dawbattleshipgame.domain.board
+package com.example.battleships.game.domain.board
 
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 

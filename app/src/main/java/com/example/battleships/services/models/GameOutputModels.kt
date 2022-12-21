@@ -1,9 +1,7 @@
 package com.example.battleships.services.models
 
 import com.example.battleships.game.domain.game.Configuration
-import com.google.gson.Gson
-import org.jetbrains.annotations.TestOnly
-import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
+import com.example.battleships.game.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 

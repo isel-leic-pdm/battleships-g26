@@ -2,12 +2,13 @@ package com.example.battleships.use_cases
 
 import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.Game
+import com.example.battleships.game.domain.game.Shots
 import com.example.battleships.rankings.GameRanking
 import com.example.battleships.services.*
 import com.example.battleships.services.real.RealGamesDataServices
 import com.example.battleships.services.real.RealHomeDataServices
 import com.example.battleships.services.real.RealUserDataServices
-import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
+import com.example.battleships.game.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
@@ -91,14 +92,14 @@ class RealUseCases(
         }
     }
 
-    override suspend fun placeShot(token: String, coordinate: Coordinate, mode: Mode): Boolean {
-        val result = gameServices.placeShot(token, coordinate, null, mode)
+    override suspend fun placeShots(token: String, shots: Shots, mode: Mode): Boolean {
+        val result = gameServices.placeShots(token, shots, null, mode)
         return getValueOrExecute(result) {
             val userHomeLink = homeServices.getUserHomeLink()
             val getCurrentGameIdLink = userServices.getCurrentGameIdLink(token, userHomeLink)
             val getGameLink = gameServices.getGameLink(token, getCurrentGameIdLink)
             val placeShotAction = gameServices.getPlaceShotAction(token, getGameLink)
-            val res = gameServices.placeShot(token, coordinate, placeShotAction, mode)
+            val res = gameServices.placeShots(token, shots, placeShotAction, mode)
             return@getValueOrExecute getValueOrThrow(res)
         }
     }

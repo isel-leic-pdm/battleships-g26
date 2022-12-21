@@ -20,9 +20,10 @@ import androidx.compose.ui.unit.sp
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.game.domain.game.GameState
 import pt.isel.daw.dawbattleshipgame.domain.board.Board
-import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
+import com.example.battleships.game.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.board.Panel
 import com.example.battleships.game.domain.game.Configuration
+import com.example.battleships.game.domain.game.Shots
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 

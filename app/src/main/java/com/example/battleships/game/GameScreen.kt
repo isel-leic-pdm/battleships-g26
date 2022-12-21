@@ -1,35 +1,23 @@
 package com.example.battleships.game
 
-import android.content.Context
-import android.util.AttributeSet
 import android.util.Log
-import android.widget.NumberPicker
-import android.widget.Toast
-import androidx.annotation.FloatRange
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.ClearAll
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import com.example.battleships.game.domain.game.*
 import com.example.battleships.game.domain.ship.getOrientation
 import com.example.battleships.ui.NavigationHandlers
@@ -39,7 +27,7 @@ import com.example.battleships.utils.ErrorAlert
 import com.example.battleships.utils.SCREEN_HEIGHT
 import com.example.battleships.utils.getWith
 import pt.isel.battleships.R
-import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
+import com.example.battleships.game.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
@@ -100,7 +88,10 @@ private fun PlayScreen(
     var selected: Selection? = null
     val game = gameState.gameResultInternal.game
     val player = gameState.gameResultInternal.player
-
+    val configuration = gameState.gameResultInternal.game.configuration
+    val shots = remember {
+        mutableStateOf(Shots(emptyList()))
+    }
     GameView(
         game = game,
         player = player,
@@ -112,15 +103,15 @@ private fun PlayScreen(
                 ?: return@GameView
         },
         onShotPlaced = {
-            val playerId =
-                if (player == Player.ONE) game.player1 else game.player2
-            game.placeShot(playerId, it, player)
-                ?: return@GameView // TODO -> shouldn't require playerId
-            activity.vm.placeShot(it)
+            val playerId = if (player == Player.ONE) game.player1 else game.player2
+            game.placeShot(playerId, it, player) ?: return@GameView
+            shots.value = Shots(shots.value.shots.toMutableList().plus(it))
+            if(shots.value.shots.size == configuration.shots.toInt()){
+                activity.vm.placeShots(shots.value)
+            }
         },
         onConfirmLayout = {
-            game.confirmFleet(player)
-                ?: return@GameView // checks if its possible to confirm the current fleet state
+            game.confirmFleet(player) ?: return@GameView
             game.getBoard(player).getShips().map { ship ->
                 Triple(
                     ship.type,
@@ -301,7 +292,10 @@ private fun ConfigShipView(fleet: MutableState<Map<ShipType, Pair<Int, Boolean>>
                     Color.Gray else Color.Red
 
                 repeat(shipLength) {
-                    Box(Modifier.size(PLAY_SIDE).background(shipColor))
+                    Box(
+                        Modifier
+                            .size(PLAY_SIDE)
+                            .background(shipColor))
                     Spacer(Modifier.size(GRID_WIDTH))
                 }
                 Spacer(Modifier.size(GRID_WIDTH))
@@ -378,7 +372,7 @@ private fun onSquarePressed(
     curGame: Game,
     player: Player,
     activity: GameActivity,
-    coordinate: Coordinate
+    coordinate: Coordinate,
 ): Selection? {
     if (selected == null /*&& curGame.isShip(coordinate)*/) {
         return Square(coordinate)

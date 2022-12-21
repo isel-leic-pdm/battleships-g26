@@ -2,13 +2,13 @@ package com.example.battleships.services
 
 import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.Game
+import com.example.battleships.game.domain.game.Shots
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenLink
-import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
+import com.example.battleships.game.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
-import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType.*
 
 /**
  * This interface is responsible for providing the options that interact with the game.
@@ -32,7 +32,7 @@ interface GameDataServices {
         mode: Mode
     ): Either<ApiException, Boolean>
 
-    suspend fun placeShot(token: String, coordinate: Coordinate, PlaceShotAction: SirenAction? = null, mode: Mode): Either<ApiException, Boolean>
+    suspend fun placeShots(token: String, shots: Shots, PlaceShotAction: SirenAction? = null, mode: Mode): Either<ApiException, Boolean>
 
     /**
      * This function is responsible for getting the game state.

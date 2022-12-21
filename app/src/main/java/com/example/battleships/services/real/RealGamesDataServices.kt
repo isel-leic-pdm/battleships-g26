@@ -3,6 +3,7 @@ package com.example.battleships.services.real
 import com.example.battleships.dtos.*
 import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.Game
+import com.example.battleships.game.domain.game.Shots
 import com.example.battleships.services.*
 import com.example.battleships.services.models.ConfigurationOutputModel
 import com.example.battleships.services.models.PlaceShipOutputModel
@@ -11,8 +12,7 @@ import com.example.battleships.utils.hypermedia.*
 import com.example.battleships.utils.send
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
-import org.jetbrains.annotations.TestOnly
-import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
+import com.example.battleships.game.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
@@ -42,7 +42,7 @@ class RealGamesDataServices(
             ?: this.createGameAction ?: return Either.Left(UnresolvedActionException())
 
         val url = createGameAction.href.toApiURL()
-        val requestBody = if(configuration == null) null
+        val requestBody = if(configuration == null) ""
             else ConfigurationOutputModel.transform(configuration).toJson(jsonEncoder)
         val request = buildRequest(Post(url, requestBody), token, mode)
 
@@ -87,16 +87,16 @@ class RealGamesDataServices(
         return Either.Right(true)
     }
 
-    override suspend fun placeShot(
+    override suspend fun placeShots(
         token: String,
-        coordinate: Coordinate,
+        shots: Shots,
         PlaceShotAction: SirenAction?,
         mode: Mode
     ): Either<ApiException, Boolean> {
         val placeShotAction = PlaceShotAction?.also { placeShotAction = it }
             ?: this.placeShotAction ?: return Either.Left(UnresolvedActionException())
         val placeShotUrl = placeShotAction.href.toApiURL()
-        val body = jsonEncoder.toJson(coordinate)
+        val body = jsonEncoder.toJson(shots)
         val request = buildRequest(Post(placeShotUrl, body), token, mode)
 
         request.send(httpClient) { response ->

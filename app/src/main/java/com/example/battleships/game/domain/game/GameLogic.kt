@@ -3,9 +3,9 @@ package com.example.battleships.game.domain.game
 import com.example.battleships.game.domain.ship.getOrientation
 import com.example.battleships.game.domain.ship.getShip
 import pt.isel.daw.dawbattleshipgame.domain.board.Board
-import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
-import pt.isel.daw.dawbattleshipgame.domain.board.CoordinateSet
-import pt.isel.daw.dawbattleshipgame.domain.board.moveFromTo
+import com.example.battleships.game.domain.board.Coordinate
+import com.example.battleships.game.domain.board.CoordinateSet
+import com.example.battleships.game.domain.board.moveFromTo
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
@@ -15,10 +15,10 @@ import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
  * @return updated Game or null, if is not possible to position [shipType] in [position]
  */
 fun Game.placeShip(
-        shipType: ShipType,
-        position: Coordinate,
-        orientation: Orientation,
-        player: Player = Player.ONE
+    shipType: ShipType,
+    position: Coordinate,
+    orientation: Orientation,
+    player: Player = Player.ONE
 ): Game? {
     if (isShipPlaced(shipType, player)) return null
     return try {
@@ -37,9 +37,9 @@ fun Game.placeShip(
  * Tries to place a ship, giving its coordinates and its type
  */
 private fun Game.placeShip(
-        shipType: ShipType,
-        coordinates: CoordinateSet,
-        player: Player = Player.ONE
+    shipType: ShipType,
+    coordinates: CoordinateSet,
+    player: Player = Player.ONE
 ): Game? {
     return try {
         if (!this.configuration.isShipValid(shipType)) throw Exception("Invalid ship type")
@@ -54,9 +54,9 @@ private fun Game.placeShip(
  * Generates a new Warmup Board with a moved ship
  */
 fun Game.moveShip(
-        position: Coordinate,
-        destination: Coordinate,
-        player: Player = Player.ONE,
+    position: Coordinate,
+    destination: Coordinate,
+    player: Player = Player.ONE,
 ): Game? {
     return try {
         val ship = getBoard(player).getShips().getShip(position)
@@ -133,14 +133,24 @@ fun Game.placeShot(userId: Int, shot: Coordinate, player: Player): Game? {
     }
 }
 
+fun Game.placeShots(userId: Int, shots: List<Coordinate>, player: Player) : Game? {
+    var game : Game? = this
+    shots.forEach {
+        game = placeShot(userId, it, player) ?: return null
+    }
+    return game
+}
+
+
+
 /** ------------------------------------------ Auxiliary functions ---------------------------------------**/
 
 /**
  * @returns List of Coordinates with positions to build a ship or null if impossible
  */
 private fun Game.generateShipCoordinates(
-        ship: ShipType, position: Coordinate,
-        orientation: Orientation, player: Player
+    ship: ShipType, position: Coordinate,
+    orientation: Orientation, player: Player
 ): CoordinateSet? {
     if (getBoard(player).isShip(position)) return null
 

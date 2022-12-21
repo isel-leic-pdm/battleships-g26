@@ -1,5 +1,6 @@
 package pt.isel.daw.dawbattleshipgame.domain.board
 
+import com.example.battleships.game.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 
 

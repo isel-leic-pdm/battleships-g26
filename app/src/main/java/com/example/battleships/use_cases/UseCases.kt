@@ -2,10 +2,11 @@ package com.example.battleships.use_cases
 
 import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.Game
+import com.example.battleships.game.domain.game.Shots
 import com.example.battleships.info.ServerInfo
 import com.example.battleships.rankings.GameRanking
 import com.example.battleships.services.Mode
-import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
+import com.example.battleships.game.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
@@ -29,7 +30,7 @@ interface UseCases{
         mode: Mode = Mode.AUTO
     ): Boolean
 
-    suspend fun placeShot(token: String, coordinate: Coordinate, mode: Mode = Mode.AUTO): Boolean
+    suspend fun placeShots(token: String, shots: Shots, mode: Mode = Mode.AUTO): Boolean
 
     suspend fun fetchServerInfo(mode : Mode = Mode.AUTO) : ServerInfo
 }

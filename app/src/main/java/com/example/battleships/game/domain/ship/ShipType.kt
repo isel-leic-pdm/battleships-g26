@@ -1,6 +1,6 @@
 package pt.isel.daw.dawbattleshipgame.domain.ship
 
-import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
+import com.example.battleships.game.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.board.Panel
 
 enum class ShipType(private val icon: Char) {

@@ -12,7 +12,8 @@ import com.example.battleships.game.domain.game.GameState
 import com.example.battleships.use_cases.UseCases
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
+import com.example.battleships.game.domain.board.Coordinate
+import com.example.battleships.game.domain.game.Shots
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
@@ -133,12 +134,12 @@ class GameViewModel(
         }
     }
 
-    fun placeShot(coordinate: Coordinate) {
+    fun placeShots(shots: Shots) {
         val game = game.getOrNull() as? Started ?: return
         if (game.gameResultInternal.game.state != GameState.BATTLE) return
         viewModelScope.launch {
             try {
-                val res = useCases.placeShot(token, coordinate)
+                val res = useCases.placeShots(token, shots)
                 if (res) {
                     keepOnFetchingGameUntil { !isWaitingForOpponent() }
                 }

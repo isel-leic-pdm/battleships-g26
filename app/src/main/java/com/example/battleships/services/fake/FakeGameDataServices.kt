@@ -10,7 +10,7 @@ import com.example.battleships.services.Mode
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenLink
 import kotlinx.coroutines.delay
-import pt.isel.daw.dawbattleshipgame.domain.board.Coordinate
+import com.example.battleships.game.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.game.*
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
@@ -88,14 +88,14 @@ class FakeGameDataServices : GameDataServices {
         return Either.Right(true)
     }
 
-    override suspend fun placeShot(
+    override suspend fun placeShots(
         token: String,
-        coordinate: Coordinate,
+        shots: Shots,
         PlaceShotAction: SirenAction?,
         mode: Mode
     ): Either<ApiException, Boolean> {
         val game = game ?: return Either.Right(false)
-        val newGame = game.placeShot(game.player1, coordinate, Player.ONE) ?: return Either.Right(false)
+        val newGame = game.placeShots(game.player1, shots.shots, Player.ONE) ?: return Either.Right(false)
         this.game = newGame
         if (newGame.state == GameState.FINISHED) return Either.Right(true)
         delay(100)
