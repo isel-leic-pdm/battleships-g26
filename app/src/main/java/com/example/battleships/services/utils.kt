@@ -12,6 +12,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.jetbrains.annotations.TestOnly
 import java.lang.reflect.Type
 import java.net.URL
+import java.util.logging.Logger
 import kotlin.reflect.javaType
 import kotlin.reflect.typeOf
 
@@ -75,6 +76,7 @@ internal fun <T> handleResponse(jsonEncoder: Gson, response: Response, type: Typ
         try {
             jsonEncoder.fromJson<T>(body, type)
         } catch (e: JsonSyntaxException) {
+            Log.e("JsonSyntaxException", e.toString())
             throw UnexpectedResponseException(response, body, "Error parsing JSON")
         }
     }

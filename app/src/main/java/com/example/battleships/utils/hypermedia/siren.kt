@@ -56,6 +56,14 @@ data class SirenAction(
         val value: String? = null,
         val title: String? = null
     )
+
+    /*
+    class ObjectFieldModel(
+        override val name: String,
+        override val type: String,
+        val items: List<Field>,
+    ) : Field(name, type)
+     */
 }
 
 data class SirenEntity<T>(

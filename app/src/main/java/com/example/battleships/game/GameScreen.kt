@@ -75,6 +75,30 @@ internal fun GameScreen(
 }
 
 @Composable
+private fun InitScreen(activity: GameActivity) {
+    Button(onClick = { /*TODO*/ }) {
+        Text("Quick Game")
+    }
+
+    Button(onClick = { activity.vm.startGame() }) {
+        Text("Start New Game")
+    }
+    Button(onClick = { activity.vm.restoreGame() }) {
+        Text("Restore Previous Game")
+    }
+}
+
+@Composable
+private fun CreatingGame() {
+    Text("Creating Game...")
+}
+
+@Composable
+private fun Matchmaking() {
+    Text("Matchmaking...")
+}
+
+@Composable
 private fun PlayScreen(
     activity: GameActivity,
     gameState: GameViewModel.Started
@@ -116,30 +140,6 @@ private fun PlayScreen(
             }
         }
     )
-}
-
-@Composable
-private fun InitScreen(activity: GameActivity) {
-    Button(onClick = { /*TODO*/ }) {
-        Text("Quick Game")
-    }
-
-    Button(onClick = { activity.vm.startGame() }) {
-        Text("Start New Game")
-    }
-    Button(onClick = { activity.vm.restoreGame() }) {
-        Text("Restore Previous Game")
-    }
-}
-
-@Composable
-private fun CreatingGame() {
-    Text("Creating Game...")
-}
-
-@Composable
-private fun Matchmaking() {
-    Text("Matchmaking...")
 }
 
 /**

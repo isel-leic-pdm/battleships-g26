@@ -1,0 +1,8 @@
+- Download Vysor to connect real device to android studio, and make final presentation (record video);
+
+- O ecrã para apresentação do ranking global contém a lista dos jogadores e das respectivas pontuações
+acumuladas. Cada item da lista contém os elementos necessários à identificação do jogador, da sua posição
+no ranking e da sua pontuação acumulada. Este ecrã admite a pesquisa de jogadores dado o seu nome e
+inclui um atalho para navegação imediata para a posição ocupada pelo jogador actual no ranking.
+
+- Use resources (values) to store strings, in at least 2 languages (pt and en);
