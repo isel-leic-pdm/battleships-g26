@@ -5,7 +5,7 @@ import com.example.battleships.game.domain.game.Game
 import com.example.battleships.game.domain.game.GameState
 import com.example.battleships.game.domain.game.Instants
 import com.example.battleships.utils.hypermedia.SirenEntity
-import pt.isel.daw.dawbattleshipgame.domain.board.Board
+import com.example.battleships.game.domain.board.Board
 import com.example.battleships.game.domain.game.Configuration
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 

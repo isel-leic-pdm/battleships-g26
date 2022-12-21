@@ -90,7 +90,7 @@ class FakeGameDataServices : GameDataServices {
 
     override suspend fun placeShots(
         token: String,
-        shots: Shots,
+        shots: ShotsList,
         PlaceShotAction: SirenAction?,
         mode: Mode
     ): Either<ApiException, Boolean> {

@@ -2,7 +2,7 @@ package com.example.battleships.game.domain.game
 
 import com.example.battleships.game.domain.ship.getOrientation
 import com.example.battleships.game.domain.ship.getShip
-import pt.isel.daw.dawbattleshipgame.domain.board.Board
+import com.example.battleships.game.domain.board.Board
 import com.example.battleships.game.domain.board.Coordinate
 import com.example.battleships.game.domain.board.CoordinateSet
 import com.example.battleships.game.domain.board.moveFromTo

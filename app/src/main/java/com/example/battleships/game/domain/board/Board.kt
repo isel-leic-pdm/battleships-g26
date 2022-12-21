@@ -1,9 +1,7 @@
-package pt.isel.daw.dawbattleshipgame.domain.board
+package com.example.battleships.game.domain.board
 
-import com.example.battleships.game.domain.board.Coordinate
-import com.example.battleships.game.domain.board.CoordinateSet
-import com.example.battleships.game.domain.board.Coordinates
 import com.example.battleships.game.domain.ship.Ship
+import pt.isel.daw.dawbattleshipgame.domain.board.Panel
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 import pt.isel.daw.dawbattleshipgame.domain.ship.getPanel

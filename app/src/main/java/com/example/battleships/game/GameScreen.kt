@@ -88,10 +88,6 @@ private fun PlayScreen(
     var selected: Selection? = null
     val game = gameState.gameResultInternal.game
     val player = gameState.gameResultInternal.player
-    val configuration = gameState.gameResultInternal.game.configuration
-    val shots = remember {
-        mutableStateOf(Shots(emptyList()))
-    }
     GameView(
         game = game,
         player = player,
@@ -102,13 +98,10 @@ private fun PlayScreen(
             selected = onSquarePressed(selected, game, player, activity, it)
                 ?: return@GameView
         },
-        onShotPlaced = {
+        onShotsPlaced = {
             val playerId = if (player == Player.ONE) game.player1 else game.player2
-            game.placeShot(playerId, it, player) ?: return@GameView
-            shots.value = Shots(shots.value.shots.toMutableList().plus(it))
-            if(shots.value.shots.size == configuration.shots.toInt()){
-                activity.vm.placeShots(shots.value)
-            }
+            game.placeShots(playerId, it.shots, player) ?: return@GameView
+            activity.vm.placeShots(it)
         },
         onConfirmLayout = {
             game.confirmFleet(player) ?: return@GameView

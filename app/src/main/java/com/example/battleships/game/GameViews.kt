@@ -2,10 +2,7 @@ package com.example.battleships.game
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,11 +16,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.game.domain.game.GameState
-import pt.isel.daw.dawbattleshipgame.domain.board.Board
+import com.example.battleships.game.domain.board.Board
 import com.example.battleships.game.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.board.Panel
 import com.example.battleships.game.domain.game.Configuration
-import com.example.battleships.game.domain.game.Shots
+import com.example.battleships.game.domain.game.ShotsList
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 
@@ -45,7 +42,7 @@ fun GameView(
     player: Player,
     onShipClick: (ShipType) -> Unit,
     onSquarePressed: (Coordinate) -> Unit,
-    onShotPlaced: (Coordinate) -> Unit,
+    onShotsPlaced: (ShotsList) -> Unit,
     onConfirmLayout: () -> Unit
 ) {
     Column(Modifier.fillMaxWidth()) {
@@ -65,7 +62,7 @@ fun GameView(
             game.state === GameState.BATTLE -> {
                 val playerIdTurn = game.playerTurn ?: return
                 val playerTurn = game.getPlayerFromId(playerIdTurn)
-                Battle(player, playerTurn, game.board1, game.board2, onShotPlaced)
+                Battle(player, playerTurn, game.configuration, game.board1, game.board2, onShotsPlaced)
             }
             game.state === GameState.FINISHED -> {
                 val winnerId = game.winner ?: return
@@ -117,13 +114,23 @@ private fun WaitingForOpponentToConfirm(board: Board) {
 private fun Battle(
     player: Player,
     turn: Player,
+    configuration: Configuration,
     player1Board: Board,
     player2Board: Board,
-    onShot: (Coordinate) -> Unit
+    onShot: (ShotsList) -> Unit,
 ) {
+    val shots = remember {
+        mutableStateOf(ShotsList(emptyList()))
+    }
+    fun onCoordinateClick(c : Coordinate) {
+        if(shots.value.shots.size >= configuration.shots.toInt()){
+            shots.value = ShotsList(shots.value.shots.toMutableList().plus(c))
+        }
+    }
+
     val displayedBoard = remember { mutableStateOf(player.other())}
-    val clickAction = remember { mutableStateOf<((Coordinate) -> Unit)?>(onShot) }
-    clickAction.value = if (turn === player && displayedBoard.value === player.other()) onShot else null
+    val clickAction = remember { mutableStateOf<((Coordinate) -> Unit)?>(::onCoordinateClick) }
+    clickAction.value = if (turn === player && displayedBoard.value === player.other()) ::onCoordinateClick else null
     Column(
         Modifier
             .fillMaxWidth()
@@ -140,12 +147,19 @@ private fun Battle(
             modifier = Modifier.padding(16.dp)
         )
         BoardView(
-            if (displayedBoard.value === Player.ONE) player1Board else player2Board,
+            if (displayedBoard.value === Player.ONE) player1Board else
+            player2Board //set default board
+        ){
             clickAction.value
-        )
+        }
+
+        OutlinedButton(onClick = { onShot(shots.value)}) {
+            Text("Place Shots")
+        }
+
         TextButton(onClick = {
             displayedBoard.value = displayedBoard.value.other()
-            clickAction.value = if (clickAction.value == null) onShot else null
+            clickAction.value = if (clickAction.value == null) ::onCoordinateClick else null
         }) {
             Text("Switch board")
         }
@@ -174,12 +188,14 @@ private fun BoardView(board: Board, onPanelClick: ((Coordinate) -> Unit)?) {
     ) {
         Box(
             modifier = Modifier
-                .background(Color.Black)
+                .background(MaterialTheme.colors.background)
                 .size(boardSide),
         ) {
             board.board.forEach { panel ->
                 ShipOptionView(panel.coordinate, panel) {
-                    onPanelClick?.invoke(panel.coordinate)
+                    if (onPanelClick != null) {
+                        onPanelClick(panel.coordinate)
+                    }
                 }
             }
         }
@@ -208,6 +224,34 @@ private fun ShipOptionView(coordinate: Coordinate, panel: Panel, onClick: (() ->
         )
     }
 }
+
+/**
+ * Displays a single panel
+ */
+@Composable
+private fun ShotOptionView(coordinate: Coordinate, panel: Panel, onClick: (() -> Unit)?) {
+    val color = if (panel.shipType != null) Color.Gray else Color.Blue
+    val m = Modifier
+        .size(PLAY_SIDE)
+        .offset(
+            (PLAY_SIDE + GRID_WIDTH) * (coordinate.column - 1),
+            (PLAY_SIDE + GRID_WIDTH) * (coordinate.row - 1)
+        )
+        .background(color)
+    Box(m.clickable {
+        if (onClick != null) {
+            onClick()
+        }
+    })
+    if (panel.isHit) {
+        Box(
+            modifier = m
+                .background(Color.Red)
+                .padding(5.dp)
+        )
+    }
+}
+
 
 @Composable
 internal fun ShipOptionView(configuration: Configuration, ship: ShipType, onClick: () -> Unit) {

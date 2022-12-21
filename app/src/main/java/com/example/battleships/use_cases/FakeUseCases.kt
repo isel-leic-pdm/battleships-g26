@@ -4,14 +4,13 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.Game
-import com.example.battleships.game.domain.game.Shots
+import com.example.battleships.game.domain.game.ShotsList
 import com.example.battleships.info.ServerInfo
 import com.example.battleships.rankings.GameRanking
 import com.example.battleships.services.*
 import com.example.battleships.services.fake.FakeGameDataServices
 import com.example.battleships.services.fake.FakeHomeDataServices
 import com.example.battleships.services.fake.FakeUserDataServices
-import com.example.battleships.game.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
@@ -58,14 +57,14 @@ class FakeUseCases(
 
     override suspend fun setFleet(
         token: String,
-        ships: List<Triple<ShipType, Coordinate, Orientation>>,
+        ships: List<Triple<ShipType, com.example.battleships.game.domain.board.Coordinate, Orientation>>,
         mode: Mode
     ): Boolean {
         val result = gameServices.setFleet(token, ships, mode = mode)
         return getValueOrThrow(result)
     }
 
-    override suspend fun placeShots(token: String, shots: Shots, mode: Mode): Boolean {
+    override suspend fun placeShots(token: String, shots: ShotsList, mode: Mode): Boolean {
         val result = gameServices.placeShots(token, shots, mode = mode)
         return getValueOrThrow(result)
     }

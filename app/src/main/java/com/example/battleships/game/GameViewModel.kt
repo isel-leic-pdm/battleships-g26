@@ -6,14 +6,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.battleships.game.domain.board.Coordinate
 import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.game.domain.game.GameState
 import com.example.battleships.use_cases.UseCases
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import com.example.battleships.game.domain.board.Coordinate
-import com.example.battleships.game.domain.game.Shots
+import com.example.battleships.game.domain.game.ShotsList
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
@@ -134,7 +134,7 @@ class GameViewModel(
         }
     }
 
-    fun placeShots(shots: Shots) {
+    fun placeShots(shots: ShotsList) {
         val game = game.getOrNull() as? Started ?: return
         if (game.gameResultInternal.game.state != GameState.BATTLE) return
         viewModelScope.launch {

@@ -3,7 +3,7 @@ package com.example.battleships.services.real
 import com.example.battleships.dtos.*
 import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.Game
-import com.example.battleships.game.domain.game.Shots
+import com.example.battleships.game.domain.game.ShotsList
 import com.example.battleships.services.*
 import com.example.battleships.services.models.ConfigurationOutputModel
 import com.example.battleships.services.models.PlaceShipOutputModel
@@ -12,7 +12,6 @@ import com.example.battleships.utils.hypermedia.*
 import com.example.battleships.utils.send
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
-import com.example.battleships.game.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
@@ -63,7 +62,7 @@ class RealGamesDataServices(
 
     override suspend fun setFleet(
         token: String,
-        ships: List<Triple<ShipType, Coordinate, Orientation>>,
+        ships: List<Triple<ShipType, com.example.battleships.game.domain.board.Coordinate, Orientation>>,
         newSetFleetAction: SirenAction?,
         mode: Mode
     ): Either<ApiException, Boolean> {
@@ -89,7 +88,7 @@ class RealGamesDataServices(
 
     override suspend fun placeShots(
         token: String,
-        shots: Shots,
+        shots: ShotsList,
         PlaceShotAction: SirenAction?,
         mode: Mode
     ): Either<ApiException, Boolean> {
