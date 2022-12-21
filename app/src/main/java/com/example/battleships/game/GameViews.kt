@@ -84,7 +84,7 @@ private fun PreparationPhase(
     onShipClick: ((ShipType) -> Unit),
     onConfirmLayout: (() -> Unit)
 ) {
-    BoardView(board, onPanelClick)
+    BoardView(board, onPanelClick = onPanelClick)
     Column (
         modifier = Modifier
             .fillMaxHeight()
@@ -106,7 +106,7 @@ private fun PreparationPhase(
 
 @Composable
 private fun WaitingForOpponentToConfirm(board: Board) {
-    BoardView(board, null)
+    BoardView(board, onPanelClick = null)
     Text("Waiting for opponent to confirm", fontSize = 40.sp)
 }
 
@@ -123,12 +123,12 @@ private fun Battle(
         mutableStateOf(ShotsList(emptyList()))
     }
     fun onCoordinateClick(c : Coordinate) {
-        if(shots.value.shots.size >= configuration.shots.toInt()){
+        if(shots.value.shots.size <= configuration.shots.toInt()){
             shots.value = ShotsList(shots.value.shots.toMutableList().plus(c))
         }
     }
 
-    val displayedBoard = remember { mutableStateOf(player.other())}
+    val displayedBoard = remember { mutableStateOf(player)}
     val clickAction = remember { mutableStateOf<((Coordinate) -> Unit)?>(::onCoordinateClick) }
     clickAction.value = if (turn === player && displayedBoard.value === player.other()) ::onCoordinateClick else null
     Column(
@@ -137,7 +137,7 @@ private fun Battle(
             .fillMaxSize()
     ) {
         Text(
-            text = "Turn: ${turn.name}",
+            text = "Turn: " + if(turn == player) "You" else "Opponent",
             fontSize = 40.sp,
             modifier = Modifier.padding(16.dp)
         )
@@ -146,16 +146,24 @@ private fun Battle(
             fontSize = 40.sp,
             modifier = Modifier.padding(16.dp)
         )
+        Text(text = "Shots left = ${(configuration.shots - shots.value.shots.size)}")
         BoardView(
-            if (displayedBoard.value === Player.ONE) player1Board else
-            player2Board //set default board
-        ){
+            if (displayedBoard.value === player){
+                when(player) {
+                    Player.ONE -> player1Board
+                    Player.TWO -> player2Board
+                }
+            }else when(player) {
+                Player.ONE -> player2Board
+                Player.TWO -> player1Board
+            },
+            viewShips = displayedBoard.value == player,
             clickAction.value
-        }
-
-        OutlinedButton(onClick = { onShot(shots.value)}) {
-            Text("Place Shots")
-        }
+        )
+        if(turn == player && displayedBoard.value != player)
+            OutlinedButton(onClick = { onShot(shots.value)}) {
+                Text("Place Shots")
+            }
 
         TextButton(onClick = {
             displayedBoard.value = displayedBoard.value.other()
@@ -175,7 +183,7 @@ private fun End(winner: Player) {
 }
 
 @Composable
-private fun BoardView(board: Board, onPanelClick: ((Coordinate) -> Unit)?) {
+private fun BoardView(board: Board, viewShips : Boolean = true, onPanelClick: ((Coordinate) -> Unit)?) {
     val gameSize = board.dimension
     val boardSide = PLAY_SIDE * gameSize + GRID_WIDTH * (gameSize - 1)
     Column(
@@ -192,7 +200,7 @@ private fun BoardView(board: Board, onPanelClick: ((Coordinate) -> Unit)?) {
                 .size(boardSide),
         ) {
             board.board.forEach { panel ->
-                ShipOptionView(panel.coordinate, panel) {
+                ShipOptionView(panel.coordinate, panel, viewShips) {
                     if (onPanelClick != null) {
                         onPanelClick(panel.coordinate)
                     }
@@ -206,50 +214,26 @@ private fun BoardView(board: Board, onPanelClick: ((Coordinate) -> Unit)?) {
  * Displays a single panel
  */
 @Composable
-private fun ShipOptionView(coordinate: Coordinate, panel: Panel, onClick: (() -> Unit)?) {
-    val color = if (panel.shipType != null) Color.Gray else Color.Blue
-    val m = Modifier
-        .size(PLAY_SIDE)
-        .offset(
-            (PLAY_SIDE + GRID_WIDTH) * (coordinate.column - 1),
-            (PLAY_SIDE + GRID_WIDTH) * (coordinate.row - 1)
-        )
-        .background(color)
-    Box(m.clickable { onClick?.invoke() })
-    if (panel.isHit) {
-        Box(
-            modifier = m
-                .background(Color.Red)
-                .padding(5.dp)
-        )
+private fun ShipOptionView(coordinate: Coordinate, panel: Panel, viewShips: Boolean, onClick: (() -> Unit)?) {
+    val color = when (panel.isHit) {
+            true -> {
+                if(panel.isShip())
+                    Color.Red
+                else Color.Black
+            }
+            false -> {
+                if(panel.isShip() && viewShips)
+                    Color.Gray
+                else Color.Blue
+            }
     }
-}
-
-/**
- * Displays a single panel
- */
-@Composable
-private fun ShotOptionView(coordinate: Coordinate, panel: Panel, onClick: (() -> Unit)?) {
-    val color = if (panel.shipType != null) Color.Gray else Color.Blue
-    val m = Modifier
+    Box(
+        Modifier
         .size(PLAY_SIDE)
-        .offset(
-            (PLAY_SIDE + GRID_WIDTH) * (coordinate.column - 1),
-            (PLAY_SIDE + GRID_WIDTH) * (coordinate.row - 1)
-        )
-        .background(color)
-    Box(m.clickable {
-        if (onClick != null) {
-            onClick()
-        }
-    })
-    if (panel.isHit) {
-        Box(
-            modifier = m
-                .background(Color.Red)
-                .padding(5.dp)
-        )
-    }
+        .offset((PLAY_SIDE + GRID_WIDTH) * (coordinate.column - 1),
+            (PLAY_SIDE + GRID_WIDTH) * (coordinate.row - 1))
+        .background(color).clickable { onClick?.invoke() }
+    )
 }
 
 
