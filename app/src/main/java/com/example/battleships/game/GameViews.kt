@@ -3,6 +3,7 @@ package com.example.battleships.game
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -92,9 +93,12 @@ private fun PreparationPhase(
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Box(modifier = Modifier.weight(1f)) {
+        Row(Modifier
+            .fillMaxWidth()
+        ) {
             ShipOptionView(configuration, onShipClick)
         }
+
         Button(modifier = Modifier.padding(top = 16.dp),
                 onClick = onConfirmLayout) {
                 Text("Confirm", fontSize = 30.sp)
@@ -120,7 +124,9 @@ private fun Battle(
     val clickAction = remember { mutableStateOf<((Coordinate) -> Unit)?>(onShot) }
     clickAction.value = if (turn === player && displayedBoard.value === player.other()) onShot else null
     Column(
-        Modifier.verticalScroll(rememberScrollState())
+        Modifier
+            .fillMaxWidth()
+            .fillMaxSize()
     ) {
         Text(
             text = "Turn: ${turn.name}",
@@ -159,7 +165,7 @@ private fun BoardView(board: Board, onPanelClick: ((Coordinate) -> Unit)?) {
     val boardSide = PLAY_SIDE * gameSize + GRID_WIDTH * (gameSize - 1)
     Column(
         modifier = Modifier
-            .background(Color.Black)
+            .background(MaterialTheme.colors.background)
             .fillMaxWidth()
             .height(boardSide),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -203,7 +209,7 @@ private fun ShipOptionView(coordinate: Coordinate, panel: Panel, onClick: (() ->
 }
 
 @Composable
-private fun ShipOptionView(configuration: Configuration, ship: ShipType, onClick: () -> Unit) {
+internal fun ShipOptionView(configuration: Configuration, ship: ShipType, onClick: () -> Unit) {
     Row(Modifier.testTag(ship.toTestTag())) {
         Spacer(Modifier.size(GRID_WIDTH))
         val shipLength = configuration.getShipLength(ship)
@@ -230,20 +236,29 @@ private fun ShipType.toTestTag() = when (this) {
  * Draws all ships in the option menu.
  */
 @Composable
-private fun ShipOptionView(configuration: Configuration, onShipClick: ((ShipType) -> Unit)?) {
+internal fun ShipOptionView(configuration: Configuration, onShipClick: ((ShipType) -> Unit)?) {
     Row(
-        modifier = Modifier.horizontalScroll(rememberScrollState())
+        modifier = Modifier
+            .horizontalScroll(rememberScrollState())
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically,
     ){
         configuration.fleet.forEach { ship ->
-            Text(
-                AnnotatedString(ship.key.name),
-                style = TextStyle(
-                    fontSize = 26.sp,
-                    color = Color.White
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    AnnotatedString(ship.key.name),
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                    )
                 )
-            )
-            Spacer(modifier = Modifier.size(10.dp))
-            ShipOptionView(configuration, ship.key) { if (onShipClick != null) onShipClick(ship.key) }
+                Spacer(modifier = Modifier.size(13.dp))
+                ShipOptionView(configuration, ship.key) { if (onShipClick != null) onShipClick(ship.key) }
+            }
+            Spacer(modifier = Modifier.size(30.dp))
         }
     }
 }

@@ -2,6 +2,7 @@ package com.example.battleships.use_cases
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.info.ServerInfo
 import com.example.battleships.rankings.GameRanking
@@ -35,7 +36,7 @@ class FakeUseCases(
      * @return the game id, or null if the game is still pending another player
      */
     @RequiresApi(Build.VERSION_CODES.O)
-    override suspend fun createGame(token: String, mode: Mode): Boolean {
+    override suspend fun createGame(token: String, mode: Mode, configuration: Configuration?): Boolean {
         val gameId = gameServices.createGame(token, mode)
         return getValueOrThrow(gameId)
     }

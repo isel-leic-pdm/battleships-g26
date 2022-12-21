@@ -1,5 +1,6 @@
 package com.example.battleships.use_cases
 
+import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.info.ServerInfo
 import com.example.battleships.rankings.GameRanking
@@ -14,7 +15,7 @@ interface UseCases{
 
     suspend fun createToken(username: String, password: String, mode: Mode = Mode.AUTO): String
 
-    suspend fun createGame(token: String, mode: Mode = Mode.AUTO): Boolean
+    suspend fun createGame(token: String, mode: Mode = Mode.AUTO, configuration : Configuration?): Boolean
 
     suspend fun fetchCurrentGameId(token: String, mode: Mode = Mode.AUTO): Int?
 

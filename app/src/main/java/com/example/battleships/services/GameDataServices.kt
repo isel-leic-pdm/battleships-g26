@@ -16,16 +16,7 @@ import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType.*
 interface GameDataServices {
     suspend fun createGame(token: String, mode: Mode,
                            CreateGameAction: SirenAction? = null,
-                           configuration: Configuration? = Configuration(
-                               10, mapOf(
-                                   CARRIER to 5,
-                                   BATTLESHIP to 4,
-                                   CRUISER to 3,
-                                   SUBMARINE to 3,
-                                   DESTROYER to 2,
-                               ),
-                               1L,10
-                           )
+                           configuration: Configuration? = null
     ): Either<ApiException, Boolean>
 
     suspend fun getCurrentGameId(token: String, GetCurrentGameIdLink: SirenLink? = null, mode: Mode): Either<ApiException, Int?>

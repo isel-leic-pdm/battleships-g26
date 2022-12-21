@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.game.domain.game.GameState
 import com.example.battleships.use_cases.UseCases
@@ -50,11 +51,11 @@ class GameViewModel(
     val game: Result<GameResult>
         get() = _game
 
-    fun startGame() {
+    fun startGame(configuration: Configuration? = null) {
         viewModelScope.launch {
             _game = Result.success(Creating)
             try {
-                val result = useCases.createGame(token)
+                val result = useCases.createGame(token, configuration = configuration)
                 if (result) {
                     _game = Result.success(Matchmaking)
                     keepOnFetchingGameUntil { gameStarted() }

@@ -41,12 +41,12 @@ class RealUseCases(
      * Creates a game.
      * @return the game id, or null if the game is still pending another player
      */
-    override suspend fun createGame(token: String, mode: Mode): Boolean {
-        val gameId = gameServices.createGame(token, mode)
+    override suspend fun createGame(token: String, mode: Mode, configuration: Configuration?): Boolean {
+        val gameId = gameServices.createGame(token, mode, configuration = configuration)
         return getValueOrExecute(gameId) {
             val userHomeLink = homeServices.getUserHomeLink()
             val createGameAction = userServices.getCreateGameAction(token, userHomeLink)
-            val game = gameServices.createGame(token, mode, createGameAction)
+            val game = gameServices.createGame(token, mode, createGameAction, configuration)
             return@getValueOrExecute getValueOrThrow(game)
         }
     }
