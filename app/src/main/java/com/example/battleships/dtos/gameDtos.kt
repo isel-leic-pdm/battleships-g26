@@ -25,7 +25,8 @@ data class GameDtoProperties(
     val state: String,
     val board1: BoardDtoProperties,
     val board2: BoardDtoProperties,
-    val playerTurn: Int,
+    val playerTurn: Int?,
+    val winner: Int?,
     val myPlayer: String
 )
 typealias GameDto = SirenEntity<GameDtoProperties>
@@ -44,7 +45,7 @@ fun GameDto.toGameAndPlayer(): Pair<Game, Player> {
         GameState.valueOf(game.state.uppercase()),
         instants = Instants(), // TODO -> review this
         game.playerTurn,
-        winner = null // TODO -> review this
+        winner = game.winner
     ) to Player.valueOf(game.myPlayer.uppercase())
 }
 
