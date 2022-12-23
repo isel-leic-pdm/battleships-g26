@@ -31,7 +31,7 @@ class UnresolvedActionException(msg: String = "", toast : String = "Unresolved a
  * Exception throw when an unexpected response was received from the API.
  */
 class UnexpectedResponseException(
-    val response: Response? = null,
+    response: Response? = null,
     body: String? = null,
     toast : String = "An error has occurred",
 ) : ApiException("Unexpected ${response?.code} response from the API.\n", toast) {

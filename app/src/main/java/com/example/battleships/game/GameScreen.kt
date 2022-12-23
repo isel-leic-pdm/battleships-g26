@@ -1,5 +1,6 @@
 package com.example.battleships.game
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -23,11 +24,9 @@ import com.example.battleships.game.domain.ship.getOrientation
 import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
-import com.example.battleships.utils.ErrorAlert
-import com.example.battleships.utils.SCREEN_HEIGHT
-import com.example.battleships.utils.getWith
 import pt.isel.battleships.R
 import com.example.battleships.game.domain.board.Coordinate
+import com.example.battleships.utils.*
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
@@ -88,6 +87,7 @@ private fun PlayScreen(
     var selected: Selection? = null
     val game = gameState.gameResultInternal.game
     val player = gameState.gameResultInternal.player
+    val context = LocalContext.current
     GameView(
         game = game,
         player = player,
@@ -95,13 +95,14 @@ private fun PlayScreen(
             selected = ShipOption(it)
         },
         onSquarePressed = {
-            selected = onSquarePressed(selected, game, player, activity, it)
+            selected = onSquarePressed(selected, game, player, activity, it, context)
                 ?: return@GameView
         },
         onShotsPlaced = {
             val playerId = if (player == Player.ONE) game.player1 else game.player2
             game.placeShots(playerId, it.shots, player) ?: return@GameView
-            activity.vm.placeShots(it)
+            activity.vm.placeShots(it, ApiErrorHandler(context))
+
         },
         onConfirmLayout = {
             game.confirmFleet(player) ?: return@GameView
@@ -114,7 +115,7 @@ private fun PlayScreen(
                     ship.getOrientation()
                 )
             }.let { ships ->
-                activity.vm.setFleet(ships)
+                activity.vm.setFleet(ships, ApiErrorHandler(context))
             }
         }
     )
@@ -139,13 +140,13 @@ private fun InitScreen(activity: GameActivity) {
     val roundTimeout = remember { mutableStateOf(10F) }
     val chooseFleet = remember { mutableStateOf(false) }
 
-    Button(onClick = { activity.vm.startGame() }) {
+    Button(onClick = {activity.vm.startGame()}) {
         Text("Quick Game")
     }
     Button(onClick = { config.value = true }) {
         Text("Start New Game")
     }
-    Button(onClick = { activity.vm.restoreGame() }) {
+    Button(onClick = { activity.vm.restoreGame()}) {
         Text("Restore Previous Game")
     }
     if (config.value) {
@@ -195,17 +196,20 @@ private fun InitScreen(activity: GameActivity) {
                                     Text("Go back")
                                 }
                                 OutlinedButton(border = BorderStroke(0.dp, Color.Unspecified),
-                                    onClick = { activity.vm.startGame(
-                                        Configuration(
-                                            boardSize.value.toInt(),
-                                            fleet = fleet.value.filter {
-                                                it.value.second
-                                            }.entries.associate {
-                                                it.key to it.value.first
-                                            },
-                                            shots = shots.value.toInt().toLong(), //to int to cut all the floating point values
-                                            roundTimeout = roundTimeout.value.toInt().toLong()
-                                        ).also { Log.e("Config", it.toString()) })
+                                    onClick = {
+                                        activity.vm.startGame(
+                                                Configuration(
+                                                    boardSize.value.toInt(),
+                                                    fleet = fleet.value.filter {
+                                                        it.value.second
+                                                    }.entries.associate {
+                                                        it.key to it.value.first
+                                                    },
+                                                    shots = shots.value.toInt()
+                                                        .toLong(), //to int to cut all the floating point values
+                                                    roundTimeout = roundTimeout.value.toInt()
+                                                        .toLong()
+                                                ).also { Log.e("Config", it.toString()) })
                                     }
                                 ) {
                                     Text("Continue")
@@ -256,7 +260,7 @@ private fun ConfigShipView(fleet: MutableState<Map<ShipType, Pair<Int, Boolean>>
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start,
         ) {
-            Row(modifier = Modifier.size(GRID_WIDTH * 2)){}
+            Row(modifier = Modifier.size(GRID_WIDTH * 2)) {}
             Text(
                 AnnotatedString(ship.key.name),
                 style = TextStyle(
@@ -265,10 +269,10 @@ private fun ConfigShipView(fleet: MutableState<Map<ShipType, Pair<Int, Boolean>>
             )
             Spacer(modifier = Modifier.size(13.dp))
 
-            Row (
+            Row(
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
-                    ){
+            ) {
 
                 ActionButton("-") {
                     val fleetV = fleet.value.getValue(ship.key)
@@ -288,7 +292,8 @@ private fun ConfigShipView(fleet: MutableState<Map<ShipType, Pair<Int, Boolean>>
                     Box(
                         Modifier
                             .size(PLAY_SIDE)
-                            .background(shipColor))
+                            .background(shipColor)
+                    )
                     Spacer(Modifier.size(GRID_WIDTH))
                 }
                 Spacer(Modifier.size(GRID_WIDTH))
@@ -332,11 +337,13 @@ fun ActionButton(
             .border(BorderStroke(1.dp, Color.Gray))
             .clickable { func() },
         contentAlignment = Alignment.Center
-    ){
-        Text(title, style = TextStyle(
-            color = Color.Black,
-            fontSize = 23.sp
-        ))
+    ) {
+        Text(
+            title, style = TextStyle(
+                color = Color.Black,
+                fontSize = 23.sp
+            )
+        )
     }
 
 }
@@ -366,6 +373,7 @@ private fun onSquarePressed(
     player: Player,
     activity: GameActivity,
     coordinate: Coordinate,
+    context: Context
 ): Selection? {
     if (selected == null /*&& curGame.isShip(coordinate)*/) {
         return Square(coordinate)
@@ -374,21 +382,23 @@ private fun onSquarePressed(
             val newGame =
                 curGame.placeShip(selected.shipType, coordinate, Orientation.HORIZONTAL, player)
                     ?: return null // validates
-            activity.vm.setGame(newGame, player) // updates game locally
+            activity.vm.setGame(newGame, player)
+            // updates game locally
             return null
         }
-        if (selected is Square) {
-            return if (coordinate == selected.coordinate) {
-                val newGame = curGame.rotateShip(coordinate, player) ?: return null // validates
-                activity.vm.setGame(newGame, player) // updates game locally
-                null
-            } else {
-                val newGame = curGame.moveShip(selected.coordinate, coordinate, player)
-                    ?: return null // validates
-                activity.vm.setGame(newGame, player) // updates game locally
-                null
-            }
-        }
-        return null
     }
+    if (selected is Square) {
+        return if (coordinate == selected.coordinate) {
+            val newGame = curGame.rotateShip(coordinate, player) ?: return null // validates
+            activity.vm.setGame(newGame, player)
+            // updates game locally
+            null
+        } else {
+            val newGame = curGame.moveShip(selected.coordinate, coordinate, player)
+                ?: return null // validates
+            activity.vm.setGame(newGame, player) // updates game locally
+            null
+        }
+    }
+    return null
 }

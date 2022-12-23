@@ -14,6 +14,8 @@ import com.example.battleships.use_cases.UseCases
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.example.battleships.game.domain.game.ShotsList
+import com.example.battleships.services.ApiException
+import kotlinx.coroutines.CoroutineExceptionHandler
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
@@ -119,7 +121,7 @@ class GameViewModel(
         }
     }
 
-    fun setFleet(ships: List<Triple<ShipType, Coordinate, Orientation>>) {
+    fun setFleet(ships: List<Triple<ShipType, Coordinate, Orientation>>, errorHandler : (Exception) -> Unit) {
         val game = game.getOrNull() as? Started ?: return
         if (game.gameResultInternal.game.state != GameState.FLEET_SETUP) return
         viewModelScope.launch {
@@ -130,11 +132,12 @@ class GameViewModel(
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error setting fleet", e)
+                errorHandler(e)
             }
         }
     }
 
-    fun placeShots(shots: ShotsList) {
+    fun placeShots(shots: ShotsList, errorHandler : (Exception) -> Unit) {
         val game = game.getOrNull() as? Started ?: return
         if (game.gameResultInternal.game.state != GameState.BATTLE) return
         viewModelScope.launch {
@@ -145,11 +148,10 @@ class GameViewModel(
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error placing shot", e)
+                errorHandler(e)
             }
         }
     }
-
-    // private fun getMyBoard(game: Game) = if (myBoardDisplayed.value) game.board1 else game.board2
 
     internal fun setGame(game: Game, player: Player) {
         _game = Result.success(Started(GameResultInternal(game, player)))
