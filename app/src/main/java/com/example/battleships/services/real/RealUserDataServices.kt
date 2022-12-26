@@ -3,7 +3,7 @@ package com.example.battleships.services.real
 import com.example.battleships.dtos.*
 import com.example.battleships.services.*
 import com.example.battleships.services.models.UserCreateOutputModel
-import com.example.battleships.user_home.UserHome
+import com.example.battleships.home.UserHome
 import com.example.battleships.utils.hypermedia.*
 import com.example.battleships.utils.send
 import com.google.gson.Gson

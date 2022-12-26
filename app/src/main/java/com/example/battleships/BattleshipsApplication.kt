@@ -1,14 +1,9 @@
 package com.example.battleships
 
 import android.app.Application
-import androidx.compose.ui.platform.LocalContext
-import com.example.battleships.services.fake.FakeGameDataServices
-import com.example.battleships.services.fake.FakeHomeDataServices
-import com.example.battleships.services.fake.FakeUserDataServices
 import com.example.battleships.services.real.RealGamesDataServices
 import com.example.battleships.services.real.RealHomeDataServices
 import com.example.battleships.services.real.RealUserDataServices
-import com.example.battleships.use_cases.FakeUseCases
 import com.example.battleships.use_cases.RealUseCases
 import com.example.battleships.use_cases.UseCases
 import com.google.gson.Gson

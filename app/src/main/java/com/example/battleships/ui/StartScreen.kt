@@ -13,7 +13,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.battleships.home.NavigateToAuthenticationButtonTestTag
 import com.example.battleships.home.NavigateToRankingsButtonTestTag
 import com.example.battleships.ui.theme.BattleshipsTheme
 import com.example.battleships.utils.SCREEN_HEIGHT

@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.battleships.ui.CenteredTopAppBar
 import com.example.battleships.ui.NavigationHandlers
-import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
 import pt.isel.battleships.R
 

@@ -1,15 +1,12 @@
 package com.example.battleships.auth
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.battleships.services.Mode
 import com.example.battleships.use_cases.UseCases
-import com.example.battleships.utils.getWith
 import kotlinx.coroutines.launch
-import kotlin.math.log
 
 class AuthViewModel(private val useCases: UseCases): ViewModel() {
     private var _userId by mutableStateOf<Result<Int>?>(null)

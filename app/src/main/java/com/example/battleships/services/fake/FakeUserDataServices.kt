@@ -1,7 +1,7 @@
 package com.example.battleships.services.fake
 
 import com.example.battleships.services.*
-import com.example.battleships.user_home.UserHome
+import com.example.battleships.home.UserHome
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenLink
 

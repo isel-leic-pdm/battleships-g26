@@ -1,3 +1,3 @@
-package com.example.battleships.user_home
+package com.example.battleships.home
 
 data class UserHome(val userId: Int, val username: String)

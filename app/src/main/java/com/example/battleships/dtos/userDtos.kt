@@ -1,6 +1,6 @@
 package com.example.battleships.dtos
 
-import com.example.battleships.user_home.UserHome
+import com.example.battleships.home.UserHome
 import com.example.battleships.utils.hypermedia.SirenEntity
 
 data class CreateUserDtoProperties(val userId: Int)

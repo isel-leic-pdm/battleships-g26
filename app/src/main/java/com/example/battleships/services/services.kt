@@ -3,7 +3,6 @@ package com.example.battleships.services
 import android.util.Log
 import com.example.battleships.services.Mode.*
 import okhttp3.Response
-import okhttp3.ResponseBody
 
 /**
  * Used to identify how implementations SHOULD behave:

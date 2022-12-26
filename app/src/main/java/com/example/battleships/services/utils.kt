@@ -3,18 +3,13 @@ package com.example.battleships.services
 import android.util.Log
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenLink
-import com.example.battleships.utils.hypermedia.SirenMediaType
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
-import org.jetbrains.annotations.TestOnly
 import java.lang.reflect.Type
 import java.net.URL
-import java.util.logging.Logger
-import kotlin.reflect.javaType
-import kotlin.reflect.typeOf
 
 sealed class RequestMethod(val url: URL)
 class Get(url: URL) : RequestMethod(url)

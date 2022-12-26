@@ -1,6 +1,7 @@
 package com.example.battleships.rankings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -33,13 +34,15 @@ fun RankingsScreen(
     rankings: GameRanking?,
     refreshingState: RefreshingState,
     onRefresh: () -> Unit,
-    onNavigationRequested: NavigationHandlers = NavigationHandlers()
+    onNavigationRequested: NavigationHandlers = NavigationHandlers(),
+    onUserClick: (Int) -> Unit,
 ) {
     RankingList(
         rankings ?: GameRanking(emptyList()),
         refreshingState,
         onNavigationRequested,
-        onRefresh
+        onRefresh,
+        onUserClick
     )
 }
 
@@ -48,7 +51,8 @@ private fun RankingList(
     ranking: GameRanking,
     refreshingState: RefreshingState,
     onNavigationRequested: NavigationHandlers,
-    onRefreshRequested: () -> Unit
+    onRefreshRequested: () -> Unit,
+    onUserClick : (Int) -> Unit,
 ) {
     BattleshipsTheme {
         Scaffold(
@@ -67,13 +71,9 @@ private fun RankingList(
             },
             floatingActionButtonPosition = FabPosition.Center,
         ) { padding ->
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .testTag("RankingsScreen"),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            Column (modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally){
                 Column(
                     Modifier
                         .offset(y = (-20).dp)
@@ -82,25 +82,33 @@ private fun RankingList(
                         .clip(RoundedCornerShape(30.dp))
                         .background(Milk)
                         .padding(30.dp)
-                        .verticalScroll(rememberScrollState())
                         .testTag(RankingListTestTag),
                     verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Row(Modifier.offset(x = 17.dp)) {
-                        Column { Text("NAME", fontSize = 25.sp) }
-                        Spacer(Modifier.size(20.dp))
-                        Column { Text("GAMES", fontSize = 25.sp) }
-                        Spacer(Modifier.size(20.dp))
-                        Column { Text("WINS", fontSize = 25.sp) }
+                    Row(
+                        Modifier.fillMaxWidth().height(40.dp),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        val fontSize = 20.sp
+                        Text("Nº", fontSize = fontSize)
+                        Text("NAME", fontSize = fontSize)
+                        Text("GAMES", fontSize = fontSize)
+                        Text("WINS", fontSize = fontSize)
                     }
-                    Row(Modifier.height(20.dp)) {}
-                    ranking.users.forEachIndexed { idx, it ->
-                        ListEntry(
-                            name = it.username,
-                            games = it.gamesPlayed,
-                            wins = it.wins, idx = idx + 1
-                        )
+                    Column(
+                        Modifier.verticalScroll(rememberScrollState())
+                    ){
+                        Row(Modifier.height(20.dp)) {}
+                        ranking.users.forEachIndexed { idx, it ->
+                            ListEntry(
+                                id = it.id,
+                                name = it.username,
+                                games = it.gamesPlayed,
+                                wins = it.wins, idx = idx + 1,
+                                onUserClick
+                            )
+                        }
                     }
                 }
             }
@@ -110,23 +118,24 @@ private fun RankingList(
 
 
 @Composable
-fun ListEntry(name: String, games: Int, wins: Int, idx : Int) {
+fun ListEntry(id : Int, name: String, games: Int, wins: Int, idx : Int, onUserClick: (Int) -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
-            .padding(6.dp)
             .clip(RoundedCornerShape(15.dp))
             .background(MaterialTheme.colors.background)
-            .padding(6.dp),
+            .padding(8.dp)
+            .clickable { onUserClick(id) },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
         Meddle(idx = idx)
-        Spacer(modifier = Modifier.size(20.dp))
+        Spacer(modifier = Modifier.size(13.dp))
         Entry(label = name)
         Entry(label = games.toString())
         Entry(label = wins.toString())
     }
+    Row(Modifier.fillMaxWidth().height(10.dp)){}
 
 }
 
@@ -172,24 +181,21 @@ fun Meddle(idx : Int){
 fun StartScreenPreview() {
     val fakeRankings = GameRanking(
         listOf(
-            UserStats("Antonio Carvalho", 5, 8),
-            UserStats("Miguel", 0, 0),
-            UserStats("Pedro", 0, 0),
-            UserStats("Antonio Carvalho", 0, 0),
-            UserStats("Miguel", 0, 0),
-            UserStats("Pedro", 0, 0),
-            UserStats("Antonio Carvalho", 0, 0),
-            UserStats("Miguel", 0, 0),
-            UserStats("Pedro", 0, 0),
-            UserStats("Antonio Carvalho", 0, 0),
-            UserStats("Miguel", 0, 0),
-            UserStats("Pedro", 0, 0),
+            UserStats(1, "Antonio Carvalho", 5, 8),
+            UserStats(1, "Miguel", 0, 0),
+            UserStats(1, "Pedro", 0, 0),
+            UserStats(1, "Antonio Carvalho", 0, 0),
+            UserStats(1, "Miguel", 0, 0),
+            UserStats(1, "Pedro", 0, 0),
+            UserStats(1, "Antonio Carvalho", 0, 0),
+            UserStats(1, "Miguel", 0, 0),
         )
     )
     RankingsScreen(
         fakeRankings,
         RefreshingState.Idle,
         onRefresh = {},
-        onNavigationRequested = NavigationHandlers()
+        onNavigationRequested = NavigationHandlers(),
+        onUserClick = {}
     )
 }

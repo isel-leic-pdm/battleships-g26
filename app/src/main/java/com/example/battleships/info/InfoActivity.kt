@@ -15,7 +15,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.battleships.DependenciesContainer
 import com.example.battleships.TAG
-import com.example.battleships.services.ApiException
 import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.utils.getWith
 import pt.isel.battleships.R

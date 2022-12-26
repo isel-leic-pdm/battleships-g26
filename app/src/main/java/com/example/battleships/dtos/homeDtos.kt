@@ -16,7 +16,7 @@ data class RankingsDtoProperties(val users: List<UserStatsDtoProperties>)
 typealias RankingsDto = SirenEntity<RankingsDtoProperties>
 val RankingsDtoType = SirenEntity.getType<RankingsDtoProperties>()
 
-data class UserStatsDtoProperties(val username: String, val wins: Int, val gamesPlayed: Int)
+data class UserStatsDtoProperties(val id : Int, val username: String, val wins: Int, val gamesPlayed: Int)
 
 typealias UserStatsDto = SirenEntity<UserStatsDtoProperties>
 val UserStatsDtoType = SirenEntity.getType<UserStatsDtoProperties>()

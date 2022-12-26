@@ -10,11 +10,11 @@ import com.example.battleships.services.Mode
 class FakeHomeDataServices : HomeDataServices {
     override suspend fun getRankings(mode: Mode) = GameRanking(
             listOf(
-                UserStats("user1", 10, 20),
-                UserStats("user2", 5, 10),
-                UserStats("user3", 2, 5),
-                UserStats("user4", 1, 2),
-                UserStats("user5", 0, 1)
+                UserStats(1, "user1", 10, 20),
+                UserStats(2, "user2", 5, 10),
+                UserStats(3, "user3", 2, 5),
+                UserStats(4, "user4", 1, 2),
+                UserStats(5, "user5", 0, 1)
             )
         )
 

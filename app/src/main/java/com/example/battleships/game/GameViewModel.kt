@@ -15,7 +15,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.example.battleships.game.domain.game.ShotsList
 import com.example.battleships.utils.launchWithErrorHandling
-import okhttp3.internal.wait
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType

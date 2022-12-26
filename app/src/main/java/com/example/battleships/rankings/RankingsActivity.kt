@@ -10,7 +10,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.battleships.DependenciesContainer
-import com.example.battleships.ErrorMessage
 import com.example.battleships.info.InfoActivity
 import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.RefreshingState
@@ -57,7 +56,8 @@ class RankingsActivity : ComponentActivity() {
                 NavigationHandlers(
                     onInfoRequested = { InfoActivity.navigate(origin = this) },
                     onBackRequested = { finish() }
-                )
+                ),
+                onUserClick = {ex -> }
             )
 
         }
