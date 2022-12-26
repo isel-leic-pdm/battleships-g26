@@ -146,6 +146,9 @@ private fun Battle(
     val shots = remember {
         mutableStateOf(ShotsList(emptyList()))
     }
+    val firstCall = remember { //safe val to prevent calling onshot more than once
+        mutableStateOf(true)
+    }
 
     fun onCoordinateClick(c: Coordinate) {
         if (shots.value.shots.size <= configuration.shots.toInt()) {
@@ -153,9 +156,10 @@ private fun Battle(
         }
     }
 
-    if(player != turn) {
+    if (player != turn && firstCall.value) {
         shots.value = ShotsList(emptyList())
-        onShot(shots.value) //trigger to start fetching (see onshot function)
+        onShot(shots.value) //trigger to start fetching game (see onshot function)
+        firstCall.value = false
     }
 
     val displayedBoard = remember { mutableStateOf(player) }
@@ -168,16 +172,11 @@ private fun Battle(
             .fillMaxSize()
     ) {
         Text(
-            text = "Turn: " + if (turn == player) "You" else "Opponent",
+            text = if (turn == player) "Your turn" else "Opponent turn",
             fontSize = 40.sp,
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
+            color = if (turn == player) Color.Blue else Color.Black
         )
-        Text(
-            text = if (displayedBoard.value === player) "Your Board" else "Opponent Board",
-            fontSize = 40.sp,
-            modifier = Modifier.padding(16.dp)
-        )
-        Text(text = "Shots left = ${(configuration.shots - shots.value.shots.size)}")
         BoardView(
             if (displayedBoard.value === player) {
                 when (player) {
@@ -192,21 +191,32 @@ private fun Battle(
             clickAction.value
         )
         Row(
-            Modifier.fillMaxHeight().fillMaxWidth()
+            Modifier
+                .fillMaxHeight()
+                .fillMaxWidth()
                 .padding(20.dp),
             horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically) {
-
-            if (turn == player && displayedBoard.value != player)
-                OutlinedButton(onClick = { onShot(shots.value) }) {
-                    Text("Place Shots")
-                }
+            verticalAlignment = Alignment.CenterVertically
+        ) {
 
             OutlinedButton(onClick = {
                 displayedBoard.value = displayedBoard.value.other()
                 clickAction.value = if (clickAction.value == null) ::onCoordinateClick else null
             }) {
-                Text("Switch board")
+                Text(text = if (displayedBoard.value == player) "Opponent board" else "Your Board")
+            }
+
+            if (turn == player && displayedBoard.value != player) {
+                if((configuration.shots - shots.value.shots.size) == 0L) {
+                    OutlinedButton(onClick = { onShot(shots.value).also { firstCall.value = true } }) {
+                        Text("Place Shots")
+                    }
+                }
+                else {
+                    OutlinedButton(onClick = {}) {
+                        Text("Shots left = ${(configuration.shots - shots.value.shots.size)}")
+                    }
+                }
             }
         }
     }
@@ -301,7 +311,7 @@ internal fun ShipOptionView(
             val m = Modifier
                 .size(DEFAULT_PLAY_SIDE)
                 .background(Color.Gray)
-            Box(m.clickable { onClick().also {  } })
+            Box(m.clickable { onClick().also { } })
             Spacer(Modifier.size(GRID_WIDTH))
         }
     }

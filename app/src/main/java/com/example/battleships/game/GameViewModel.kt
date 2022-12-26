@@ -15,6 +15,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.example.battleships.game.domain.game.ShotsList
 import com.example.battleships.utils.launchWithErrorHandling
+import okhttp3.internal.wait
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
@@ -119,7 +120,7 @@ class GameViewModel(
         viewModelScope.launch {
             while (!stop()) {
                 updateGame()
-                delay(3000)
+                delay(1000)
             }
         }
     }
@@ -162,9 +163,7 @@ class GameViewModel(
                 keepOnFetchingGameUntil { !isWaitingForOpponent() }
             } else {
                 val res = useCases.placeShots(token, shots)
-                if (res) keepOnFetchingGameUntil {
-                    isWaitingForOpponent()
-                }
+                if (res) updateGame()
             }
         }
     }
