@@ -10,10 +10,9 @@ data class ShipOutputModel(val shipType: ShipType,
                            val orientation: Orientation
                            ): OutputModel
 
-internal class PlaceShipOutputModel(val ships : List<ShipOutputModel>) :OutputModel{
-    val operation = "place-ships"
-    val fleetConfirmed = "true"
-}
+internal data class PlaceShipOutputModel(val ships : List<ShipOutputModel>,
+                                         val fleetConfirmed : Boolean = true,
+val operation : String = "place-ships") : OutputModel
 
 
 internal data class ConfigurationOutputModel(

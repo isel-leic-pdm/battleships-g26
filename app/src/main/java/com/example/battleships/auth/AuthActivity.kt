@@ -16,6 +16,7 @@ import com.example.battleships.ErrorMessage
 import com.example.battleships.auth.views.LoadingState
 import com.example.battleships.home.HomeActivity
 import com.example.battleships.ui.NavigationHandlers
+import com.example.battleships.utils.ApiErrorHandler
 import com.example.battleships.utils.getWith
 import okhttp3.internal.wait
 
@@ -58,6 +59,7 @@ class AuthActivity : ComponentActivity() {
 
     @Composable
     private fun AuthScreen(action: Action = Action.REGISTER) {
+        val context = LocalContext.current
         val isCreateUserLoading =
             if (vm.isCreateUserLoading.value) LoadingState.Loading
             else LoadingState.Idle
@@ -70,10 +72,10 @@ class AuthActivity : ComponentActivity() {
             isLogin = isLoginLoading,
             isRegister = isCreateUserLoading,
             onRegisterUser = { username, password ->
-                vm.createUser(username, password, true)
+                vm.createUser(username, password, true, ApiErrorHandler(context))
             },
             onLoginUser = { username, password ->
-                vm.login(username, password)
+                vm.login(username, password, ApiErrorHandler(context))
             },
             navigationHandlers = NavigationHandlers(
                 onBackRequested = { finish() }

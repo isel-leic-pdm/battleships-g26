@@ -28,7 +28,7 @@ class AuthViewModel(private val useCases: UseCases): ViewModel() {
     val isLoginLoading: State<Boolean>
         get() = _isLoginLoading
 
-    fun createUser(username: String, password: String, login : Boolean = false) {
+    fun createUser(username: String, password: String, login : Boolean = false, errorHandler : (Exception) -> Unit) {
         viewModelScope.launch {
             _isCreateUserLoading.value = true
             _userId =
@@ -36,15 +36,16 @@ class AuthViewModel(private val useCases: UseCases): ViewModel() {
                     Result.success(useCases.createUser(username, password, Mode.FORCE_REMOTE))
                         .also { Log.i("AuthViewModel", "User created: $it") }
                 } catch (e: Exception) {
+                    errorHandler(e)
                     Log.e("AuthViewModel", "Error creating user", e)
                     Result.failure(e)
                 }
             _isCreateUserLoading.value = false
-            if(login) login(username, password)
+            if(login) login(username, password, errorHandler)
         }
     }
 
-    fun login(username: String, password: String) {
+    fun login(username: String, password: String, errorHandler : (Exception) -> Unit) {
         viewModelScope.launch {
             _isLoginLoading.value = true
             _token =
@@ -53,6 +54,7 @@ class AuthViewModel(private val useCases: UseCases): ViewModel() {
                         Log.i("AuthViewModel", "Token created: $it")
                     }
                 } catch (e: Exception) {
+                    errorHandler(e)
                     Log.e("AuthViewModel", "Error creating token", e)
                     Result.failure(e)
                 }

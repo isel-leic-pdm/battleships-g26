@@ -14,8 +14,7 @@ import com.example.battleships.use_cases.UseCases
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.example.battleships.game.domain.game.ShotsList
-import com.example.battleships.services.ApiException
-import kotlinx.coroutines.CoroutineExceptionHandler
+import com.example.battleships.utils.launchWithErrorHandling
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
@@ -54,7 +53,7 @@ class GameViewModel(
     val game: Result<GameResult>
         get() = _game
 
-    fun startGame(configuration: Configuration? = null) {
+    fun startGame(configuration: Configuration? = null, errorHandler: (Exception) -> Unit) {
         viewModelScope.launch {
             _game = Result.success(Creating)
             try {
@@ -63,12 +62,12 @@ class GameViewModel(
                     _game = Result.success(Matchmaking)
                     keepOnFetchingGameUntil { gameStarted() }
                     keepOnFetchingGameUntil { !isWaitingForOpponent() }
-                }
-                else {
+                } else {
                     _game = Result.failure(Exception("Game already created"))
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Error starting game", e)
+                errorHandler(e)
+                Log.e("Start Game", "Failed to start game")
                 _game = Result.failure(e)
             }
         }
@@ -80,7 +79,8 @@ class GameViewModel(
         val game = gameAux.gameResultInternal.game
         val player = gameAux.gameResultInternal.player
         if (game.state === GameState.FLEET_SETUP) {
-            return game.getBoard(player).isConfirmed() && !game.getBoard(player.other()).isConfirmed()
+            return game.getBoard(player).isConfirmed() && !game.getBoard(player.other())
+                .isConfirmed()
         }
         if (game.state === GameState.BATTLE) {
             val playerTurn = game.playerTurn ?: return false
@@ -88,6 +88,22 @@ class GameViewModel(
         }
         return false
     }
+
+    private fun opponentConfirmBoard(): Boolean {
+        val gameAux = game.getOrNull()
+        if (gameAux == null || gameAux !is Started) return false
+        val game = gameAux.gameResultInternal.game
+        val player = gameAux.gameResultInternal.player
+        if (game.state === GameState.FLEET_SETUP) {
+            return game.getBoard(player.other()).isConfirmed()
+        }
+        if (game.state === GameState.BATTLE) {
+            val playerTurn = game.playerTurn ?: return false
+            return game.getPlayerFromId(playerTurn) !== player
+        }
+        return false
+    }
+
 
     fun restoreGame() {
         viewModelScope.launch {
@@ -103,7 +119,7 @@ class GameViewModel(
         viewModelScope.launch {
             while (!stop()) {
                 updateGame()
-                delay(1000)
+                delay(3000)
             }
         }
     }
@@ -121,47 +137,40 @@ class GameViewModel(
         }
     }
 
-    fun setFleet(ships: List<Triple<ShipType, Coordinate, Orientation>>, errorHandler : (Exception) -> Unit) {
+    fun setFleet(
+        ships: List<Triple<ShipType, Coordinate, Orientation>>,
+        errorHandler: (Exception) -> Unit
+    ) {
         val game = game.getOrNull() as? Started ?: return
         if (game.gameResultInternal.game.state != GameState.FLEET_SETUP) return
-        viewModelScope.launch {
-            try {
-                val res = useCases.setFleet(token, ships)
-                if (res) {
-                    keepOnFetchingGameUntil { !isWaitingForOpponent() }
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error setting fleet", e)
-                errorHandler(e)
-            }
+        viewModelScope.launchWithErrorHandling(errorHandler) {
+            val res = useCases.setFleet(token, ships)
+            if (res) keepOnFetchingGameUntil { opponentConfirmBoard() }
         }
     }
 
-    fun placeShots(shots: ShotsList, errorHandler : (Exception) -> Unit) {
+    fun placeShots(shots: ShotsList, errorHandler: (Exception) -> Unit) {
         val game = game.getOrNull() as? Started ?: return
         if (game.gameResultInternal.game.state != GameState.BATTLE) return
-        viewModelScope.launch {
-            try {
+
+        viewModelScope.launchWithErrorHandling(errorHandler) {
+            if (game.gameResultInternal.player !=
+                game.gameResultInternal.game.getPlayerFromId(
+                    game.gameResultInternal.game.playerTurn!!
+                )
+            ) {
+                keepOnFetchingGameUntil { !isWaitingForOpponent() }
+            } else {
                 val res = useCases.placeShots(token, shots)
-                if (res) {
-                    keepOnFetchingGameUntil { !isWaitingForOpponent() }
+                if (res) keepOnFetchingGameUntil {
+                    isWaitingForOpponent()
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error placing shot", e)
-                errorHandler(e)
             }
         }
     }
 
     internal fun setGame(game: Game, player: Player) {
         _game = Result.success(Started(GameResultInternal(game, player)))
-    }
-
-    private fun getGameIfStartedOrNull(): GameResultInternal? {
-        return game.getOrNull()?.let {
-            if (it is Started) it.gameResultInternal
-            else null
-        }
     }
 
 

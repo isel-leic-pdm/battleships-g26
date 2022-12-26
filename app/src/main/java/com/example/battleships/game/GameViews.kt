@@ -9,9 +9,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.battleships.game.domain.game.Game
@@ -21,10 +23,13 @@ import com.example.battleships.game.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.board.Panel
 import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.ShotsList
+import com.example.battleships.utils.SCREEN_WIDTH
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 
-val PLAY_SIDE = 30.dp
+val PLAY_SIDE =
+    fun(boardSize: Int) = (SCREEN_WIDTH / ((boardSize + GRID_WIDTH.value) * 2 + boardSize / 1.5)).dp
+val DEFAULT_PLAY_SIDE = 30.dp
 val GRID_WIDTH = 5.dp
 
 // Test tags for the Rankings screen
@@ -62,7 +67,14 @@ fun GameView(
             game.state === GameState.BATTLE -> {
                 val playerIdTurn = game.playerTurn ?: return
                 val playerTurn = game.getPlayerFromId(playerIdTurn)
-                Battle(player, playerTurn, game.configuration, game.board1, game.board2, onShotsPlaced)
+                Battle(
+                    player,
+                    playerTurn,
+                    game.configuration,
+                    game.board1,
+                    game.board2,
+                    onShotsPlaced
+                )
             }
             game.state === GameState.FINISHED -> {
                 val winnerId = game.winner ?: return
@@ -85,21 +97,33 @@ private fun PreparationPhase(
     onConfirmLayout: (() -> Unit)
 ) {
     BoardView(board, onPanelClick = onPanelClick)
-    Column (
+    Column(
         modifier = Modifier
             .fillMaxHeight()
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Row(Modifier
-            .fillMaxWidth()
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .offset(y = GRID_WIDTH * 2)
+                .padding(15.dp)
         ) {
             ShipOptionView(configuration, onShipClick)
         }
-
-        Button(modifier = Modifier.padding(top = 16.dp),
-                onClick = onConfirmLayout) {
-                Text("Confirm", fontSize = 30.sp)
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Button(
+                modifier = Modifier.padding(15.dp),
+                onClick = onConfirmLayout
+            ) {
+                Text("Confirm", fontSize = 20.sp)
+            }
         }
     }
 }
@@ -122,22 +146,29 @@ private fun Battle(
     val shots = remember {
         mutableStateOf(ShotsList(emptyList()))
     }
-    fun onCoordinateClick(c : Coordinate) {
-        if(shots.value.shots.size <= configuration.shots.toInt()){
+
+    fun onCoordinateClick(c: Coordinate) {
+        if (shots.value.shots.size <= configuration.shots.toInt()) {
             shots.value = ShotsList(shots.value.shots.toMutableList().plus(c))
         }
     }
 
-    val displayedBoard = remember { mutableStateOf(player)}
+    if(player != turn) {
+        shots.value = ShotsList(emptyList())
+        onShot(shots.value) //trigger to start fetching (see onshot function)
+    }
+
+    val displayedBoard = remember { mutableStateOf(player) }
     val clickAction = remember { mutableStateOf<((Coordinate) -> Unit)?>(::onCoordinateClick) }
-    clickAction.value = if (turn === player && displayedBoard.value === player.other()) ::onCoordinateClick else null
+    clickAction.value =
+        if (turn === player && displayedBoard.value === player.other()) ::onCoordinateClick else null
     Column(
         Modifier
             .fillMaxWidth()
             .fillMaxSize()
     ) {
         Text(
-            text = "Turn: " + if(turn == player) "You" else "Opponent",
+            text = "Turn: " + if (turn == player) "You" else "Opponent",
             fontSize = 40.sp,
             modifier = Modifier.padding(16.dp)
         )
@@ -148,28 +179,35 @@ private fun Battle(
         )
         Text(text = "Shots left = ${(configuration.shots - shots.value.shots.size)}")
         BoardView(
-            if (displayedBoard.value === player){
-                when(player) {
+            if (displayedBoard.value === player) {
+                when (player) {
                     Player.ONE -> player1Board
                     Player.TWO -> player2Board
                 }
-            }else when(player) {
+            } else when (player) {
                 Player.ONE -> player2Board
                 Player.TWO -> player1Board
             },
             viewShips = displayedBoard.value == player,
             clickAction.value
         )
-        if(turn == player && displayedBoard.value != player)
-            OutlinedButton(onClick = { onShot(shots.value)}) {
-                Text("Place Shots")
-            }
+        Row(
+            Modifier.fillMaxHeight().fillMaxWidth()
+                .padding(20.dp),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically) {
 
-        TextButton(onClick = {
-            displayedBoard.value = displayedBoard.value.other()
-            clickAction.value = if (clickAction.value == null) ::onCoordinateClick else null
-        }) {
-            Text("Switch board")
+            if (turn == player && displayedBoard.value != player)
+                OutlinedButton(onClick = { onShot(shots.value) }) {
+                    Text("Place Shots")
+                }
+
+            OutlinedButton(onClick = {
+                displayedBoard.value = displayedBoard.value.other()
+                clickAction.value = if (clickAction.value == null) ::onCoordinateClick else null
+            }) {
+                Text("Switch board")
+            }
         }
     }
 }
@@ -183,13 +221,19 @@ private fun End(winner: Player) {
 }
 
 @Composable
-private fun BoardView(board: Board, viewShips : Boolean = true, onPanelClick: ((Coordinate) -> Unit)?) {
+private fun BoardView(
+    board: Board,
+    viewShips: Boolean = true,
+    onPanelClick: ((Coordinate) -> Unit)?
+) {
     val gameSize = board.dimension
-    val boardSide = PLAY_SIDE * gameSize + GRID_WIDTH * (gameSize - 1)
+    val playSide = PLAY_SIDE(gameSize)
+    val boardSide = playSide * gameSize + GRID_WIDTH * (gameSize - 1)
     Column(
         modifier = Modifier
             .background(MaterialTheme.colors.background)
             .fillMaxWidth()
+            .offset(y = (GRID_WIDTH))
             .height(boardSide),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -200,7 +244,7 @@ private fun BoardView(board: Board, viewShips : Boolean = true, onPanelClick: ((
                 .size(boardSide),
         ) {
             board.board.forEach { panel ->
-                ShipOptionView(panel.coordinate, panel, viewShips) {
+                ShipOptionView(panel.coordinate, panel, viewShips, playSide) {
                     if (onPanelClick != null) {
                         onPanelClick(panel.coordinate)
                     }
@@ -214,40 +258,50 @@ private fun BoardView(board: Board, viewShips : Boolean = true, onPanelClick: ((
  * Displays a single panel
  */
 @Composable
-private fun ShipOptionView(coordinate: Coordinate, panel: Panel, viewShips: Boolean, onClick: (() -> Unit)?) {
+private fun ShipOptionView(
+    coordinate: Coordinate, panel: Panel, viewShips: Boolean,
+    playSize: Dp,
+    onClick: (() -> Unit)?,
+) {
     val color = when (panel.isHit) {
-            true -> {
-                if(panel.isShip())
-                    Color.Red
-                else Color.Black
-            }
-            false -> {
-                if(panel.isShip() && viewShips)
-                    Color.Gray
-                else Color.Blue
-            }
+        true -> {
+            if (panel.isShip())
+                Color.Red
+            else Color.Black
+        }
+        false -> {
+            if (panel.isShip() && viewShips)
+                Color.Gray
+            else Color.Blue
+        }
     }
     Box(
         Modifier
-        .size(PLAY_SIDE)
-        .offset((PLAY_SIDE + GRID_WIDTH) * (coordinate.column - 1),
-            (PLAY_SIDE + GRID_WIDTH) * (coordinate.row - 1))
-        .background(color).clickable { onClick?.invoke() }
+            .size(playSize)
+            .offset(
+                (playSize + GRID_WIDTH) * (coordinate.column - 1),
+                (playSize + GRID_WIDTH) * (coordinate.row - 1)
+            )
+            .background(color)
+            .clickable { onClick?.invoke() }
     )
 }
 
 
 @Composable
-internal fun ShipOptionView(configuration: Configuration, ship: ShipType, onClick: () -> Unit) {
+internal fun ShipOptionView(
+    configuration: Configuration, ship: ShipType,
+    onClick: () -> Unit,
+) {
     Row(Modifier.testTag(ship.toTestTag())) {
         Spacer(Modifier.size(GRID_WIDTH))
         val shipLength = configuration.getShipLength(ship)
         require(shipLength != null)
         repeat(shipLength) {
             val m = Modifier
-                .size(PLAY_SIDE)
+                .size(DEFAULT_PLAY_SIDE)
                 .background(Color.Gray)
-            Box(m.clickable { onClick() })
+            Box(m.clickable { onClick().also {  } })
             Spacer(Modifier.size(GRID_WIDTH))
         }
     }
@@ -272,7 +326,7 @@ internal fun ShipOptionView(configuration: Configuration, onShipClick: ((ShipTyp
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
-    ){
+    ) {
         configuration.fleet.forEach { ship ->
             Column(
                 verticalArrangement = Arrangement.Center,
@@ -285,10 +339,13 @@ internal fun ShipOptionView(configuration: Configuration, onShipClick: ((ShipTyp
                     )
                 )
                 Spacer(modifier = Modifier.size(13.dp))
-                ShipOptionView(configuration, ship.key) { if (onShipClick != null) onShipClick(ship.key) }
+
+                ShipOptionView(configuration, ship.key) {
+                    if (onShipClick != null) onShipClick(ship.key)
+                }
             }
-            Spacer(modifier = Modifier.size(30.dp))
         }
+        Spacer(modifier = Modifier.size(30.dp))
     }
 }
 

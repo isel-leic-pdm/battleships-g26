@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.battleships.game.domain.game.*
@@ -95,17 +96,13 @@ private fun PlayScreen(
             selected = ShipOption(it)
         },
         onSquarePressed = {
-            selected = onSquarePressed(selected, game, player, activity, it, context)
+            selected = onSquarePressed(selected, game, player, activity, it)
                 ?: return@GameView
         },
         onShotsPlaced = {
-            val playerId = if (player == Player.ONE) game.player1 else game.player2
-            game.placeShots(playerId, it.shots, player) ?: return@GameView
             activity.vm.placeShots(it, ApiErrorHandler(context))
-
         },
         onConfirmLayout = {
-            game.confirmFleet(player) ?: return@GameView
             game.getBoard(player).getShips().map { ship ->
                 Triple(
                     ship.type,
@@ -117,7 +114,7 @@ private fun PlayScreen(
             }.let { ships ->
                 activity.vm.setFleet(ships, ApiErrorHandler(context))
             }
-        }
+        },
     )
 }
 
@@ -125,6 +122,7 @@ private fun PlayScreen(
 private fun InitScreen(activity: GameActivity) {
     val config = remember { mutableStateOf(false) }
     val boardSize = remember { mutableStateOf(10F) }
+    val context = LocalContext.current
     val fleet = remember {
         mutableStateOf(
             mapOf(
@@ -140,7 +138,7 @@ private fun InitScreen(activity: GameActivity) {
     val roundTimeout = remember { mutableStateOf(10F) }
     val chooseFleet = remember { mutableStateOf(false) }
 
-    Button(onClick = {activity.vm.startGame()}) {
+    Button(onClick = {activity.vm.startGame(errorHandler = ApiErrorHandler(context))}) {
         Text("Quick Game")
     }
     Button(onClick = { config.value = true }) {
@@ -164,7 +162,7 @@ private fun InitScreen(activity: GameActivity) {
                         if (!chooseFleet.value) {
                             CustomSlider(
                                 title = "Board Size", v =
-                                boardSize, range = 8F..15F
+                                boardSize, range = 8F..13F
                             )
                             CustomSlider(
                                 title = "Shots per round", v =
@@ -209,7 +207,8 @@ private fun InitScreen(activity: GameActivity) {
                                                         .toLong(), //to int to cut all the floating point values
                                                     roundTimeout = roundTimeout.value.toInt()
                                                         .toLong()
-                                                ).also { Log.e("Config", it.toString()) })
+                                                ).also { Log.e("Config", it.toString()) },
+                                        ApiErrorHandler(context))
                                     }
                                 ) {
                                     Text("Continue")
@@ -291,7 +290,7 @@ private fun ConfigShipView(fleet: MutableState<Map<ShipType, Pair<Int, Boolean>>
                 repeat(shipLength) {
                     Box(
                         Modifier
-                            .size(PLAY_SIDE)
+                            .size(DEFAULT_PLAY_SIDE)
                             .background(shipColor)
                     )
                     Spacer(Modifier.size(GRID_WIDTH))
@@ -311,7 +310,7 @@ private fun ConfigShipView(fleet: MutableState<Map<ShipType, Pair<Int, Boolean>>
                     contentDescription = null,
                     tint = Color.Black,
                     modifier = Modifier
-                        .size(PLAY_SIDE)
+                        .size(DEFAULT_PLAY_SIDE)
                         .clickable {
                             val fleetV = fleet.value.getValue(ship.key)
                             auxMap[ship.key] = Pair(fleetV.first, !fleetV.second)
@@ -319,7 +318,7 @@ private fun ConfigShipView(fleet: MutableState<Map<ShipType, Pair<Int, Boolean>>
                         }
                 )
             }
-            Spacer(modifier = Modifier.size(30.dp))
+            Spacer(modifier = Modifier.size(DEFAULT_PLAY_SIDE))
         }
     }
 }
@@ -332,7 +331,7 @@ fun ActionButton(
 ) {
     Box(
         modifier = Modifier
-            .size(PLAY_SIDE)
+            .size(DEFAULT_PLAY_SIDE)
             .clip(RoundedCornerShape(3.dp))
             .border(BorderStroke(1.dp, Color.Gray))
             .clickable { func() },
@@ -373,7 +372,6 @@ private fun onSquarePressed(
     player: Player,
     activity: GameActivity,
     coordinate: Coordinate,
-    context: Context
 ): Selection? {
     if (selected == null /*&& curGame.isShip(coordinate)*/) {
         return Square(coordinate)
