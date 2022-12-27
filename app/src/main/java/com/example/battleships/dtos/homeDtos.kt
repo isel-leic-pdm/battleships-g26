@@ -34,3 +34,6 @@ typealias ServerAuthorDto = SirenEntity<ServerAuthorDtoProperties>
 val ServerAuthorDtoType = SirenEntity.getType<ServerAuthorDtoProperties>()
 
 
+
+
+

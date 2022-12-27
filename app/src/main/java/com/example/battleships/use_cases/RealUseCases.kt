@@ -3,7 +3,8 @@ package com.example.battleships.use_cases
 import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.game.domain.game.ShotsList
-import com.example.battleships.rankings.GameRanking
+import com.example.battleships.rankings.UserRanking
+import com.example.battleships.rankings.UserStats
 import com.example.battleships.services.*
 import com.example.battleships.services.real.RealGamesDataServices
 import com.example.battleships.services.real.RealHomeDataServices
@@ -72,7 +73,7 @@ class RealUseCases(
     }
 
     @Throws(UnexpectedResponseException::class)
-    override suspend fun fetchRankings(mode: Mode): GameRanking =
+    override suspend fun fetchRankings(mode: Mode): UserRanking =
         homeServices.getRankings(mode)
 
     override suspend fun setFleet(
@@ -106,6 +107,9 @@ class RealUseCases(
     @Throws(UnexpectedResponseException::class)
     override suspend fun fetchServerInfo(mode: Mode) =
         homeServices.getServerInfo(mode)
+
+    override suspend fun getUserById(id: Int, mode: Mode): UserStats =
+        homeServices.getUserById(id, mode) ?: throw UnexpectedResponseException(toast = "User not found")
 
 
     private suspend fun <T> getValueOrExecute(either: Either<ApiException, T>, onEitherLeft: suspend () -> T): T {

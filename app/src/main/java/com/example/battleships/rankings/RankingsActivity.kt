@@ -13,6 +13,8 @@ import com.example.battleships.DependenciesContainer
 import com.example.battleships.info.InfoActivity
 import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.RefreshingState
+import com.example.battleships.user.UserActivity
+import com.example.battleships.utils.ApiErrorHandler
 import com.example.battleships.utils.getWith
 
 class RankingsActivity : ComponentActivity() {
@@ -57,7 +59,7 @@ class RankingsActivity : ComponentActivity() {
                     onInfoRequested = { InfoActivity.navigate(origin = this) },
                     onBackRequested = { finish() }
                 ),
-                onUserClick = {ex -> }
+                onUserClick = { ex -> UserActivity.navigate(this, ex) }
             )
 
         }

@@ -15,8 +15,8 @@ class RankingsViewModel(private val useCases: UseCases): ViewModel() {
     val isLoading: Boolean
         get() = _isLoading
 
-    private var _rankings by mutableStateOf<Result<GameRanking>?>(null)
-    val rankings: Result<GameRanking>?
+    private var _rankings by mutableStateOf<Result<UserRanking>?>(null)
+    val rankings: Result<UserRanking>?
         get() = _rankings
 
     fun loadRankings(forcedRefresh: Boolean = false) {
@@ -35,4 +35,5 @@ class RankingsViewModel(private val useCases: UseCases): ViewModel() {
             _isLoading = false
         }
     }
+
 }

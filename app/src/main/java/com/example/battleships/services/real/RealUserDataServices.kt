@@ -4,10 +4,13 @@ import com.example.battleships.dtos.*
 import com.example.battleships.services.*
 import com.example.battleships.services.models.UserCreateOutputModel
 import com.example.battleships.home.UserHome
+import com.example.battleships.rankings.rankings
 import com.example.battleships.utils.hypermedia.*
 import com.example.battleships.utils.send
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
+import pt.isel.daw.dawbattleshipgame.domain.player.UserRanking
+import java.net.URL
 
 class RealUserDataServices(
     private val httpClient: OkHttpClient,
@@ -100,6 +103,8 @@ class RealUserDataServices(
 
     private fun extractCurrentGameIdLink(userHomeDto: SirenEntity<UserHomeDtoProperties>) =
         userHomeDto.links?.find { it.rel.contains("game-id") }
+
+
 
     suspend fun getCreateGameAction(token: String, newUserHomeLink: SirenLink): SirenAction {
         if (createGameAction == null) {

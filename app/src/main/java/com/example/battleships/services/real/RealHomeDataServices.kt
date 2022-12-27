@@ -5,8 +5,10 @@ import com.example.battleships.dtos.*
 import com.example.battleships.home.Home
 import com.example.battleships.info.ServerInfo
 import com.example.battleships.info.serverInfo
-import com.example.battleships.rankings.GameRanking
+import com.example.battleships.rankings.UserRanking
+import com.example.battleships.rankings.UserStats
 import com.example.battleships.rankings.rankings
+import com.example.battleships.rankings.userInfo
 import com.example.battleships.services.*
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenLink
@@ -27,6 +29,7 @@ class RealHomeDataServices(
     private var userHomeLink: SirenLink? = null
     private var rankingsLink: SirenLink? = null
     private var serverInfoLink: SirenLink? = null
+    private var userInfoLink : SirenLink? = null
 
     private suspend fun getHome(): Home {
         val request = buildRequest(Get(battleshipsHome), null, Mode.AUTO)
@@ -55,7 +58,20 @@ class RealHomeDataServices(
         return serverInfo(serverInfoProperties)
     }
 
-    override suspend fun getRankings(mode: Mode): GameRanking {
+    override suspend fun getUserById(id: Int, mode: Mode): UserStats? {
+        val auxLink = ensureGetUserLink()
+        val userInfoUrl = URL(auxLink.toString().replace(":id", id.toString()))
+
+        val request = buildRequest(Get(userInfoUrl), null, mode)
+
+        val userInfoDto = request.send(httpClient) { response ->
+            handleResponse<UserStatsDto>(jsonEncoder, response, UserStatsDtoType.type, SirenMediaType)
+        }
+        val userProperties = userInfoDto.properties
+        return userInfo(userProperties)
+    }
+
+    override suspend fun getRankings(mode: Mode): UserRanking {
         val rankingsURL: URL = ensureRankingsLink()
         val request = buildRequest(Get(rankingsURL), null, mode)
 
@@ -73,6 +89,7 @@ class RealHomeDataServices(
         userHomeLink = home.links?.find("user-home")
         serverInfoLink = home.links?.find("server-info")
         rankingsLink = home.links?.find("user-stats")
+        userInfoLink = home.links?.find("user")
     }
 
     private suspend fun ensureServerInfoLink(): URL {
@@ -80,6 +97,14 @@ class RealHomeDataServices(
             getHome()
         }
         val action = serverInfoLink ?: throw UnresolvedLinkException()
+        return action.href.toApiURL()
+    }
+
+    private suspend fun ensureGetUserLink(): URL {
+        if (userInfoLink == null) {
+            getHome()
+        }
+        val action = userInfoLink ?: throw UnresolvedLinkException()
         return action.href.toApiURL()
     }
 

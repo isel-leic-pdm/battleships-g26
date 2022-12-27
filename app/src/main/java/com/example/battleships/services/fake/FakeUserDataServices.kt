@@ -4,6 +4,7 @@ import com.example.battleships.services.*
 import com.example.battleships.home.UserHome
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenLink
+import pt.isel.daw.dawbattleshipgame.domain.player.UserRanking
 
 private data class UserCredentials(val username: String, val password: String)
 

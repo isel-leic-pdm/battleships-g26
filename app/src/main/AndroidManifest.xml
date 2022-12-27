@@ -74,7 +74,7 @@
         </activity>
 
         <activity
-            android:name="com.example.battleships.user_home.UserHomeActivity"
+            android:name="com.example.battleships.user.UserActivity"
             android:exported="true"
             android:theme="@style/Theme.Battleships">
 
@@ -82,6 +82,7 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+
     </application>
 
 </manifest>

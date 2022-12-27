@@ -31,14 +31,14 @@ const val RefreshButtonTestTag = "RefreshButton"
 
 @Composable
 fun RankingsScreen(
-    rankings: GameRanking?,
+    rankings: UserRanking?,
     refreshingState: RefreshingState,
     onRefresh: () -> Unit,
     onNavigationRequested: NavigationHandlers = NavigationHandlers(),
     onUserClick: (Int) -> Unit,
 ) {
     RankingList(
-        rankings ?: GameRanking(emptyList()),
+        rankings ?: UserRanking(emptyList()),
         refreshingState,
         onNavigationRequested,
         onRefresh,
@@ -48,7 +48,7 @@ fun RankingsScreen(
 
 @Composable
 private fun RankingList(
-    ranking: GameRanking,
+    ranking: UserRanking,
     refreshingState: RefreshingState,
     onNavigationRequested: NavigationHandlers,
     onRefreshRequested: () -> Unit,
@@ -179,7 +179,7 @@ fun Meddle(idx : Int){
 @Preview
 @Composable
 fun StartScreenPreview() {
-    val fakeRankings = GameRanking(
+    val fakeRankings = UserRanking(
         listOf(
             UserStats(1, "Antonio Carvalho", 5, 8),
             UserStats(1, "Miguel", 0, 0),

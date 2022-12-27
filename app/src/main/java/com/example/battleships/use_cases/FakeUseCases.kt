@@ -6,7 +6,8 @@ import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.game.domain.game.ShotsList
 import com.example.battleships.info.ServerInfo
-import com.example.battleships.rankings.GameRanking
+import com.example.battleships.rankings.UserRanking
+import com.example.battleships.rankings.UserStats
 import com.example.battleships.services.*
 import com.example.battleships.services.fake.FakeGameDataServices
 import com.example.battleships.services.fake.FakeHomeDataServices
@@ -52,7 +53,7 @@ class FakeUseCases(
     }
 
     @Throws(UnexpectedResponseException::class)
-    override suspend fun fetchRankings(mode: Mode): GameRanking =
+    override suspend fun fetchRankings(mode: Mode): UserRanking =
         homeServices.getRankings(mode)
 
     override suspend fun setFleet(
@@ -70,6 +71,10 @@ class FakeUseCases(
     }
 
     override suspend fun fetchServerInfo(mode: Mode): ServerInfo {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getUserById(id: Int, mode: Mode): UserStats {
         TODO("Not yet implemented")
     }
 
