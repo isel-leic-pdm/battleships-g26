@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.battleships.rankings.UserStats
 import com.example.battleships.ui.CenteredTopAppBar
+import com.example.battleships.ui.MarqueeText
 import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.theme.BattleshipsTheme
 import com.example.battleships.ui.theme.Milk
@@ -52,7 +53,8 @@ fun UserScreen(user: UserStats, onBackRequest: () -> Unit) {
 
                 Row(
                     Modifier
-                        .fillMaxWidth().offset(y = 15.dp),
+                        .fillMaxWidth()
+                        .offset(y = 15.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Column(

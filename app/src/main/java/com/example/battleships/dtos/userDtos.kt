@@ -15,7 +15,7 @@ typealias UserLoginDto = SirenEntity<UserLoginDtoProperties>
 val UserLoginDtoType = SirenEntity.getType<UserLoginDtoProperties>()
 
 
-data class UserHomeDtoProperties(val userId: Int, val username: String)
+data class UserHomeDtoProperties(val id: Int, val username: String)
 
 typealias UserHomeDto = SirenEntity<UserHomeDtoProperties>
 val UserHomeDtoType = SirenEntity.getType<UserHomeDtoProperties>()
@@ -36,5 +36,5 @@ fun UserLoginDto.toToken(): String {
 fun UserHomeDto.toUserHome(): UserHome {
     val properties = this.properties
     require(properties != null) { "UserHomeDto properties are null" }
-    return UserHome(properties.userId, properties.username)
+    return UserHome(properties.id, properties.username)
 }

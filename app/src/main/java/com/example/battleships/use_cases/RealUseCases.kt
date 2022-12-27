@@ -3,6 +3,7 @@ package com.example.battleships.use_cases
 import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.game.domain.game.ShotsList
+import com.example.battleships.home.UserHome
 import com.example.battleships.rankings.UserRanking
 import com.example.battleships.rankings.UserStats
 import com.example.battleships.services.*
@@ -111,6 +112,10 @@ class RealUseCases(
     override suspend fun getUserById(id: Int, mode: Mode): UserStats =
         homeServices.getUserById(id, mode) ?: throw UnexpectedResponseException(toast = "User not found")
 
+    override suspend fun getUserHome(token: String, mode: Mode) : UserHome{
+        val userHomeLink = homeServices.getUserHomeLink()
+        return userServices.getUserHome(token, Mode.AUTO, userHomeLink)
+    }
 
     private suspend fun <T> getValueOrExecute(either: Either<ApiException, T>, onEitherLeft: suspend () -> T): T {
         return when (either) {

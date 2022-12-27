@@ -4,8 +4,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,37 +21,6 @@ import com.example.battleships.utils.SCREEN_HEIGHT
 import pt.isel.battleships.R
 
 data class Handler(val name: String, val tag: String, val handler: () -> Unit)
-const val REGISTER_BUTTON_TAG = "REGBUTTON"
-
-@Composable
-fun StartScreen(
-    vararg handlers: Handler,
-    tag: String? = null,
-    onNavigationRequested: NavigationHandlers = NavigationHandlers(),
-) {
-    BattleshipsTheme {
-        val modifier = if (tag != null) Modifier.testTag(tag) else Modifier
-        Scaffold(
-            modifier = modifier.fillMaxSize(),
-            topBar = {
-                        TopBar(navigation = onNavigationRequested)
-                     },
-            bottomBar = { BottomAppBar {} },
-        ) { innerPadding ->
-            Column(
-                verticalArrangement = Arrangement.SpaceAround,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize(),
-            ) {
-                handlers.forEach { handler ->
-                    NavigationButton(title = handler.name, tagName = handler.tag) { handler.handler() }
-                }
-            }
-        }
-    }
-}
 
 @Composable
 private fun NavigationButton(title: String, tagName: String, onClick: () -> Unit) {
@@ -62,11 +33,12 @@ private fun NavigationButton(title: String, tagName: String, onClick: () -> Unit
 }
 
 @Composable
-fun StartScreenNew(
+fun StartScreen(
     vararg handlers: Handler,
     tag: String? = null,
     onRanking : () -> Unit = {},
-    onAppInfo : () -> Unit = {}
+    onAppInfo : () -> Unit = {},
+    onUserInfo : (() -> Unit)? = null,
 ) {
     BattleshipsTheme {
         val modifier = if (tag != null) Modifier.testTag(tag) else Modifier
@@ -74,7 +46,7 @@ fun StartScreenNew(
             modifier = modifier.fillMaxSize(),
             bottomBar = { BottomAppBar(
                 content = {
-                    BottomAppNavigation(onRanking, onAppInfo)
+                    BottomAppNavigation(onRanking, onAppInfo, onUserInfo)
                 }
             ) },
         ) { innerPadding ->
@@ -99,8 +71,9 @@ fun StartScreenNew(
 }
 
 @Composable
-fun BottomAppNavigation(ranking : () -> Unit, appInfo : () -> Unit)  = Row(
-    horizontalArrangement = Arrangement.Center,
+fun BottomAppNavigation(ranking : () -> Unit, appInfo : () -> Unit, onUserInfo : (() -> Unit)?)  = Row(
+    Modifier.fillMaxWidth(),
+    horizontalArrangement = Arrangement.SpaceBetween,
     verticalAlignment = Alignment.CenterVertically
 ) {
     Column {
@@ -114,8 +87,25 @@ fun BottomAppNavigation(ranking : () -> Unit, appInfo : () -> Unit)  = Row(
             )
         }
     }
+
+    if(onUserInfo != null) {
+        Column(
+            horizontalAlignment = Alignment.End
+        ) {
+            IconButton(
+                modifier = Modifier.testTag(NavigateToInfoTestTag),
+                onClick = onUserInfo,
+            ) {
+                Icon(
+                    Icons.Default.AccountCircle,
+                    null
+                )
+            }
+        }
+    }
+
+
     Column(
-        Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.End
     ) {
         IconButton(
@@ -133,5 +123,5 @@ fun BottomAppNavigation(ranking : () -> Unit, appInfo : () -> Unit)  = Row(
 @Preview
 @Composable
 fun NewStartScreenPreview(){
-    StartScreenNew()
+    StartScreen()
 }

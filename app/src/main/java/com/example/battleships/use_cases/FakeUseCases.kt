@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.game.domain.game.ShotsList
+import com.example.battleships.home.UserHome
 import com.example.battleships.info.ServerInfo
 import com.example.battleships.rankings.UserRanking
 import com.example.battleships.rankings.UserStats
@@ -75,6 +76,10 @@ class FakeUseCases(
     }
 
     override suspend fun getUserById(id: Int, mode: Mode): UserStats {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getUserHome(token: String, mode: Mode): UserHome {
         TODO("Not yet implemented")
     }
 

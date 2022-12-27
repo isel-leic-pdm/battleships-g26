@@ -69,6 +69,7 @@ class RealUserDataServices(
                 handleResponse<UserLoginDto>(jsonEncoder, response, UserLoginDtoType.type, SirenMediaType)
             }
             userHomeLink = extractUserHomeLink(createTokenDto) ?: throw UnresolvedLinkException()
+            println(userHomeLink)
             Either.Right(createTokenDto.toToken())
         } catch (e: ApiException) {
             Either.Left(e)
@@ -89,6 +90,8 @@ class RealUserDataServices(
         }
         createGameAction = extractCreateGameAction(userHomeDto) ?: throw UnresolvedLinkException()
         getCurrentGameIdLink = extractCurrentGameIdLink(userHomeDto) ?: throw UnresolvedLinkException()
+
+        println(userHomeDto)
         return userHomeDto.toUserHome()
     }
 

@@ -27,8 +27,4 @@ class UserViewModel(
             }
         }
     }
-
-    fun getMe() {
-
-    }
 }
