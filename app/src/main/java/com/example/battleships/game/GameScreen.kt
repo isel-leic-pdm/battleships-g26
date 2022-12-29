@@ -14,6 +14,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -48,6 +49,7 @@ internal fun GameScreen(
             backgroundColor = MaterialTheme.colors.background,
             topBar = {
                 TopBar(
+                    title = stringResource(id = R.string.game_screen_top_app_bar_title),
                     navigation = NavigationHandlers(
                         onBackRequested = onBackRequest
                     )
@@ -137,13 +139,13 @@ private fun InitScreen(activity: GameActivity) {
     val chooseFleet = remember { mutableStateOf(false) }
 
     Button(onClick = {activity.vm.startGame(errorHandler = ApiErrorHandler(context))}) {
-        Text("Quick Game")
+        Text(text = stringResource(id = R.string.game_screen_option_1))
     }
     Button(onClick = { config.value = true }) {
-        Text("Start New Game")
+        Text(text = stringResource(id = R.string.game_screen_option_2))
     }
     Button(onClick = { activity.vm.restoreGame()}) {
-        Text("Restore Previous Game")
+        Text(text = stringResource(id = R.string.game_screen_option_3))
     }
     if (config.value) {
         AlertDialog(
@@ -159,20 +161,22 @@ private fun InitScreen(activity: GameActivity) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         if (!chooseFleet.value) {
                             CustomSlider(
-                                title = "Board Size", v =
-                                boardSize, range = 8F..13F
+                                title = stringResource(id = R.string.game_screen_config_option_1),
+                                v = boardSize,
+                                range = 8F..13F
                             )
                             CustomSlider(
-                                title = "Shots per round", v =
-                                shots, range = 1F..5F
+                                title = stringResource(id = R.string.game_screen_config_option_2),
+                                v = shots, range = 1F..5F
                             )
                             CustomSlider(
-                                title = "Round timeout", v =
-                                roundTimeout, range = 10F..240F
+                                title = stringResource(id = R.string.game_screen_config_option_3),
+                                v = roundTimeout,
+                                range = 10F..240F
                             )
                             OutlinedButton(border = BorderStroke(0.dp, Color.Unspecified),
                                 onClick = { chooseFleet.value = true }) {
-                                Text("Set Fleet")
+                                Text(stringResource(id = R.string.game_screen_set_fleet_option))
                             }
                         } else {
                             Column(
@@ -345,15 +349,14 @@ fun ActionButton(
 
 }
 
-
 @Composable
 private fun CreatingGame() {
-    Text("Creating Game...")
+    Text(stringResource(id = R.string.game_screen_creating_game))
 }
 
 @Composable
 private fun Matchmaking() {
-    Text("Matchmaking...")
+    Text(stringResource(id = R.string.game_screen_matchmaking))
 }
 
 /**

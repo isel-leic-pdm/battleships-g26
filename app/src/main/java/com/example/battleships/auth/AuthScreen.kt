@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,6 +33,7 @@ import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
 import com.example.battleships.ui.theme.Milk
+import pt.isel.battleships.R
 
 // Test tags for the TopBar navigation elements
 const val RegisterUserButtonTestTag = "CreateUserButton"
@@ -54,7 +56,10 @@ internal fun LaunchScreen(
         Scaffold(
             modifier = Modifier.fillMaxSize().testTag("AuthScreen"),
             backgroundColor = MaterialTheme.colors.background,
-            topBar = { TopBar(navigationHandlers ?: NavigationHandlers()) }
+            topBar = { TopBar(
+                title = stringResource(id = R.string.auth_screen_top_app_bar_title),
+                navigation = navigationHandlers ?: NavigationHandlers()
+            )}
         ){ paddingValues ->
             Column(
                 verticalArrangement = Arrangement.SpaceAround,
@@ -112,13 +117,13 @@ fun InputView(
     OutlinedTextField(
         value = username.value,
         onValueChange = { username.value = it },
-        label = { Text("Username") },
+        label = { Text(stringResource(id = R.string.username_lable)) },
     )
-    PasswordOutlinedTextField(label = "Password", password = password,
+    PasswordOutlinedTextField(label = stringResource(id = R.string.password_lable_1), password = password,
         passwordVisible = passwordVisible)
 
     if(buttonAction.value == Action.REGISTER) {
-        PasswordOutlinedTextField(label = "Re-type Password", password = retypedPassword,
+        PasswordOutlinedTextField(label = stringResource(id = R.string.password_lable_2), password = retypedPassword,
             passwordVisible = retypePasswordVisible)
     }
 
@@ -127,8 +132,17 @@ fun InputView(
         Action.LOGIN -> LoginButtonTestTag
     }
 
+    val passwordDoNotMatchError = stringResource(id = R.string.password_dont_match_error)
+    val usernameIsEmptyError = stringResource(id = R.string.username_is_empty_error)
+    val passwordIsEmptyError = stringResource(id = R.string.password_is_empty_error)
+
+    val loadingButtonText = when (buttonAction.value) {
+        Action.REGISTER -> stringResource(id = R.string.auth_screen_register_action)
+        Action.LOGIN -> stringResource(id = R.string.auth_screen_login_action)
+    }
+
     LoadingButton(
-        value = buttonAction.value.companion,
+        value = loadingButtonText,
         state = when(buttonAction.value) {
             Action.REGISTER -> isLogin
             Action.LOGIN -> isRegister
@@ -138,11 +152,11 @@ fun InputView(
             when(buttonAction.value) {
                 Action.REGISTER -> {
                     if(retypedPassword.value != password.value)
-                        Toast.makeText(mContext, "Passwords don't match", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(mContext, passwordDoNotMatchError, Toast.LENGTH_SHORT).show()
                     else if(username.value.isEmpty() || username.value.isBlank())
-                        Toast.makeText(mContext, "Username is empty", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(mContext, usernameIsEmptyError, Toast.LENGTH_SHORT).show()
                     else if(password.value.isEmpty() || password.value.isBlank())
-                        Toast.makeText(mContext, "Password is empty", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(mContext, passwordIsEmptyError, Toast.LENGTH_SHORT).show()
                     else onRegister(username.value, password.value)
                 }
                 Action.LOGIN -> onLogin(username.value, password.value)
@@ -155,15 +169,19 @@ fun InputView(
         Action.LOGIN -> SwitchToRegisterButtonTestTag
     }
 
+    val switchActionTest = when (buttonAction.value.other()) {
+        Action.REGISTER -> stringResource(id = R.string.auth_screen_register_action)
+        Action.LOGIN -> stringResource(id = R.string.auth_screen_login_action)
+    }
     Row {
         Text(text =
         when(buttonAction.value) {
-            Action.REGISTER -> "Already have an account? "
-            Action.LOGIN -> "Don't have an account? "
+            Action.REGISTER -> stringResource(id = R.string.auth_screen_already_have_account)
+            Action.LOGIN -> stringResource(id = R.string.auth_screen_dont_have_account)
         })
         ClickableText(
             modifier = Modifier.testTag(switchButtonTestTag),
-            text = AnnotatedString(buttonAction.value.other().companion) ,
+            text = AnnotatedString(switchActionTest),
             onClick = {
                 buttonAction.value = buttonAction.value.other()
             },

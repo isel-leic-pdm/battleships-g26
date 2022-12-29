@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -36,7 +37,10 @@ fun InfoScreen(
                 .fillMaxSize()
                 .testTag("InfoScreen"),
             backgroundColor = MaterialTheme.colors.background,
-            topBar = { CenteredTopAppBar(title = "Info", navigationHandlers) },
+            topBar = { CenteredTopAppBar(
+                title = stringResource(R.string.info_screen_top_app_bar_text),
+                navigationHandlers)
+            },
         ) { innerPadding ->
             Column(
                 verticalArrangement = Arrangement.SpaceAround,
@@ -67,13 +71,19 @@ fun Authors(onSendEmailRequested: () -> Unit = { },
             .fillMaxHeight()
             .offset(y = (-60).dp)
     ) {
-        Text(text = "Made with ❤ by:", style = MaterialTheme.typography.h6)
+        Text(
+            text = stringResource(R.string.info_screen_title_text),
+            style = MaterialTheme.typography.h6
+        )
         MySpacer()
         Developer(name = "António Carvalho", "https://github.com/ACRae", onOpenUrlRequested)
         Developer(name = "Pedro Silva", "https://github.com/psilva20019", onOpenUrlRequested)
         Developer(name = "Miguel Rocha", "https://github.com/MiguelRocha2001", onOpenUrlRequested)
         MySpacer(30.dp)
-        Text(text = "Email us:", style = MaterialTheme.typography.h6)
+        Text(
+            text = stringResource(R.string.info_screen_email_text),
+            style = MaterialTheme.typography.h6
+        )
         MySpacer()
         Icon(imageVector = Icons.Default.Email,
             contentDescription = null,

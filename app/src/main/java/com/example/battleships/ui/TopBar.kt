@@ -29,9 +29,12 @@ const val NavigateToHistoryTestTag = "NavigateToHistory"
 const val NavigateToInfoTestTag = "NavigateToInfo"
 
 @Composable
-fun TopBar(navigation: NavigationHandlers = NavigationHandlers()) {
+fun TopBar(
+    title: String = stringResource(id = R.string.app_name),
+    navigation: NavigationHandlers = NavigationHandlers()
+) {
     TopAppBar(
-        title = { Text(text = stringResource(id = R.string.app_name)) },
+        title = { Text(text = title) },
         navigationIcon = {
             if (navigation.onBackRequested != null) {
                 IconButton(

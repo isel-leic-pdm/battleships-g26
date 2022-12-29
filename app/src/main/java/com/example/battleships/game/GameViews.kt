@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
@@ -23,6 +24,7 @@ import pt.isel.daw.dawbattleshipgame.domain.board.Panel
 import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.ShotsList
 import com.example.battleships.utils.SCREEN_WIDTH
+import pt.isel.battleships.R
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 
@@ -121,7 +123,10 @@ private fun PreparationPhase(
                 modifier = Modifier.padding(15.dp),
                 onClick = onConfirmLayout
             ) {
-                Text("Confirm", fontSize = 20.sp)
+                Text(
+                    text = stringResource(id = R.string.game_screen_place_phase_confirm_button),
+                    fontSize = 20.sp
+                )
             }
         }
     }
@@ -130,7 +135,10 @@ private fun PreparationPhase(
 @Composable
 private fun WaitingForOpponentToConfirm(board: Board) {
     BoardView(board, onPanelClick = null)
-    Text("Waiting for opponent to confirm", fontSize = 40.sp)
+    Text(
+        text = stringResource(id = R.string.game_screen_waiting_for_opponent_to_confirm_error),
+        fontSize = 40.sp
+    )
 }
 
 @Composable
@@ -171,7 +179,9 @@ private fun Battle(
             .fillMaxSize()
     ) {
         Text(
-            text = if (turn == player) "Your turn" else "Opponent turn",
+            text =
+                if (turn == player) stringResource(id = R.string.game_screen_your_turn_msg)
+                else stringResource(id = R.string.game_screen_opponents_turn_msg),
             fontSize = 40.sp,
             modifier = Modifier.padding(16.dp),
             color = if (turn == player) Color.Blue else Color.Black

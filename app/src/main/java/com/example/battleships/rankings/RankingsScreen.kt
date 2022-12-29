@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,6 +25,7 @@ import com.example.battleships.ui.*
 import com.example.battleships.ui.theme.*
 import com.example.battleships.utils.SCREEN_HEIGHT
 import com.example.battleships.utils.SCREEN_WIDTH
+import pt.isel.battleships.R
 
 // Test tags for the Rankings screen
 const val RankingListTestTag = "RankingList"
@@ -59,7 +61,7 @@ private fun RankingList(
             topBar = {
                 CenteredTopAppBar(
                     navigation = onNavigationRequested,
-                    title = "Rankings"
+                    title = stringResource(R.string.ranking_top_app_bar_tittle_text)
                 )
             },
             backgroundColor = MaterialTheme.colors.background,
@@ -91,10 +93,10 @@ private fun RankingList(
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
                         val fontSize = 20.sp
-                        Text("Nº", fontSize = fontSize)
-                        Text("NAME", fontSize = fontSize)
-                        Text("GAMES", fontSize = fontSize)
-                        Text("WINS", fontSize = fontSize)
+                        Text(stringResource(R.string.rankings_screen_table_col_1_title), fontSize = fontSize)
+                        Text(stringResource(R.string.rankings_screen_table_col_2_title), fontSize = fontSize)
+                        Text(stringResource(R.string.rankings_screen_table_col_3_title), fontSize = fontSize)
+                        Text(stringResource(R.string.rankings_screen_table_col_4_title), fontSize = fontSize)
                     }
                     Column(
                         Modifier.verticalScroll(rememberScrollState())

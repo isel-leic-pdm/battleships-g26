@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,7 +27,12 @@ import pt.isel.battleships.R
 fun UserScreen(user: UserStats, onBackRequest: () -> Unit) {
     BattleshipsTheme {
         Scaffold(
-            topBar = { CenteredTopAppBar(title = "User", NavigationHandlers(onBackRequest)) }
+            topBar = {
+                CenteredTopAppBar(
+                    title = stringResource(id = R.string.user_screen_top_app_bar_title),
+                    NavigationHandlers(onBackRequest)
+                )
+            }
         ) { padding ->
             Column(
                 Modifier
@@ -67,7 +73,7 @@ fun UserScreen(user: UserStats, onBackRequest: () -> Unit) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Wins",
+                            text = stringResource(id = R.string.user_screen_label_1),
                             fontSize = 20.sp
                         )
                         Text(
@@ -88,7 +94,7 @@ fun UserScreen(user: UserStats, onBackRequest: () -> Unit) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Games played",
+                            text = stringResource(id = R.string.user_screen_label_2),
                             fontSize = 20.sp
                         )
                         Text(

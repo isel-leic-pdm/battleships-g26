@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.battleships.DependenciesContainer
@@ -20,8 +21,8 @@ import com.example.battleships.rankings.RankingsActivity
 import com.example.battleships.ui.Handler
 import com.example.battleships.ui.StartScreen
 import com.example.battleships.user.UserActivity
-import com.example.battleships.user.UserViewModel
 import com.example.battleships.utils.getWith
+import pt.isel.battleships.R
 
 const val NavigateToAuthenticationButtonTestTag = "NavigateToAuthenticationButton"
 const val NavigateToRankingsButtonTestTag = "NavigateToRankingsButton"
@@ -61,10 +62,16 @@ class HomeActivity : ComponentActivity() {
             val context = LocalContext.current
             Log.e(TAG, "user home token = $token")
             val handler = if (token == null) {
-                Handler("Sign In", "sign-in") {
+                Handler(
+                    name = stringResource(R.string.sign_in_button_text),
+                    tag = "sign-in"
+                ) {
                     AuthActivity.navigate(this)
                 }
-            } else Handler("Start Game", "start-game") {
+            } else Handler(
+                name = stringResource(R.string.start_game_button_text),
+                tag = "start-game"
+            ) {
                 GameActivity.navigate(this, token!!)
             }
             val onUserInfo = if (token == null) null

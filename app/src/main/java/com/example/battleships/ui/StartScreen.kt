@@ -104,7 +104,6 @@ fun BottomAppNavigation(ranking : () -> Unit, appInfo : () -> Unit, onUserInfo :
         }
     }
 
-
     Column(
         horizontalAlignment = Alignment.End
     ) {
