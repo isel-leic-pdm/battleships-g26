@@ -212,18 +212,21 @@ private fun Battle(
                 displayedBoard.value = displayedBoard.value.other()
                 clickAction.value = if (clickAction.value == null) ::onCoordinateClick else null
             }) {
-                Text(text = if (displayedBoard.value == player) "Opponent board" else "Your Board")
+                Text(
+                    text = if (displayedBoard.value == player) stringResource(id = R.string.game_screen_opponent_board)
+                        else stringResource(id = R.string.game_screen_my_board)
+                )
             }
 
             if (turn == player && displayedBoard.value != player) {
                 if((configuration.shots - shots.value.shots.size) == 0L) {
                     OutlinedButton(onClick = { onShot(shots.value).also { firstCall.value = true } }) {
-                        Text("Place Shots")
+                        stringResource(id = R.string.game_screen_place_shots)
                     }
                 }
                 else {
                     OutlinedButton(onClick = {}) {
-                        Text("Shots left = ${(configuration.shots - shots.value.shots.size)}")
+                        Text("${stringResource(id = R.string.game_screen_place_shots)} = ${(configuration.shots - shots.value.shots.size)}")
                     }
                 }
             }
@@ -235,8 +238,16 @@ private fun Battle(
 private fun End(winner: Player) {
     val fontSize = 40.sp
     val modifier = Modifier.padding(16.dp)
-    Text("Game over", modifier = modifier, fontSize = fontSize)
-    Text("Winner: $winner", modifier = modifier, fontSize = fontSize)
+    Text(
+        text = stringResource(id = R.string.game_screen_game_over),
+        modifier = modifier,
+        fontSize = fontSize
+    )
+    Text(
+        text = "${stringResource(id = R.string.game_screen_winner)} $winner",
+        modifier = modifier,
+        fontSize = fontSize
+    )
 }
 
 @Composable

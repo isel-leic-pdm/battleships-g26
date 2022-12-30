@@ -47,5 +47,11 @@
     <string name="game_screen_place_phase_confirm_button">Confirm</string>
     <string name="game_screen_waiting_for_opponent_to_confirm_error">Waiting For Opponent To Confirm</string>
     <string name="game_screen_your_turn_msg">Your Turn !</string>
-    <string name="game_screen_opponents_turn_msg">Oponent Turn !</string>
+    <string name="game_screen_opponents_turn_msg">Opponent Turn !</string>
+    <string name="game_screen_opponent_board">Opponent Board</string>
+    <string name="game_screen_my_board">My Board</string>
+    <string name="game_screen_place_shots">Place Shots</string>
+    <string name="game_screen_shots_left">Shots left</string>
+    <string name="game_screen_game_over">Game Over</string>
+    <string name="game_screen_winner">Winner</string>
 </resources>
