@@ -22,7 +22,6 @@ class RankingsActivityTests {
     fun screen_contains_all_options() {
         // Assert
         testRule.onNodeWithTag(RankingListTestTag).assertExists()
-        testRule.onNodeWithTag(NavigateToAppInfoTestTag).assertExists()
         testRule.onNodeWithTag(NavigateBackTestTag).assertExists()
     }
 
@@ -39,21 +38,6 @@ class RankingsActivityTests {
         testRule.onNodeWithTag("AuthScreen").assertDoesNotExist()
         testRule.waitForIdle()
         assert(testRule.activityRule.scenario.state == Lifecycle.State.DESTROYED)
-    }
-
-    @Test
-    fun pressing_navigate_to_info_opens_info_activity() {
-        // Arrange
-        testRule.onNodeWithTag("RankingsScreen").assertExists()
-
-        // Act
-        testRule.onNodeWithTag(NavigateToAppInfoTestTag).performClick()
-        testRule.waitForIdle()
-
-        // Assert
-        testRule.onNodeWithTag("InfoScreen").assertExists()
-        testRule.waitForIdle()
-        assert(testRule.activityRule.scenario.state == Lifecycle.State.STARTED)
     }
 
     @Test

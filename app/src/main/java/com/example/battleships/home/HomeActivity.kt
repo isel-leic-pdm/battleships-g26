@@ -82,7 +82,7 @@ class HomeActivity : ComponentActivity() {
             }
             StartScreen(
                 handler,
-                tag = "HomeScreen",
+                tag = if (tokenAux == null) "HomeScreen" else "UserHomeScreen",
                 onRanking = { RankingsActivity.navigate(this) },
                 onAppInfo = { InfoActivity.navigate(this) },
                 onUserInfo = onUserInfo,

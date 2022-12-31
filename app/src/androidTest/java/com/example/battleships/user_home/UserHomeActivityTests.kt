@@ -45,21 +45,6 @@ class UserHomeActivityTests {
     }
 
     @Test
-    fun pressing_navigate_back_finishes_activity() {
-        // Arrange
-        testRule.onNodeWithTag("UserHomeScreen").assertExists()
-
-        // Act
-        testRule.onNodeWithTag(NavigateBackTestTag).performClick()
-        testRule.waitForIdle()
-
-        // Assert
-        testRule.onNodeWithTag("UserHomeScreen").assertDoesNotExist()
-        testRule.waitForIdle()
-        assert(testRule.activityRule.scenario.state == Lifecycle.State.DESTROYED)
-    }
-
-    @Test
     fun pressing_navigate_to_info_opens_info_screen() {
         // Arrange
         testRule.onNodeWithTag("UserHomeScreen").assertExists()
@@ -79,7 +64,7 @@ class UserHomeActivityTests {
         testRule.onNodeWithTag("UserHomeScreen").assertExists()
 
         // Act
-        testRule.onNodeWithTag("start-game").performClick()
+        testRule.onNodeWithTag(NavigateToGameTestTag).performClick()
         testRule.waitForIdle()
 
         // Assert

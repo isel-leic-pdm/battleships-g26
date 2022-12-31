@@ -58,6 +58,7 @@ private fun RankingList(
 ) {
     BattleshipsTheme {
         Scaffold(
+            modifier = Modifier.testTag("RankingsScreen"),
             topBar = {
                 CenteredTopAppBar(
                     navigation = onNavigationRequested,
