@@ -2,11 +2,13 @@
 
 package com.example.battleships.utils.hypermedia
 
+import com.example.battleships.URL
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import java.net.URI
+import java.net.URL
 
 /**
  * For details regarding the Siren media type, see <a href="https://github.com/kevinswiber/siren">Siren</a>
@@ -110,4 +112,7 @@ data class EmbeddedEntity<T>(
     }
 }
 
-fun URI.toApiURL() = URI("http://10.0.2.2:9000$this").toURL()
+fun URI.toApiURL(): URL {
+    val t = URI("$URL$this").toURL()
+    return t
+}

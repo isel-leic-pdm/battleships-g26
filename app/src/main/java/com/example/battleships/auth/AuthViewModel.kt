@@ -38,7 +38,7 @@ class AuthViewModel(private val useCases: UseCases): ViewModel() {
                     Result.failure(e)
                 }
             _isCreateUserLoading.value = false
-            if(login) login(username, password, errorHandler)
+            if (login) login(username, password, errorHandler)
         }
     }
 

@@ -17,7 +17,9 @@ interface DependenciesContainer {
     val useCases: UseCases
 }
 
-private val battleshipsAPIHome = URL("http://10.0.2.2:9000")
+const val URL = "https://f884-95-94-100-26.eu.ngrok.io"
+
+private val battleshipsAPIHome = URL(URL)
 
 class BattleshipsApplication : DependenciesContainer, Application() {
     private val httpClient: OkHttpClient by lazy { OkHttpClient() }

@@ -27,7 +27,7 @@ class RankingsViewModel(private val useCases: UseCases): ViewModel() {
                     Result.success(useCases.fetchRankings(
                         if (forcedRefresh) Mode.FORCE_REMOTE
                         else Mode.AUTO
-                    ))
+                    )).also { Log.d("RankingsViewModel", "Rankings loaded") }
                 } catch (e: Exception) {
                     Log.e("RankingsViewModel", "Error loading rankings", e)
                     Result.failure(e)

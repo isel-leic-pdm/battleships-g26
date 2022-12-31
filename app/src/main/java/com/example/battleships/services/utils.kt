@@ -60,30 +60,38 @@ val JsonMediaType = "application/json".toMediaType()
 internal fun <T> handleResponse(jsonEncoder: Gson, response: Response, type: Type, mediaType: MediaType): T {
     val contentType = response.body?.contentType()
 
-    if(contentType != ProblemMediaType && contentType != mediaType)
+    if(contentType != ProblemMediaType && contentType != mediaType) {
+        val body = response.body?.string()
         throw UnexpectedResponseException(response, toast = "Content type does not match").also {
-            Log.e("content type" , contentType.toString())
-            Log.e("media type" , mediaType.toString())
+            Log.e("HandleResponse", contentType.toString())
+            Log.e("HandleResponse", mediaType.toString())
         }
+    }
 
     val body = response.body?.string()
     return if (response.isSuccessful) {
         try {
-            jsonEncoder.fromJson<T>(body, type)
+            jsonEncoder.fromJson<T>(body, type).also {
+                Log.d("HandleResponse", "Response successful: $it")
+            }
         } catch (e: JsonSyntaxException) {
-            Log.e("JsonSyntaxException", e.toString())
+            Log.e("HandleResponse", e.toString())
             throw UnexpectedResponseException(response, body, "Error parsing JSON")
         }
-    }
-    else {
+    } else {
         val problem: Problem
-        try{
-            problem = jsonEncoder.fromJson(body, problemType)
+        try {
+            problem = jsonEncoder.fromJson<Problem?>(body, problemType).also {
+                Log.d("HandleResponse", "Response not successful (Problem: $it)")
+            }
+        } catch (e : Exception){
+            throw UnexpectedResponseException(response, body, "An error has occurred").also {
+                Log.e("HandleResponse", e.toString())
+            }
         }
-        catch (e : Exception){
-            throw UnexpectedResponseException(response, body, "An error has occurred")
+        throw UnexpectedResponseException(response, body, problem.detail).also {
+            Log.e("HandleResponse", problem.detail)
         }
-        throw UnexpectedResponseException(response, body, problem.detail)
     }
 }
 
