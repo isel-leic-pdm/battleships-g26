@@ -17,7 +17,7 @@ interface DependenciesContainer {
     val useCases: UseCases
 }
 
-const val URL = "https://f884-95-94-100-26.eu.ngrok.io"
+const val URL = "http://10.0.2.2:9000"
 
 private val battleshipsAPIHome = URL(URL)
 
@@ -31,12 +31,11 @@ class BattleshipsApplication : DependenciesContainer, Application() {
             RealUserDataServices(httpClient, jsonEncoder),
             RealGamesDataServices(httpClient, jsonEncoder)
         )
-/*
+    /*
         get() = FakeUseCases(
             FakeHomeDataServices(),
             FakeUserDataServices(),
             FakeGameDataServices()
         )
-
- */
+    */
 }

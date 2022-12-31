@@ -6,7 +6,7 @@ import androidx.compose.ui.test.performClick
 import androidx.lifecycle.Lifecycle
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.battleships.ui.NavigateBackTestTag
-import com.example.battleships.ui.NavigateToInfoTestTag
+import com.example.battleships.ui.NavigateToAppInfoTestTag
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,10 +20,11 @@ class HomeActivityTests {
 
     @Test
     fun screen_contains_three_options() {
-        testRule.onNodeWithTag(NavigateToInfoTestTag).assertExists()
+        testRule.onNodeWithTag(NavigateToAppInfoTestTag).assertExists()
         testRule.onNodeWithTag(NavigateToAuthenticationButtonTestTag).assertExists()
         testRule.onNodeWithTag(NavigateToRankingsButtonTestTag).assertExists()
         testRule.onNodeWithTag(NavigateBackTestTag).assertDoesNotExist()
+        testRule.onNodeWithTag(NavigateToGameTestTag).assertDoesNotExist()
     }
 
     @Test
@@ -65,7 +66,7 @@ class HomeActivityTests {
         testRule.onNodeWithTag("InfoScreen").assertDoesNotExist()
 
         // Act
-        testRule.onNodeWithTag(NavigateToInfoTestTag).performClick()
+        testRule.onNodeWithTag(NavigateToAppInfoTestTag).performClick()
         testRule.waitForIdle()
 
         // Assert

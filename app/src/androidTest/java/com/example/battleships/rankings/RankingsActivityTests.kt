@@ -6,7 +6,7 @@ import androidx.compose.ui.test.performClick
 import androidx.lifecycle.Lifecycle
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.battleships.ui.NavigateBackTestTag
-import com.example.battleships.ui.NavigateToInfoTestTag
+import com.example.battleships.ui.NavigateToAppInfoTestTag
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,7 +22,7 @@ class RankingsActivityTests {
     fun screen_contains_all_options() {
         // Assert
         testRule.onNodeWithTag(RankingListTestTag).assertExists()
-        testRule.onNodeWithTag(NavigateToInfoTestTag).assertExists()
+        testRule.onNodeWithTag(NavigateToAppInfoTestTag).assertExists()
         testRule.onNodeWithTag(NavigateBackTestTag).assertExists()
     }
 
@@ -47,7 +47,7 @@ class RankingsActivityTests {
         testRule.onNodeWithTag("RankingsScreen").assertExists()
 
         // Act
-        testRule.onNodeWithTag(NavigateToInfoTestTag).performClick()
+        testRule.onNodeWithTag(NavigateToAppInfoTestTag).performClick()
         testRule.waitForIdle()
 
         // Assert

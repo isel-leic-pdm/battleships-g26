@@ -112,7 +112,4 @@ data class EmbeddedEntity<T>(
     }
 }
 
-fun URI.toApiURL(): URL {
-    val t = URI("$URL$this").toURL()
-    return t
-}
+fun URI.toApiURL() = URI("$URL$this").toURL()

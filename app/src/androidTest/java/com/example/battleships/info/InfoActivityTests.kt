@@ -6,7 +6,7 @@ import androidx.compose.ui.test.performClick
 import androidx.lifecycle.Lifecycle
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.battleships.ui.NavigateBackTestTag
-import com.example.battleships.ui.NavigateToInfoTestTag
+import com.example.battleships.ui.NavigateToAppInfoTestTag
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,7 +23,7 @@ class InfoActivityTests {
 
         // Assert
         testRule.onNodeWithTag(NavigateBackTestTag).assertExists()
-        testRule.onNodeWithTag(NavigateToInfoTestTag).assertDoesNotExist()
+        testRule.onNodeWithTag(NavigateToAppInfoTestTag).assertDoesNotExist()
     }
 
     @Test

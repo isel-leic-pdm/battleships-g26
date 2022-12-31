@@ -26,6 +26,7 @@ import pt.isel.battleships.R
 
 const val NavigateToAuthenticationButtonTestTag = "NavigateToAuthenticationButton"
 const val NavigateToRankingsButtonTestTag = "NavigateToRankingsButton"
+const val NavigateToGameTestTag = "NavigateToGame"
 
 class HomeActivity : ComponentActivity() {
 
@@ -57,24 +58,25 @@ class HomeActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (token != null) vm.getUserHome(token!!)
+        val tokenAux = token
+        if (tokenAux != null) vm.getUserHome(tokenAux)
         setContent {
             val context = LocalContext.current
-            Log.e(TAG, "user home token = $token")
-            val handler = if (token == null) {
+            Log.e(TAG, "user home token = $tokenAux")
+            val handler = if (tokenAux == null) {
                 Handler(
                     name = stringResource(R.string.sign_in_button_text),
-                    tag = "sign-in"
+                    tag = NavigateToAuthenticationButtonTestTag,
                 ) {
                     AuthActivity.navigate(this)
                 }
             } else Handler(
                 name = stringResource(R.string.start_game_button_text),
-                tag = "start-game"
+                tag = NavigateToGameTestTag
             ) {
-                GameActivity.navigate(this, token!!)
+                GameActivity.navigate(this, tokenAux)
             }
-            val onUserInfo = if (token == null) null
+            val onUserInfo = if (tokenAux == null) null
             else {
                 { UserActivity.navigate(this, vm.me?.getWith(context)!!.userId) }
             }

@@ -7,7 +7,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +18,8 @@ import com.example.battleships.home.NavigateToRankingsButtonTestTag
 import com.example.battleships.ui.theme.BattleshipsTheme
 import com.example.battleships.utils.SCREEN_HEIGHT
 import pt.isel.battleships.R
+
+const val NavigateToUserInfoButton = "NavigateToUserInfoButton"
 
 data class Handler(val name: String, val tag: String, val handler: () -> Unit)
 
@@ -71,7 +72,7 @@ fun StartScreen(
 }
 
 @Composable
-fun BottomAppNavigation(ranking : () -> Unit, appInfo : () -> Unit, onUserInfo : (() -> Unit)?)  = Row(
+fun BottomAppNavigation(ranking : () -> Unit, onAppInfo : () -> Unit, onUserInfo : (() -> Unit)?)  = Row(
     Modifier.fillMaxWidth(),
     horizontalArrangement = Arrangement.SpaceBetween,
     verticalAlignment = Alignment.CenterVertically
@@ -93,7 +94,7 @@ fun BottomAppNavigation(ranking : () -> Unit, appInfo : () -> Unit, onUserInfo :
             horizontalAlignment = Alignment.End
         ) {
             IconButton(
-                modifier = Modifier.testTag(NavigateToInfoTestTag),
+                modifier = Modifier.testTag(NavigateToUserInfoButton),
                 onClick = onUserInfo,
             ) {
                 Icon(
@@ -108,8 +109,8 @@ fun BottomAppNavigation(ranking : () -> Unit, appInfo : () -> Unit, onUserInfo :
         horizontalAlignment = Alignment.End
     ) {
         IconButton(
-            modifier = Modifier.testTag(NavigateToInfoTestTag),
-            onClick = appInfo,
+            modifier = Modifier.testTag(NavigateToAppInfoTestTag),
+            onClick = onAppInfo,
         ) {
             Icon(
                 Icons.Default.Info,

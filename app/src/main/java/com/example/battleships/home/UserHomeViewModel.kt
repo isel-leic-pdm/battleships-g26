@@ -14,11 +14,11 @@ class UserHomeViewModel(val useCases: UseCases) : ViewModel() {
     val me: Result<UserHome>?
         get() = _me
 
-    fun getUserHome(token : String){
+    fun getUserHome(token : String) {
         viewModelScope.launch {
             _me = try {
                 Result.success(useCases.getUserHome(token))
-            }catch (e : Exception) {
+            } catch (e : Exception) {
                 Log.e("UserHomeViewModel", "Error loading user", e)
                 Result.failure(e)
             }

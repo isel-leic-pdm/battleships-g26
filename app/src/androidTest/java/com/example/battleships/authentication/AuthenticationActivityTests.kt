@@ -10,7 +10,7 @@ import com.example.battleships.auth.SwitchToLoginButtonTestTag
 import com.example.battleships.home.LoginButtonTestTag
 import com.example.battleships.home.RegisterUserButtonTestTag
 import com.example.battleships.ui.NavigateBackTestTag
-import com.example.battleships.ui.NavigateToInfoTestTag
+import com.example.battleships.ui.NavigateToAppInfoTestTag
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,7 +26,7 @@ class AuthenticationActivityTests {
     fun screen_contains_all_options() {
         // Assert
         testRule.onNodeWithTag(RegisterUserButtonTestTag).assertExists()
-        testRule.onNodeWithTag(NavigateToInfoTestTag).assertExists()
+        testRule.onNodeWithTag(NavigateToAppInfoTestTag).assertExists()
         testRule.onNodeWithTag(NavigateBackTestTag).assertExists()
     }
 
@@ -66,7 +66,7 @@ class AuthenticationActivityTests {
         testRule.onNodeWithTag("AuthScreen").assertExists()
 
         // Act
-        testRule.onNodeWithTag(NavigateToInfoTestTag).performClick()
+        testRule.onNodeWithTag(NavigateToAppInfoTestTag).performClick()
         testRule.waitForIdle()
 
         // Assert

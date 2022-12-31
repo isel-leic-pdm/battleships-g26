@@ -17,11 +17,11 @@ class UserViewModel(
     val user: Result<UserStats>?
         get() = _user
 
-    fun getUserById(id : Int){
+    fun getUserById(id : Int) {
         viewModelScope.launch {
             _user = try {
                 Result.success(useCases.getUserById(id))
-            }catch (e : Exception) {
+            } catch (e : Exception) {
                 Log.e("UserViewModel", "Error loading user", e)
                 Result.failure(e)
             }

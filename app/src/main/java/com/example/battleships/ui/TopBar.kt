@@ -26,7 +26,7 @@ data class NavigationHandlers(
 // Test tags for the TopBar navigation elements
 const val NavigateBackTestTag = "NavigateBack"
 const val NavigateToHistoryTestTag = "NavigateToHistory"
-const val NavigateToInfoTestTag = "NavigateToInfo"
+const val NavigateToAppInfoTestTag = "NavigateToInfo"
 
 @Composable
 fun TopBar(
@@ -63,7 +63,7 @@ fun TopBar(
             if (navigation.onInfoRequested != null) {
                 IconButton(
                     onClick = navigation.onInfoRequested,
-                    modifier = Modifier.testTag(NavigateToInfoTestTag)
+                    modifier = Modifier.testTag(NavigateToAppInfoTestTag)
                 ) {
                     Icon(
                         Icons.Default.Info,
