@@ -35,7 +35,7 @@ class FakeUserDataServices : UserDataServices {
         password: String,
         mode: Mode,
         createTokenAction: SirenAction?
-    ): Either<ApiException, String?> {
+    ): Either<ApiException, String> {
         return Either.Right(users[UserCredentials(username, password)]?.let { tokens[it] }
             ?: throw UnexpectedResponseException()
         )
@@ -53,7 +53,9 @@ class FakeUserDataServices : UserDataServices {
      */
 
     override suspend fun getUserHome(token: String, mode: Mode, userHomeLink: SirenLink?): UserHome {
-        TODO("Not yet implemented")
+        val user = users.entries.find { it.value == tokens.entries.find { it.value == token }?.key }
+            ?: throw UnexpectedResponseException()
+        return UserHome(user.value, user.key.username)
     }
 
 }

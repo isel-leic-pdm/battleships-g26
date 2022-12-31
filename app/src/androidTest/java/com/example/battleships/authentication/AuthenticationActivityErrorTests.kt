@@ -33,7 +33,7 @@ class AuthenticationActivityErrorTests {
         }
 
         ActivityScenario.launch(AuthActivity::class.java).use {
-            testRule.onNodeWithTag("QuoteView").assertDoesNotExist()
+            testRule.onNodeWithTag("AuthScreen").assertDoesNotExist()
             testRule.onNodeWithTag("ErrorAlert").assertExists()
             val expected = application.resources.getString(R.string.error_exit_button_text)
             testRule.onNodeWithText(expected).assertExists()

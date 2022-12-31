@@ -39,7 +39,7 @@ class FakeUseCases(
      */
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun createGame(token: String, mode: Mode, configuration: Configuration?): Boolean {
-        val gameId = gameServices.createGame(token, mode)
+        val gameId = gameServices.createGame(token, mode, configuration = configuration)
         return getValueOrThrow(gameId)
     }
 
@@ -72,7 +72,7 @@ class FakeUseCases(
     }
 
     override suspend fun fetchServerInfo(mode: Mode): ServerInfo {
-        TODO("Not yet implemented")
+        return homeServices.getServerInfo(mode)
     }
 
     override suspend fun getUserById(id: Int, mode: Mode): UserStats {
@@ -80,9 +80,6 @@ class FakeUseCases(
     }
 
     override suspend fun getUserHome(token: String, mode: Mode): UserHome {
-        TODO("Not yet implemented")
+        return userServices.getUserHome(token, mode)
     }
-
-    private fun <T> getValueOrThrow(either: Either<ApiException, T?>): T =
-        getValueOrThrow(either)
 }

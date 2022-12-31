@@ -123,7 +123,4 @@ class RealUseCases(
             is Either.Right -> either.value
         }
     }
-
-    private fun <T> getValueOrThrow(either: Either<ApiException, T>): T =
-        getOrThrowValue(either)
 }
