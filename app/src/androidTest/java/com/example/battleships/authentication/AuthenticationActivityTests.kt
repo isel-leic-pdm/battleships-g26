@@ -26,7 +26,6 @@ class AuthenticationActivityTests {
     fun screen_contains_all_options() {
         // Assert
         testRule.onNodeWithTag(RegisterUserButtonTestTag).assertExists()
-        testRule.onNodeWithTag(NavigateToAppInfoTestTag).assertExists()
         testRule.onNodeWithTag(NavigateBackTestTag).assertExists()
     }
 
@@ -58,20 +57,6 @@ class AuthenticationActivityTests {
         testRule.onNodeWithTag("AuthScreen").assertDoesNotExist()
         testRule.waitForIdle()
         assert(testRule.activityRule.scenario.state == Lifecycle.State.DESTROYED)
-    }
-
-    @Test
-    fun pressing_navigate_to_info_opens_info_screen() {
-        // Arrange
-        testRule.onNodeWithTag("AuthScreen").assertExists()
-
-        // Act
-        testRule.onNodeWithTag(NavigateToAppInfoTestTag).performClick()
-        testRule.waitForIdle()
-
-        // Assert
-        testRule.onNodeWithTag("InfoScreen").assertExists()
-        testRule.waitForIdle()
     }
 
     @Test

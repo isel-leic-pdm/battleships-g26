@@ -26,7 +26,7 @@ fun <A : ComponentActivity> createAndroidComposeRule(
 )
 
 /**
- * Test rule that ensures that the default quote service is preserved after the test is executed.
+ * Test rule that ensures that the default dependencies are preserved after the test is executed.
  *
  * Tests that make use of this rule are allowed to replace the globally accessible quote service test
  * double by another double that serves their purposes. The behaviour of the remaining tests
@@ -43,8 +43,9 @@ class PreserveDefaultFakeServiceRule : TestRule {
         object : Statement() {
             override fun evaluate() {
                 val defaultService = testApplication.useCases
-                try { test.evaluate() }
-                finally {
+                try {
+                    test.evaluate()
+                } finally {
                     testApplication.useCases = defaultService
                 }
             }

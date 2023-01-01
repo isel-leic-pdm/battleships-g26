@@ -31,6 +31,10 @@ import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 
+const val QuickGame = "QuickGame"
+const val NewGame = "NewGame"
+const val RestoreGame = "RestoreGame"
+
 internal open class Selection
 internal class ShipOption(val shipType: ShipType) : Selection()
 internal class Square(val coordinate: Coordinate) : Selection()
@@ -139,13 +143,22 @@ private fun InitScreen(activity: GameActivity) {
     val chooseFleet = remember { mutableStateOf(false) }
 
     Button(onClick = {activity.vm.startGame(errorHandler = ApiErrorHandler(context))}) {
-        Text(text = stringResource(id = R.string.game_screen_option_1))
+        Text(
+            modifier = Modifier.testTag(QuickGame),
+            text = stringResource(id = R.string.game_screen_option_1)
+        )
     }
     Button(onClick = { config.value = true }) {
-        Text(text = stringResource(id = R.string.game_screen_option_2))
+        Text(
+            modifier = Modifier.testTag(NewGame),
+            text = stringResource(id = R.string.game_screen_option_2)
+        )
     }
     Button(onClick = { activity.vm.restoreGame()}) {
-        Text(text = stringResource(id = R.string.game_screen_option_3))
+        Text(
+            modifier = Modifier.testTag(RestoreGame),
+            text = stringResource(id = R.string.game_screen_option_3)
+        )
     }
     if (config.value) {
         AlertDialog(

@@ -331,7 +331,7 @@ internal fun ShipOptionView(
             val m = Modifier
                 .size(DEFAULT_PLAY_SIDE)
                 .background(Color.Gray)
-            Box(m.clickable { onClick().also { } })
+            Box(m.clickable { onClick() })
             Spacer(Modifier.size(GRID_WIDTH))
         }
     }

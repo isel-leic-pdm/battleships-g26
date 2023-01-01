@@ -30,12 +30,8 @@ class GameActivityTests {
     fun screen_contains_all_options() {
         testRule.onNodeWithTag("GameScreen").assertExists()
 
-        testRule.onNodeWithTag(CarrierShipButtonTestTag).assertExists()
-        testRule.onNodeWithTag(BattleshipShipButtonTestTag).assertExists()
-        testRule.onNodeWithTag(CruiserShipButtonTestTag).assertExists()
-        testRule.onNodeWithTag(SubmarineShipButtonTestTag).assertExists()
-        testRule.onNodeWithTag(DestroyerShipButtonTestTag).assertExists()
-
-        testRule.onNodeWithTag(ConfirmFleetButtonTestTag).assertExists()
+        testRule.onNodeWithTag(QuickGame, useUnmergedTree = true).assertExists()
+        testRule.onNodeWithTag(NewGame, useUnmergedTree = true).assertExists()
+        testRule.onNodeWithTag(RestoreGame, useUnmergedTree = true).assertExists()
     }
 }
