@@ -27,7 +27,9 @@ class FakeHomeDataServices : HomeDataServices {
         "1.0.0"
     )
 
-    override suspend fun getUserById(id: Int, mode: Mode): UserStats? {
-        TODO("Not yet implemented")
+    override suspend fun getUserById(id: Int, mode: Mode): UserStats {
+        val gamesPlayed = (1..100).random()
+        val wins = (1..100).random()
+        return UserStats(id, "user$id", gamesPlayed, wins)
     }
 }

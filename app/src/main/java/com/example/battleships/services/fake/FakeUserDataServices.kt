@@ -2,6 +2,7 @@ package com.example.battleships.services.fake
 
 import com.example.battleships.services.*
 import com.example.battleships.home.UserHome
+import com.example.battleships.rankings.UserStats
 import com.example.battleships.utils.hypermedia.SirenAction
 import com.example.battleships.utils.hypermedia.SirenLink
 import pt.isel.daw.dawbattleshipgame.domain.player.UserRanking
@@ -57,5 +58,4 @@ class FakeUserDataServices : UserDataServices {
             ?: throw UnexpectedResponseException()
         return UserHome(user.value, user.key.username)
     }
-
 }

@@ -9,7 +9,6 @@ data class UserStats(val id: Int, val username: String, val wins: Int, val games
 fun rankings(rankings: RankingsDtoProperties) =
     UserRanking(rankings.users.map { UserStats(it.id, it.username, it.wins, it.gamesPlayed) })
 
-fun userInfo(user : UserStatsDtoProperties?): UserStats? {
-    user ?: return null
+fun userInfo(user : UserStatsDtoProperties): UserStats {
     return UserStats(user.id, user.username, user.wins, user.gamesPlayed)
 }

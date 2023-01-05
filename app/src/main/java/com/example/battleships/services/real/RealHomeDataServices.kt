@@ -58,7 +58,7 @@ class RealHomeDataServices(
         return serverInfo(serverInfoProperties)
     }
 
-    override suspend fun getUserById(id: Int, mode: Mode): UserStats? {
+    override suspend fun getUserById(id: Int, mode: Mode): UserStats {
         val auxLink = ensureGetUserLink()
         val userInfoUrl = URL(auxLink.toString().replace(":id", id.toString()))
 
@@ -68,6 +68,7 @@ class RealHomeDataServices(
             handleResponse<UserStatsDto>(jsonEncoder, response, UserStatsDtoType.type, SirenMediaType)
         }
         val userProperties = userInfoDto.properties
+        require(userProperties != null) { "UserStatsDto properties should not have been null" }
         return userInfo(userProperties)
     }
 

@@ -10,5 +10,5 @@ import com.example.battleships.rankings.UserStats
 interface HomeDataServices {
     suspend fun getRankings(mode: Mode): UserRanking
     suspend fun getServerInfo(mode: Mode): ServerInfo
-    suspend fun getUserById(id: Int, mode : Mode): UserStats?
+    suspend fun getUserById(id: Int, mode : Mode): UserStats
 }

@@ -80,7 +80,7 @@ class FakeUseCases(
     }
 
     override suspend fun getUserById(id: Int, mode: Mode): UserStats {
-        TODO("Not yet implemented")
+        return homeServices.getUserById(id, mode)
     }
 
     override suspend fun getUserHome(token: String, mode: Mode): UserHome {

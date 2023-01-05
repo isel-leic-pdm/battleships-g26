@@ -111,7 +111,7 @@ class RealUseCases(
         homeServices.getServerInfo(mode)
 
     override suspend fun getUserById(id: Int, mode: Mode): UserStats =
-        homeServices.getUserById(id, mode) ?: throw UnexpectedResponseException(toast = "User not found")
+        homeServices.getUserById(id, mode)
 
     override suspend fun getUserHome(token: String, mode: Mode) : UserHome{
         val userHomeLink = homeServices.getUserHomeLink()
