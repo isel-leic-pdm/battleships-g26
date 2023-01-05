@@ -13,16 +13,16 @@ fun ErrorMessage(onNonError: () -> Unit, onIoExceptionDismiss: () -> Unit, onApi
         ErrorAlert(
             title = R.string.error_api_title,
             message = R.string.error_could_not_reach_api,
-            buttonText = R.string.error_retry_button_text,
-            onDismiss = { onIoExceptionDismiss() }
+            rightButtonText = R.string.error_retry_button_text,
+            onRightButton = { onIoExceptionDismiss() }
         )
     }
     catch (e: ApiException) {
         ErrorAlert(
             title = R.string.error_api_title,
             message = R.string.error_unknown_api_response,
-            buttonText = R.string.error_exit_button_text,
-            onDismiss = { onApiExceptionDismiss() }
+            rightButtonText = R.string.error_exit_button_text,
+            onRightButton = { onApiExceptionDismiss() }
         )
     }
 }

@@ -1,5 +1,6 @@
 package com.example.battleships.use_cases
 
+import android.util.Log
 import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.game.domain.game.ShotsList
@@ -116,6 +117,8 @@ class RealUseCases(
         val userHomeLink = homeServices.getUserHomeLink()
         return userServices.getUserHome(token, Mode.AUTO, userHomeLink)
     }
+
+    override suspend fun getHome() = homeServices.getHome()
 
     private suspend fun <T> getValueOrExecute(either: Either<ApiException, T>, onEitherLeft: suspend () -> T): T {
         return when (either) {

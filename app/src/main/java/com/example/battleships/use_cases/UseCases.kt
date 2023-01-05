@@ -3,6 +3,7 @@ package com.example.battleships.use_cases
 import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.game.domain.game.ShotsList
+import com.example.battleships.home.Home
 import com.example.battleships.home.UserHome
 import com.example.battleships.info.ServerInfo
 import com.example.battleships.rankings.UserRanking
@@ -38,4 +39,6 @@ interface UseCases{
     suspend fun getUserById(id : Int, mode : Mode = Mode.AUTO) : UserStats
 
     suspend fun getUserHome(token: String, mode: Mode = Mode.AUTO) : UserHome
+
+    suspend fun getHome() : Home
 }

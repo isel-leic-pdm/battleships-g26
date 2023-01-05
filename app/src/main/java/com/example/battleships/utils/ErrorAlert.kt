@@ -2,14 +2,11 @@ package com.example.battleships.utils
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
@@ -22,14 +19,22 @@ import com.example.battleships.ui.theme.BattleshipsTheme
 fun ErrorAlert(
     @StringRes title: Int,
     @StringRes message: Int,
-    @StringRes buttonText: Int,
-    onDismiss: () -> Unit = { }
+    @StringRes rightButtonText: Int,
+    @StringRes leftButtonText: Int? = null,
+    onRightButton: () -> Unit = { },
+    onLeftButton: () -> Unit = { },
+
 ) {
+    val auxLeftButtonText = if(leftButtonText != null)
+        stringResource(id = leftButtonText) else null
+
     ErrorAlertImpl(
         title = stringResource(id = title),
         message = stringResource(id = message),
-        buttonText = stringResource(id = buttonText),
-        onDismiss = onDismiss
+        rightButtonText = stringResource(id = rightButtonText),
+        leftButtonText = auxLeftButtonText,
+        onRightButton = onRightButton,
+        onLeftButton = onLeftButton
     )
 }
 
@@ -37,23 +42,33 @@ fun ErrorAlert(
 private fun ErrorAlertImpl(
     title: String,
     message: String,
-    buttonText: String,
-    onDismiss: () -> Unit
+    rightButtonText: String,
+    leftButtonText: String? = null,
+    onRightButton: () -> Unit = {},
+    onLeftButton: () -> Unit = {},
+
 ) {
     AlertDialog(
         onDismissRequest = { },
         buttons = {
-            Box(
-                contentAlignment = Alignment.BottomEnd,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 8.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
+                if(leftButtonText != null)
+                    OutlinedButton(
+                        border = BorderStroke(0.dp, Color.Unspecified),
+                        onClick = onLeftButton
+                    ) {
+                        Text(text = leftButtonText)
+                    }
+                else Box{}
+
                 OutlinedButton(
                     border = BorderStroke(0.dp, Color.Unspecified),
-                    onClick = onDismiss
+                    onClick = onRightButton
                 ) {
-                    Text(text = buttonText)
+                    Text(text = rightButtonText)
                 }
             }
         },
@@ -70,8 +85,7 @@ private fun ErrorAlertImplPreview() {
         ErrorAlertImpl(
             title = "Error accessing server",
             message = "Could not ...",
-            buttonText = "OK",
-            onDismiss = { }
+            rightButtonText = "OK",
         )
     }
 }

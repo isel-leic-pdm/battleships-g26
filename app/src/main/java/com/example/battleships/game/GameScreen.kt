@@ -75,8 +75,8 @@ internal fun GameScreen(
                     else -> ErrorAlert(
                         title = R.string.error_api_title,
                         message = R.string.error_could_not_reach_api,
-                        buttonText = R.string.error_retry_button_text,
-                        onDismiss = { onBackRequest() }
+                        rightButtonText = R.string.error_exit_button_text,
+                        onRightButton = { onBackRequest() }
                     )
                 }
             }

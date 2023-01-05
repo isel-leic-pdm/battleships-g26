@@ -21,12 +21,15 @@ import com.example.battleships.rankings.RankingsActivity
 import com.example.battleships.ui.Handler
 import com.example.battleships.ui.StartScreen
 import com.example.battleships.user.UserActivity
+import com.example.battleships.utils.ErrorAlert
 import com.example.battleships.utils.getWith
 import pt.isel.battleships.R
 
 const val NavigateToAuthenticationButtonTestTag = "NavigateToAuthenticationButton"
 const val NavigateToRankingsButtonTestTag = "NavigateToRankingsButton"
 const val NavigateToGameTestTag = "NavigateToGame"
+const val HomeScreenTestTag = "HomeScreen"
+const val UserHomeScreenTestTag = "UserHomeScreen"
 
 class HomeActivity : ComponentActivity() {
 
@@ -47,22 +50,25 @@ class HomeActivity : ComponentActivity() {
     }
 
     @Suppress("UNCHECKED_CAST")
-    val vm by viewModels<UserHomeViewModel> {
+    val vm by viewModels<HomeViewModel> {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return UserHomeViewModel(useCases) as T
+                return HomeViewModel(useCases) as T
             }
         }
     }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        var home :Home? = null
         super.onCreate(savedInstanceState)
         val tokenAux = token
         if (tokenAux != null) vm.getUserHome(tokenAux)
+        else vm.getHome().also {
+            home = vm.home?.getOrNull()
+        }
         setContent {
             val context = LocalContext.current
-            Log.e(TAG, "user home token = $tokenAux")
             val handler = if (tokenAux == null) {
                 Handler(
                     name = stringResource(R.string.sign_in_button_text),
@@ -77,16 +83,26 @@ class HomeActivity : ComponentActivity() {
                 GameActivity.navigate(this, tokenAux)
             }
             val onUserInfo = if (tokenAux == null) null
+            else { { UserActivity.navigate(this, vm.userHome?.getWith(context)!!.userId) } }
+
+            if(home == null)
+                ErrorAlert(
+                    title = R.string.error_api_title,
+                    message = R.string.error_could_not_reach_api,
+                    rightButtonText = R.string.error_retry_button_text,
+                    leftButtonText = R.string.error_exit_button_text,
+                    onRightButton = { vm.getHome() },
+                    onLeftButton = { finish() }
+                )
             else {
-                { UserActivity.navigate(this, vm.me?.getWith(context)!!.userId) }
+                StartScreen(
+                    handler,
+                    tag = if (tokenAux == null) HomeScreenTestTag else UserHomeScreenTestTag,
+                    onRanking = { RankingsActivity.navigate(this) },
+                    onAppInfo = { InfoActivity.navigate(this) },
+                    onUserInfo = onUserInfo,
+                )
             }
-            StartScreen(
-                handler,
-                tag = if (tokenAux == null) "HomeScreen" else "UserHomeScreen",
-                onRanking = { RankingsActivity.navigate(this) },
-                onAppInfo = { InfoActivity.navigate(this) },
-                onUserInfo = onUserInfo,
-            )
         }
     }
 

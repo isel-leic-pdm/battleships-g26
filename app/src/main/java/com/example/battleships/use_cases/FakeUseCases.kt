@@ -2,9 +2,12 @@ package com.example.battleships.use_cases
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.example.battleships.dtos.HomeDto
+import com.example.battleships.dtos.HomeDtoProperties
 import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.Game
 import com.example.battleships.game.domain.game.ShotsList
+import com.example.battleships.home.Home
 import com.example.battleships.home.UserHome
 import com.example.battleships.info.ServerInfo
 import com.example.battleships.rankings.UserRanking
@@ -22,6 +25,7 @@ class FakeUseCases(
     private val userServices: FakeUserDataServices,
     private val gameServices: FakeGameDataServices
 ): UseCases {
+
 
     override suspend fun createUser(username: String, password: String, mode: Mode): Int {
         val userId = userServices.createUser(username, password, mode)
@@ -82,4 +86,7 @@ class FakeUseCases(
     override suspend fun getUserHome(token: String, mode: Mode): UserHome {
         return userServices.getUserHome(token, mode)
     }
+
+    override suspend fun getHome() = Home(HomeDto(properties = HomeDtoProperties("fake")))
+
 }
