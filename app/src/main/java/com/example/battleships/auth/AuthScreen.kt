@@ -24,15 +24,19 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.battleships.auth.views.LoadingButton
 import com.example.battleships.auth.views.LoadingState
 import com.example.battleships.auth.views.PasswordOutlinedTextField
 import com.example.battleships.home.LoginButtonTestTag
 import com.example.battleships.home.RegisterUserButtonTestTag
+import com.example.battleships.ui.CenteredTopAppBar
 import com.example.battleships.ui.NavigationHandlers
 import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
 import com.example.battleships.ui.theme.Milk
+import com.example.battleships.utils.SCREEN_HEIGHT
+import com.example.battleships.utils.SCREEN_WIDTH
 import pt.isel.battleships.R
 
 // Test tags for the TopBar navigation elements
@@ -54,12 +58,14 @@ internal fun LaunchScreen(
     val password = remember { mutableStateOf("") }
     BattleshipsTheme {
         Scaffold(
-            modifier = Modifier.fillMaxSize().testTag("AuthScreen"),
+            modifier = Modifier
+                .fillMaxSize()
+                .testTag("AuthScreen"),
             backgroundColor = MaterialTheme.colors.background,
-            topBar = { TopBar(
+            topBar = { CenteredTopAppBar(
                 title = stringResource(id = R.string.auth_screen_top_app_bar_title),
                 navigation = navigationHandlers ?: NavigationHandlers()
-            )}
+            ) }
         ){ paddingValues ->
             Column(
                 verticalArrangement = Arrangement.SpaceAround,
@@ -73,7 +79,7 @@ internal fun LaunchScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .offset(y = (-50).dp)
-                        .size(350.dp)
+                        .size((SCREEN_WIDTH / 3).dp)
                         .clip(RoundedCornerShape(30.dp))
                         .background(Milk)
                 )
@@ -114,17 +120,27 @@ fun InputView(
     val passwordVisible = remember { mutableStateOf(false) }
     val retypePasswordVisible = remember { mutableStateOf(false) }
 
-    OutlinedTextField(
-        value = username.value,
-        onValueChange = { username.value = it },
-        label = { Text(stringResource(id = R.string.username_lable)) },
-    )
-    PasswordOutlinedTextField(label = stringResource(id = R.string.password_lable_1), password = password,
-        passwordVisible = passwordVisible)
+    Column(
+        modifier = Modifier.height((SCREEN_HEIGHT/9).dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceEvenly
+    ) {
+        OutlinedTextField(
+            value = username.value,
+            onValueChange = { username.value = it },
+            label = { Text(stringResource(id = R.string.username_lable)) },
+        )
+        PasswordOutlinedTextField(
+            label = stringResource(id = R.string.password_lable_1), password = password,
+            passwordVisible = passwordVisible,
+        )
 
-    if(buttonAction.value == Action.REGISTER) {
-        PasswordOutlinedTextField(label = stringResource(id = R.string.password_lable_2), password = retypedPassword,
-            passwordVisible = retypePasswordVisible)
+        if (buttonAction.value == Action.REGISTER) {
+            PasswordOutlinedTextField(
+                label = stringResource(id = R.string.password_lable_2), password = retypedPassword,
+                passwordVisible = retypePasswordVisible,
+            )
+        }
     }
 
     val confirmOperationButtonTestTag = when (buttonAction.value) {
@@ -143,20 +159,23 @@ fun InputView(
 
     LoadingButton(
         value = loadingButtonText,
-        state = when(buttonAction.value) {
+        state = when (buttonAction.value) {
             Action.REGISTER -> isLogin
             Action.LOGIN -> isRegister
         },
         tagName = confirmOperationButtonTestTag,
         onClick = {
-            when(buttonAction.value) {
+            when (buttonAction.value) {
                 Action.REGISTER -> {
-                    if(retypedPassword.value != password.value)
-                        Toast.makeText(mContext, passwordDoNotMatchError, Toast.LENGTH_SHORT).show()
-                    else if(username.value.isEmpty() || username.value.isBlank())
-                        Toast.makeText(mContext, usernameIsEmptyError, Toast.LENGTH_SHORT).show()
-                    else if(password.value.isEmpty() || password.value.isBlank())
-                        Toast.makeText(mContext, passwordIsEmptyError, Toast.LENGTH_SHORT).show()
+                    if (retypedPassword.value != password.value)
+                        Toast.makeText(mContext, passwordDoNotMatchError, Toast.LENGTH_SHORT)
+                            .show()
+                    else if (username.value.isEmpty() || username.value.isBlank())
+                        Toast.makeText(mContext, usernameIsEmptyError, Toast.LENGTH_SHORT)
+                            .show()
+                    else if (password.value.isEmpty() || password.value.isBlank())
+                        Toast.makeText(mContext, passwordIsEmptyError, Toast.LENGTH_SHORT)
+                            .show()
                     else onRegister(username.value, password.value)
                 }
                 Action.LOGIN -> onLogin(username.value, password.value)
@@ -173,19 +192,23 @@ fun InputView(
         Action.REGISTER -> stringResource(id = R.string.auth_screen_register_action)
         Action.LOGIN -> stringResource(id = R.string.auth_screen_login_action)
     }
-    Row {
-        Text(text =
-        when(buttonAction.value) {
+
+    Row{
+        Text(text = when(buttonAction.value) {
             Action.REGISTER -> stringResource(id = R.string.auth_screen_already_have_account)
             Action.LOGIN -> stringResource(id = R.string.auth_screen_dont_have_account)
         })
+        Spacer(modifier = Modifier.size(5.dp))
         ClickableText(
             modifier = Modifier.testTag(switchButtonTestTag),
             text = AnnotatedString(switchActionTest),
             onClick = {
                 buttonAction.value = buttonAction.value.other()
             },
-            style = TextStyle(Color.Blue)
+            style = TextStyle(
+                color = Color.Blue,
+                fontSize = 15.sp,
+            ),
         )
     }
 }

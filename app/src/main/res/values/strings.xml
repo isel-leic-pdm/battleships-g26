@@ -4,7 +4,6 @@
     <string name="top_bar_navigate_to_info">Display application\'s information</string>
     <string name="top_bar_navigate_to_history">Display the quotes of the week</string>
     <string name="top_bar_go_back">Go back</string>
-
     <string name="error_api_title">Error accessing the server</string>
     <string name="error_retry_button_text">Retry</string>
     <string name="error_exit_button_text">Exit</string>
@@ -24,11 +23,11 @@
     <string name="username_lable">Username</string>
     <string name="password_lable_1">Password</string>
     <string name="password_lable_2">Re-type Password</string>
-    <string name="password_dont_match_error">Passwords Dont Match</string>
+    <string name="password_dont_match_error">Passwords dont match</string>
     <string name="username_is_empty_error">Username is empty</string>
     <string name="password_is_empty_error">Password is empty</string>
-    <string name="auth_screen_already_have_account">Already Have an Account</string>
-    <string name="auth_screen_dont_have_account">Dont Have an Account</string>
+    <string name="auth_screen_already_have_account">Already have an account?</string>
+    <string name="auth_screen_dont_have_account">Dont have an account?</string>
     <string name="auth_screen_register_action">Register</string>
     <string name="auth_screen_login_action">Log In</string>
     <string name="user_screen_top_app_bar_title">User</string>

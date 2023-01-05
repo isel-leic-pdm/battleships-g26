@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -18,7 +19,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 fun PasswordOutlinedTextField(
     label : String,
     password : MutableState<String>,
-    passwordVisible : MutableState<Boolean>
+    passwordVisible : MutableState<Boolean>,
+    modifier: Modifier = Modifier
 ){
     OutlinedTextField(
         value = password.value,
@@ -35,7 +37,8 @@ fun PasswordOutlinedTextField(
             IconButton(onClick = {passwordVisible.value = !passwordVisible.value}){
                 Icon(imageVector = image, description)
             }
-        }
+        },
+        modifier = modifier
     )
 }
 
