@@ -111,6 +111,8 @@ private fun FleetSetup(
     onConfirmLayout: (() -> Unit)
 ) {
     Title(text = stringResource(id = R.string.game_screen_placing_phase), TitleSize.H4)
+    MySpacer()
+
     BoardView(board, onPanelClick = onPanelClick)
     Column(
         modifier = Modifier
@@ -165,6 +167,7 @@ private fun Battle(
     onShot: (ShotsList) -> Unit,
 ) {
     Title(text = stringResource(id = R.string.game_screen_battle_phase), TitleSize.H4)
+    MySpacer()
 
     val shots = remember {
         mutableStateOf(ShotsList(emptyList()))
@@ -395,6 +398,11 @@ private fun getBoard(game: Game, player: Player): Board {
         Player.ONE -> game.board1
         Player.TWO -> game.board2
     }
+}
+
+@Composable
+private fun MySpacer() {
+    Spacer(modifier = Modifier.height(10.dp))
 }
 
 @Preview
