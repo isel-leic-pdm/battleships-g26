@@ -10,6 +10,8 @@ import com.example.battleships.use_cases.UseCases
 import kotlinx.coroutines.launch
 
 class HomeViewModel(val useCases: UseCases) : ViewModel() {
+    val TAG = "HomeViewModel"
+
     private var _userHome by mutableStateOf<Result<UserHome>?>(null)
     val userHome: Result<UserHome>?
         get() = _userHome
@@ -21,9 +23,11 @@ class HomeViewModel(val useCases: UseCases) : ViewModel() {
     fun getUserHome(token : String) {
         viewModelScope.launch {
             _userHome = try {
-                Result.success(useCases.getUserHome(token))
+                Result.success(useCases.getUserHome(token)).also {
+                    Log.i(TAG, "User home fetched successfully: $it")
+                }
             } catch (e : Exception) {
-                Log.e("HomeViewModel", "Error loading user home", e)
+                Log.e(TAG, "Error loading user home", e)
                 Result.failure(e)
             }
         }
@@ -32,9 +36,11 @@ class HomeViewModel(val useCases: UseCases) : ViewModel() {
     fun getHome() {
         viewModelScope.launch {
             _home = try {
-                Result.success(useCases.getHome())
+                Result.success(useCases.getHome()).also {
+                    Log.i(TAG, "Home fetched successfully: $it")
+                }
             } catch (e : Exception) {
-                Log.e("HomeViewModel", "Error loading home", e)
+                Log.e(TAG, "Error loading home", e)
                 Result.failure(e)
             }
         }

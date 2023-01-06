@@ -1,5 +1,6 @@
 package com.example.battleships.services.fake
 
+import android.util.Log
 import com.example.battleships.services.*
 import com.example.battleships.home.UserHome
 import com.example.battleships.rankings.UserStats
@@ -56,8 +57,8 @@ class FakeUserDataServices : UserDataServices {
      */
 
     override suspend fun getUserHome(token: String, mode: Mode, userHomeLink: SirenLink?): UserHome {
-        val user = users.entries.find { it.value == tokens.entries.find { it.value == token }?.key }
-            ?: throw UnexpectedResponseException()
-        return UserHome(user.value, user.key.username)
+        val userId = tokens.filter { it.value == token }.keys.firstOrNull() ?: throw UnexpectedResponseException()
+        val user = users.filter { it.value == userId }.keys.firstOrNull() ?: throw UnexpectedResponseException()
+        return UserHome(userId, user.username)
     }
 }

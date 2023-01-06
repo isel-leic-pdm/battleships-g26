@@ -1,5 +1,6 @@
 package com.example.battleships.ui
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -23,6 +24,8 @@ const val NavigateToUserInfoButton = "NavigateToUserInfoButton"
 
 data class Handler(val name: String, val tag: String, val handler: () -> Unit)
 
+const val TAG = "StartScreen"
+
 @Composable
 private fun NavigationButton(title: String, tagName: String, onClick: () -> Unit) {
     Button(
@@ -41,6 +44,7 @@ fun StartScreen(
     onAppInfo : () -> Unit = {},
     onUserInfo : (() -> Unit)? = null,
 ) {
+    Log.d(TAG, "Composing StartScreen")
     BattleshipsTheme {
         val modifier = if (tag != null) Modifier.testTag(tag) else Modifier
         Scaffold(

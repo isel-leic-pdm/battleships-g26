@@ -31,24 +31,18 @@ class AuthViewModel(private val useCases: UseCases): ViewModel() {
     fun createUser(username: String, password: String, login : Boolean = false, errorHandler : (Exception) -> Unit) {
         viewModelScope.launch {
             _isCreateUserLoading.value = true
-            _userId =
-                try {
-                    Result.success(useCases.createUser(username, password, Mode.FORCE_REMOTE))
-                        .also { Log.i(TAG, "User created: $it") }
-                } catch (e: Exception) {
-                    errorHandler(e)
-                    Log.e(TAG, "Error creating user", e)
-                    Result.failure(e)
+            try {
+                _userId = Result.success(useCases.createUser(username, password, Mode.FORCE_REMOTE))
+                    .also { Log.i(TAG, "User created: $it") }
+                _isCreateUserLoading.value = false
+                if (login) {
+                    login(username, password, errorHandler)
                 }
-            _isCreateUserLoading.value = false
-            if (login) {
-                while (true) {
-                    if (_userId != null) {
-                        login(username, password, errorHandler)
-                        break
-                    }
-                    delay(1000)
-                }
+            } catch (e: Exception) {
+                errorHandler(e)
+                Log.e(TAG, "Error creating user", e)
+                _userId =Result.failure(e)
+                _isCreateUserLoading.value = false
             }
         }
     }
