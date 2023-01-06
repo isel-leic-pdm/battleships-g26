@@ -84,7 +84,7 @@ class FakeGameDataServices : GameDataServices {
         ships.forEach { (shipType, coordinate, orientation) ->
             newGame = newGame?.placeShip(shipType, coordinate, orientation, Player.ONE) ?: return Either.Right(false)
         }
-        game = newGame?.confirmFleet(Player.ONE)
+        game = newGame?.confirmFleet(Player.ONE) ?: return Either.Right(false)
         return Either.Right(true)
     }
 

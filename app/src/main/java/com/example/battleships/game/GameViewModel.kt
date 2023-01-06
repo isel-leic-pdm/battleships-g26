@@ -154,7 +154,7 @@ class GameViewModel(
         return gameAux != null && gameAux is Started
     }
 
-    private fun getGameAndPlayerIfStartedOrNull(): Pair<Game, Player>? {
+    internal fun getGameAndPlayerIfStartedOrNull(): Pair<Game, Player>? {
         val gameAux = game.getOrNull()
         if (gameAux == null || gameAux !is Started) return null
         return gameAux.gameResultInternal.game to gameAux.gameResultInternal.player
