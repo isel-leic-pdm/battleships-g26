@@ -45,19 +45,8 @@ class FakeUserDataServices : UserDataServices {
         return Either.Right(token)
     }
 
-    /*
-    override suspend fun getToken(
-        username: String,
-        password: String,
-        mode: Mode,
-        createTokenAction: SirenAction?
-    ): Either<Unit, String> {
-        throw UnexpectedResponseException()
-    }
-     */
-
     override suspend fun getUserHome(token: String, mode: Mode, userHomeLink: SirenLink?): UserHome {
-        val userId = tokens.filter { it.value == token }.keys.firstOrNull() ?: throw UnexpectedResponseException()
+        val userId = tokens.filter { it.value == token }.keys.firstOrNull() ?: return UserHome(333, "Some User")
         val user = users.filter { it.value == userId }.keys.firstOrNull() ?: throw UnexpectedResponseException()
         return UserHome(userId, user.username)
     }

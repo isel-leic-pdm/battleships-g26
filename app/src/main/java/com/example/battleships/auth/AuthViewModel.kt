@@ -63,4 +63,6 @@ class AuthViewModel(private val useCases: UseCases): ViewModel() {
             _isLoginLoading.value = false
         }
     }
+
+    fun clearToken() { viewModelScope.launch { _token = null } }
 }

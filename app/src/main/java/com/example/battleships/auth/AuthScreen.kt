@@ -1,5 +1,6 @@
 package com.example.battleships.auth
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -45,6 +46,8 @@ const val LoginButtonTestTag = "LoginUserButton"
 const val SwitchToLoginButtonTestTag = "SwitchToLoginButton"
 const val SwitchToRegisterButtonTestTag = "SwitchToRegisterButton"
 
+val TAG = "AuthScreen"
+
 @Composable
 internal fun LaunchScreen(
     isLogin: LoadingState,
@@ -54,6 +57,7 @@ internal fun LaunchScreen(
     navigationHandlers: NavigationHandlers? = null,
     action: Action
 ) {
+    Log.d(TAG, "Composing LaunchScreen")
     val username = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
     BattleshipsTheme {

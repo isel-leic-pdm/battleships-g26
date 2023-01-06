@@ -51,6 +51,7 @@ class AuthActivity : ComponentActivity() {
                 val tokenResult = token.getWith(LocalContext.current)
                 if (tokenResult != null) {
                     Log.d(TAG, "Navigating to HomeActivity")
+                    vm.clearToken()
                     HomeActivity.navigate(this, tokenResult)
                 }
                 else AuthScreen(Action.LOGIN)
