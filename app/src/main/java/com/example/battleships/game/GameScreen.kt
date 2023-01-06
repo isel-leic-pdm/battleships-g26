@@ -39,6 +39,8 @@ internal open class Selection
 internal class ShipOption(val shipType: ShipType) : Selection()
 internal class Square(val coordinate: Coordinate) : Selection()
 
+private const val TAG = "GameScreen"
+
 @Composable
 internal fun GameScreen(
     activity: GameActivity,

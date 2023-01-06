@@ -19,7 +19,7 @@ import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
 
-const val TAG = "GameViewModel"
+private const val TAG = "GameViewModel"
 
 /**
  * The ViewModel for BattleshipActivity.
@@ -60,48 +60,20 @@ class GameViewModel(
                 val result = useCases.createGame(token, configuration = configuration)
                 if (result) {
                     _game = Result.success(Matchmaking)
+                    Log.i(TAG, "Game created")
                     keepOnFetchingGameUntil { gameStarted() }
+                    Log.i(TAG, "Game started")
                     keepOnFetchingGameUntil { !isWaitingForOpponent() }
+                    Log.i(TAG, "Ready to play")
                 } else {
                     _game = Result.failure(Exception("Game already created"))
                 }
             } catch (e: Exception) {
                 errorHandler(e)
-                Log.e("Start Game", "Failed to start game")
+                Log.e(TAG, "Failed to start game")
                 _game = Result.failure(e)
             }
         }
-    }
-
-    private fun isWaitingForOpponent(): Boolean {
-        val gameAux = game.getOrNull()
-        if (gameAux == null || gameAux !is Started) return false
-        val game = gameAux.gameResultInternal.game
-        val player = gameAux.gameResultInternal.player
-        if (game.state === GameState.FLEET_SETUP) {
-            return game.getBoard(player).isConfirmed() && !game.getBoard(player.other())
-                .isConfirmed()
-        }
-        if (game.state === GameState.BATTLE) {
-            val playerTurn = game.playerTurn ?: return false
-            return game.getPlayerFromId(playerTurn) !== player
-        }
-        return false
-    }
-
-    private fun opponentConfirmBoard(): Boolean {
-        val gameAux = game.getOrNull()
-        if (gameAux == null || gameAux !is Started) return false
-        val game = gameAux.gameResultInternal.game
-        val player = gameAux.gameResultInternal.player
-        if (game.state === GameState.FLEET_SETUP) {
-            return game.getBoard(player.other()).isConfirmed()
-        }
-        if (game.state === GameState.BATTLE) {
-            val playerTurn = game.playerTurn ?: return false
-            return game.getPlayerFromId(playerTurn) !== player
-        }
-        return false
     }
 
 
@@ -112,6 +84,7 @@ class GameViewModel(
                 val gameAux = game.getOrNull()
                 gameAux != null && gameAux is Started
             }
+            Log.i(TAG, "Game restored")
         }
     }
 
@@ -129,10 +102,12 @@ class GameViewModel(
             val res = useCases.fetchGame(token)
             if (res != null) {
                 val (game, player) = res
-                _game = Result.success(Started(GameResultInternal(game, player)))
+                _game = Result.success(Started(GameResultInternal(game, player))).also {
+                    Log.i(TAG, "Game updated")
+                }
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error getting game", e)
+            Log.e(TAG, "Error updating game", e)
             _game = Result.failure(e)
         }
     }
@@ -145,7 +120,9 @@ class GameViewModel(
         if (game.gameResultInternal.game.state != GameState.FLEET_SETUP) return
         viewModelScope.launchWithErrorHandling(errorHandler) {
             val res = useCases.setFleet(token, ships)
-            if (res) keepOnFetchingGameUntil { opponentConfirmBoard() }
+            Log.i(TAG, "Fleet set")
+            if (res) keepOnFetchingGameUntil { bothBoardsConfirmed() }
+            Log.i(TAG, "Both boards confirmed")
         }
     }
 
@@ -165,6 +142,7 @@ class GameViewModel(
                 if (res) updateGame()
             }
         }
+        Log.i(TAG, "Shots placed")
     }
 
     internal fun setGame(game: Game, player: Player) {
@@ -175,5 +153,36 @@ class GameViewModel(
     private fun gameStarted(): Boolean {
         val gameAux = game.getOrNull()
         return gameAux != null && gameAux is Started
+    }
+
+    private fun isWaitingForOpponent(): Boolean {
+        val gameAux = game.getOrNull()
+        if (gameAux == null || gameAux !is Started) return false
+        val game = gameAux.gameResultInternal.game
+        val player = gameAux.gameResultInternal.player
+        if (game.state === GameState.FLEET_SETUP) {
+            return game.getBoard(player).isConfirmed() && !game.getBoard(player.other())
+                .isConfirmed()
+        }
+        if (game.state === GameState.BATTLE) {
+            val playerTurn = game.playerTurn ?: return false
+            return game.getPlayerFromId(playerTurn) !== player
+        }
+        return false
+    }
+
+    private fun bothBoardsConfirmed(): Boolean {
+        val gameAux = game.getOrNull()
+        if (gameAux == null || gameAux !is Started) return false
+        val game = gameAux.gameResultInternal.game
+        val player = gameAux.gameResultInternal.player
+        if (game.state === GameState.FLEET_SETUP) {
+            return game.board1.isConfirmed() && game.board2.isConfirmed()
+        }
+        if (game.state === GameState.BATTLE) {
+            val playerTurn = game.playerTurn ?: return false
+            return game.getPlayerFromId(playerTurn) !== player
+        }
+        return false
     }
 }

@@ -1,5 +1,6 @@
 package com.example.battleships.game
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -41,6 +42,8 @@ const val SubmarineShipButtonTestTag = "SubmarineShipButton"
 const val DestroyerShipButtonTestTag = "DestroyerShipButton"
 const val ConfirmFleetButtonTestTag = "ConfirmFleetButton"
 
+private const val TAG = "GameViews"
+
 
 @Composable
 fun GameView(
@@ -55,6 +58,7 @@ fun GameView(
         val board = getBoard(game, player)
         when {
             game.state === GameState.FLEET_SETUP -> {
+                Log.d(TAG, "Composing GameScreen, state: FLEET_SETUP")
                 if (!board.isConfirmed())
                     PreparationPhase(
                         board,
@@ -66,6 +70,7 @@ fun GameView(
                 else WaitingForOpponentToConfirm(board)
             }
             game.state === GameState.BATTLE -> {
+                Log.d(TAG, "Composing GameScreen, state: BATTLE")
                 val playerIdTurn = game.playerTurn ?: return
                 val playerTurn = game.getPlayerFromId(playerIdTurn)
                 Battle(
@@ -78,6 +83,7 @@ fun GameView(
                 )
             }
             game.state === GameState.FINISHED -> {
+                Log.d(TAG, "Composing GameScreen, state: FINISHED")
                 val winnerId = game.winner ?: return
                 val winner = game.getPlayerFromId(winnerId)
                 End(winner)
