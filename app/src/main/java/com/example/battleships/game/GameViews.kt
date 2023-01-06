@@ -25,6 +25,8 @@ import com.example.battleships.game.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.board.Panel
 import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.ShotsList
+import com.example.battleships.ui.Title
+import com.example.battleships.ui.TitleSize
 import com.example.battleships.utils.SCREEN_WIDTH
 import pt.isel.battleships.R
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
@@ -65,7 +67,7 @@ fun GameView(
             game.state === GameState.FLEET_SETUP -> {
                 Log.d(TAG, "Composing GameScreen, state: FLEET_SETUP")
                 if (!board.isConfirmed())
-                    PreparationPhase(
+                    FleetSetup(
                         board,
                         game.configuration,
                         onSquarePressed,
@@ -101,13 +103,14 @@ fun GameView(
  * Displays the board.
  */
 @Composable
-private fun PreparationPhase(
+private fun FleetSetup(
     board: Board,
     configuration: Configuration,
     onPanelClick: ((Coordinate) -> Unit),
     onShipClick: ((ShipType) -> Unit),
     onConfirmLayout: (() -> Unit)
 ) {
+    Title(text = stringResource(id = R.string.game_screen_placing_phase), TitleSize.H4)
     BoardView(board, onPanelClick = onPanelClick)
     Column(
         modifier = Modifier
@@ -161,6 +164,8 @@ private fun Battle(
     player2Board: Board,
     onShot: (ShotsList) -> Unit,
 ) {
+    Title(text = stringResource(id = R.string.game_screen_battle_phase), TitleSize.H4)
+
     val shots = remember {
         mutableStateOf(ShotsList(emptyList()))
     }
@@ -193,7 +198,7 @@ private fun Battle(
             text =
                 if (turn == player) stringResource(id = R.string.game_screen_your_turn_msg)
                 else stringResource(id = R.string.game_screen_opponents_turn_msg),
-            fontSize = 40.sp,
+            fontSize = 20.sp,
             modifier = Modifier.padding(16.dp),
             color = if (turn == player) Color.Blue else Color.Black
         )
@@ -250,22 +255,8 @@ private fun Battle(
 
 @Composable
 private fun Winner(winner: Player) {
-    val fontSize = 40.sp
-    val modifier = Modifier.padding(16.dp)
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            text = stringResource(id = R.string.game_screen_game_over),
-            modifier = modifier,
-            fontSize = fontSize
-        )
-        Text(
-            text = "${stringResource(id = R.string.game_screen_winner)} $winner",
-            modifier = modifier,
-            fontSize = fontSize
-        )
-    }
+    Title(text = stringResource(id = R.string.game_screen_end_phase), TitleSize.H3)
+    Title(text = "${stringResource(id = R.string.game_screen_winner)} $winner", TitleSize.H4)
 }
 
 @Composable
