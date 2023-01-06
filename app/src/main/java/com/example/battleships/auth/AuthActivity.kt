@@ -3,6 +3,7 @@ package com.example.battleships.auth
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -18,6 +19,7 @@ import com.example.battleships.utils.ApiErrorHandler
 import com.example.battleships.utils.getWith
 
 class AuthActivity : ComponentActivity() {
+    val TAG = "AuthActivity"
 
     companion object {
         fun navigate(origin: Activity) {
@@ -47,8 +49,10 @@ class AuthActivity : ComponentActivity() {
             val token = vm.token
             if (token != null) {
                 val tokenResult = token.getWith(LocalContext.current)
-                if (tokenResult != null)
+                if (tokenResult != null) {
+                    Log.d(TAG, "Navigating to HomeActivity")
                     HomeActivity.navigate(this, tokenResult)
+                }
                 else AuthScreen(Action.LOGIN)
             } else AuthScreen()
         }

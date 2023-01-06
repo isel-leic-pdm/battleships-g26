@@ -6,9 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.battleships.services.Mode
 import com.example.battleships.use_cases.UseCases
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class AuthViewModel(private val useCases: UseCases): ViewModel() {
+    private val TAG = "AuthViewModel"
+
     private var _userId by mutableStateOf<Result<Int>?>(null)
     val userId: Result<Int>?
         get() = _userId
@@ -31,14 +34,22 @@ class AuthViewModel(private val useCases: UseCases): ViewModel() {
             _userId =
                 try {
                     Result.success(useCases.createUser(username, password, Mode.FORCE_REMOTE))
-                        .also { Log.i("AuthViewModel", "User created: $it") }
+                        .also { Log.i(TAG, "User created: $it") }
                 } catch (e: Exception) {
                     errorHandler(e)
-                    Log.e("AuthViewModel", "Error creating user", e)
+                    Log.e(TAG, "Error creating user", e)
                     Result.failure(e)
                 }
             _isCreateUserLoading.value = false
-            if (login) login(username, password, errorHandler)
+            if (login) {
+                while (true) {
+                    if (_userId != null) {
+                        login(username, password, errorHandler)
+                        break
+                    }
+                    delay(1000)
+                }
+            }
         }
     }
 
@@ -48,11 +59,11 @@ class AuthViewModel(private val useCases: UseCases): ViewModel() {
             _token =
                 try {
                     Result.success(useCases.createToken(username, password, Mode.FORCE_REMOTE)).also {
-                        Log.i("AuthViewModel", "Token created: $it")
+                        Log.i(TAG, "Token created: $it")
                     }
                 } catch (e: Exception) {
                     errorHandler(e)
-                    Log.e("AuthViewModel", "Error creating token", e)
+                    Log.e(TAG, "Error creating token", e)
                     Result.failure(e)
                 }
             _isLoginLoading.value = false

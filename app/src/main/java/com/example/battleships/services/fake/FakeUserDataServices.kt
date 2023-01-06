@@ -28,6 +28,7 @@ class FakeUserDataServices : UserDataServices {
         if (users.containsKey(UserCredentials(username, password))) throw UnexpectedResponseException()
         val id = users.size + 1
         users[UserCredentials(username, password)] = id
+        tokens[id] = ((1..99999).random() * 0.3).toString()
         return Either.Right(id)
     }
 
@@ -37,9 +38,10 @@ class FakeUserDataServices : UserDataServices {
         mode: Mode,
         createTokenAction: SirenAction?
     ): Either<ApiException, String> {
-        return Either.Right(users[UserCredentials(username, password)]?.let { tokens[it] }
+        val userId = users.filter { it.key.username == username && it.key.password == password }.values.firstOrNull()
             ?: throw UnexpectedResponseException()
-        )
+        val token = tokens[userId] ?: throw UnexpectedResponseException()
+        return Either.Right(token)
     }
 
     /*

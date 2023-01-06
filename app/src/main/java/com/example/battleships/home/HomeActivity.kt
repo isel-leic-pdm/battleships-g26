@@ -60,10 +60,12 @@ class HomeActivity : ComponentActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        var home :Home? = null
         super.onCreate(savedInstanceState)
+
+        var home :Home? = null
         val tokenAux = token
-        if (tokenAux != null) vm.getUserHome(tokenAux)
+        if (tokenAux != null)
+            vm.getUserHome(tokenAux)
         else vm.getHome().also {
             home = vm.home?.getOrNull()
         }
