@@ -88,12 +88,10 @@ class GameViewModel(
         }
     }
 
-    private fun keepOnFetchingGameUntil(stop: () -> Boolean) {
-        viewModelScope.launch {
-            while (!stop()) {
-                updateGame()
-                delay(1000)
-            }
+    private suspend fun keepOnFetchingGameUntil(stop: () -> Boolean) {
+        while (!stop()) {
+            updateGame()
+            delay(1000)
         }
     }
 
@@ -121,28 +119,26 @@ class GameViewModel(
         viewModelScope.launchWithErrorHandling(errorHandler) {
             val res = useCases.setFleet(token, ships)
             Log.i(TAG, "Fleet set")
-            if (res) keepOnFetchingGameUntil { bothBoardsConfirmed() }
-            Log.i(TAG, "Both boards confirmed")
+            if (res) {
+                keepOnFetchingGameUntil { bothBoardsConfirmed() }
+                Log.i(TAG, "Both boards confirmed")
+            } else {
+                Log.e(TAG, "Failed to set fleet")
+            }
         }
     }
 
     fun placeShots(shots: ShotsList, errorHandler: (Exception) -> Unit) {
-        val game = game.getOrNull() as? Started ?: return
-        if (game.gameResultInternal.game.state != GameState.BATTLE) return
+        if (isWaitingForOpponent()) return
 
         viewModelScope.launchWithErrorHandling(errorHandler) {
-            if (game.gameResultInternal.player !=
-                game.gameResultInternal.game.getPlayerFromId(
-                    game.gameResultInternal.game.playerTurn!!
-                )
-            ) {
-                keepOnFetchingGameUntil { !isWaitingForOpponent() }
-            } else {
-                val res = useCases.placeShots(token, shots)
-                if (res) updateGame()
+            val success = useCases.placeShots(token, shots)
+            if (success) {
+                Log.i(TAG, "Shots placed")
+                keepOnFetchingGameUntil { isWaitingForOpponent() || !isFinished() }
+                Log.i(TAG, "Opponent place it's shots")
             }
         }
-        Log.i(TAG, "Shots placed")
     }
 
     internal fun setGame(game: Game, player: Player) {
@@ -155,11 +151,14 @@ class GameViewModel(
         return gameAux != null && gameAux is Started
     }
 
-    private fun isWaitingForOpponent(): Boolean {
+    private fun getGameAndPlayerIfStartedOrNull(): Pair<Game, Player>? {
         val gameAux = game.getOrNull()
-        if (gameAux == null || gameAux !is Started) return false
-        val game = gameAux.gameResultInternal.game
-        val player = gameAux.gameResultInternal.player
+        if (gameAux == null || gameAux !is Started) return null
+        return gameAux.gameResultInternal.game to gameAux.gameResultInternal.player
+    }
+
+    private fun isWaitingForOpponent(): Boolean {
+        val (game, player) = getGameAndPlayerIfStartedOrNull() ?: return false
         if (game.state === GameState.FLEET_SETUP) {
             return game.getBoard(player).isConfirmed() && !game.getBoard(player.other())
                 .isConfirmed()
@@ -171,18 +170,13 @@ class GameViewModel(
         return false
     }
 
+    private fun isFinished(): Boolean {
+        val (game, _) = getGameAndPlayerIfStartedOrNull() ?: return false
+        return game.state === GameState.FINISHED
+    }
+
     private fun bothBoardsConfirmed(): Boolean {
-        val gameAux = game.getOrNull()
-        if (gameAux == null || gameAux !is Started) return false
-        val game = gameAux.gameResultInternal.game
-        val player = gameAux.gameResultInternal.player
-        if (game.state === GameState.FLEET_SETUP) {
-            return game.board1.isConfirmed() && game.board2.isConfirmed()
-        }
-        if (game.state === GameState.BATTLE) {
-            val playerTurn = game.playerTurn ?: return false
-            return game.getPlayerFromId(playerTurn) !== player
-        }
-        return false
+        val (game, _) = getGameAndPlayerIfStartedOrNull() ?: return false
+        return game.board1.isConfirmed() && game.board2.isConfirmed()
     }
 }

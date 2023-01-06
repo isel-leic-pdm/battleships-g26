@@ -95,6 +95,7 @@ private fun PlayScreen(
     val game = gameState.gameResultInternal.game
     val player = gameState.gameResultInternal.player
     val context = LocalContext.current
+
     GameView(
         game = game,
         player = player,
