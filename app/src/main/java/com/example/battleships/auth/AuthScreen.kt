@@ -33,7 +33,8 @@ import com.example.battleships.home.LoginButtonTestTag
 import com.example.battleships.home.RegisterUserButtonTestTag
 import com.example.battleships.ui.CenteredTopAppBar
 import com.example.battleships.ui.NavigationHandlers
-import com.example.battleships.ui.TopBar
+import com.example.battleships.ui.Title
+import com.example.battleships.ui.TitleSize
 import com.example.battleships.ui.theme.BattleshipsTheme
 import com.example.battleships.ui.theme.Milk
 import com.example.battleships.utils.SCREEN_HEIGHT
@@ -49,7 +50,7 @@ const val SwitchToRegisterButtonTestTag = "SwitchToRegisterButton"
 val TAG = "AuthScreen"
 
 @Composable
-internal fun LaunchScreen(
+internal fun AuthScreen(
     isLogin: LoadingState,
     isRegister: LoadingState,
     onRegisterUser: (String, String) -> Unit,
@@ -57,7 +58,7 @@ internal fun LaunchScreen(
     navigationHandlers: NavigationHandlers? = null,
     action: Action
 ) {
-    Log.d(TAG, "Composing LaunchScreen")
+    Log.d(TAG, "Composing AuthScreen")
     val username = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
     BattleshipsTheme {
@@ -70,14 +71,15 @@ internal fun LaunchScreen(
                 title = stringResource(id = R.string.auth_screen_top_app_bar_title),
                 navigation = navigationHandlers ?: NavigationHandlers()
             ) }
-        ){ paddingValues ->
+        ) { paddingValues ->
             Column(
                 verticalArrangement = Arrangement.SpaceAround,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .padding(paddingValues)
                     .fillMaxSize(),
-            ){
+            ) {
+                Title(text = stringResource(id = R.string.auth_screen_title), TitleSize.H5)
                 Column(
                     verticalArrangement = Arrangement.SpaceAround,
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -86,8 +88,7 @@ internal fun LaunchScreen(
                         .size((SCREEN_WIDTH / 3).dp)
                         .clip(RoundedCornerShape(30.dp))
                         .background(Milk)
-                )
-                {
+                ) {
                     InputView(username, password, isLogin,
                         isRegister, onRegisterUser, onLoginUser,
                         action
@@ -197,7 +198,7 @@ fun InputView(
         Action.LOGIN -> stringResource(id = R.string.auth_screen_login_action)
     }
 
-    Row{
+    Row {
         Text(text = when(buttonAction.value) {
             Action.REGISTER -> stringResource(id = R.string.auth_screen_already_have_account)
             Action.LOGIN -> stringResource(id = R.string.auth_screen_dont_have_account)
@@ -220,5 +221,5 @@ fun InputView(
 @Preview
 @Composable
 fun LaunchScreenPreview(){
-    LaunchScreen(LoadingState.Idle, LoadingState.Idle, { _, _ -> }, { _, _ ->}, null, Action.REGISTER)
+    AuthScreen(LoadingState.Idle, LoadingState.Idle, { _, _ -> }, { _, _ ->}, null, Action.REGISTER)
 }

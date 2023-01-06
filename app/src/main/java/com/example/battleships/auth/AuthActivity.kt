@@ -70,7 +70,7 @@ class AuthActivity : ComponentActivity() {
             if (vm.isLoginLoading.value) LoadingState.Loading
             else LoadingState.Idle
 
-        LaunchScreen(
+        AuthScreen(
             isLogin = isLoginLoading,
             isRegister = isCreateUserLoading,
             onRegisterUser = { username, password ->

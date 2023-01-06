@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,7 +56,10 @@ fun GameView(
     onConfirmLayout: () -> Unit
 ) {
     Log.d(TAG, "Composing GameView")
-    Column(Modifier.fillMaxWidth()) {
+    Column(
+        Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         val board = getBoard(game, player)
         when {
             game.state === GameState.FLEET_SETUP -> {
@@ -87,7 +91,7 @@ fun GameView(
                 Log.d(TAG, "Composing GameScreen, state: FINISHED")
                 val winnerId = game.winner ?: return
                 val winner = game.getPlayerFromId(winnerId)
-                End(winner)
+                Winner(winner)
             }
         }
     }
@@ -245,19 +249,23 @@ private fun Battle(
 }
 
 @Composable
-private fun End(winner: Player) {
+private fun Winner(winner: Player) {
     val fontSize = 40.sp
     val modifier = Modifier.padding(16.dp)
-    Text(
-        text = stringResource(id = R.string.game_screen_game_over),
-        modifier = modifier,
-        fontSize = fontSize
-    )
-    Text(
-        text = "${stringResource(id = R.string.game_screen_winner)} $winner",
-        modifier = modifier,
-        fontSize = fontSize
-    )
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = stringResource(id = R.string.game_screen_game_over),
+            modifier = modifier,
+            fontSize = fontSize
+        )
+        Text(
+            text = "${stringResource(id = R.string.game_screen_winner)} $winner",
+            modifier = modifier,
+            fontSize = fontSize
+        )
+    }
 }
 
 @Composable
@@ -396,4 +404,10 @@ private fun getBoard(game: Game, player: Player): Board {
         Player.ONE -> game.board1
         Player.TWO -> game.board2
     }
+}
+
+@Preview
+@Composable
+fun WinnerScreenPreview() {
+    Winner(winner = Player.ONE)
 }

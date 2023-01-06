@@ -30,9 +30,11 @@
     <string name="auth_screen_dont_have_account">Dont have an account?</string>
     <string name="auth_screen_register_action">Register</string>
     <string name="auth_screen_login_action">Log In</string>
+    <string name="auth_screen_title">Insert Your Credentials above</string>
     <string name="user_screen_top_app_bar_title">User</string>
     <string name="user_screen_label_1">Win</string>
     <string name="user_screen_label_2">Games Played</string>
+    <string name="game_screen_options_title">Select An Option</string>
     <string name="game_screen_option_1">Quick Game</string>
     <string name="game_screen_option_2">Start New Game</string>
     <string name="game_screen_option_3">Restore Previous Game</string>

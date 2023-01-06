@@ -17,15 +17,16 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.battleships.game.domain.game.*
 import com.example.battleships.game.domain.ship.getOrientation
-import com.example.battleships.ui.NavigationHandlers
-import com.example.battleships.ui.TopBar
 import com.example.battleships.ui.theme.BattleshipsTheme
 import pt.isel.battleships.R
 import com.example.battleships.game.domain.board.Coordinate
+import com.example.battleships.info.InfoScreen
+import com.example.battleships.ui.*
 import com.example.battleships.utils.*
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
@@ -146,23 +147,16 @@ private fun InitScreen(activity: GameActivity) {
     val roundTimeout = remember { mutableStateOf(10F) }
     val chooseFleet = remember { mutableStateOf(false) }
 
-    Button(onClick = {activity.vm.startGame(errorHandler = ApiErrorHandler(context))}) {
-        Text(
-            modifier = Modifier.testTag(QuickGame),
-            text = stringResource(id = R.string.game_screen_option_1)
-        )
+    Title(text = stringResource(id = R.string.game_screen_options_title), TitleSize.H4)
+
+    Button1(text = stringResource(id = R.string.game_screen_option_1), testTag = QuickGame) {
+        activity.vm.startGame(errorHandler = ApiErrorHandler(context))
     }
-    Button(onClick = { config.value = true }) {
-        Text(
-            modifier = Modifier.testTag(NewGame),
-            text = stringResource(id = R.string.game_screen_option_2)
-        )
+    Button1(text = stringResource(id = R.string.game_screen_option_2), testTag = NewGame) {
+        config.value = true
     }
-    Button(onClick = { activity.vm.restoreGame()}) {
-        Text(
-            modifier = Modifier.testTag(RestoreGame),
-            text = stringResource(id = R.string.game_screen_option_3)
-        )
+    Button1(text = stringResource(id = R.string.game_screen_option_3), testTag = RestoreGame) {
+        activity.vm.restoreGame()
     }
     if (config.value) {
         AlertDialog(

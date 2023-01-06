@@ -68,7 +68,7 @@ fun StartScreen(
                     modifier = Modifier.size((SCREEN_HEIGHT/12).dp)
                 )
                 handlers.forEach { handler ->
-                    NavigationButton(title = handler.name, tagName = handler.tag) { handler.handler() }
+                    Button1(text = handler.name, testTag = handler.tag) { handler.handler() }
                 }
             }
         }
