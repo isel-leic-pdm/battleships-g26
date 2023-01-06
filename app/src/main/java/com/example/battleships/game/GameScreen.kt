@@ -46,6 +46,7 @@ internal fun GameScreen(
     activity: GameActivity,
     onBackRequest: () -> Unit,
 ) {
+    Log.d(TAG, "Composing GameScreen")
     val mContext = LocalContext.current
     BattleshipsTheme {
         Scaffold(

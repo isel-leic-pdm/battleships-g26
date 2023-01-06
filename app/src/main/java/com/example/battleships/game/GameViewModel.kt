@@ -61,9 +61,9 @@ class GameViewModel(
                 if (result) {
                     _game = Result.success(Matchmaking)
                     Log.i(TAG, "Game created")
-                    keepOnFetchingGameUntil { gameStarted() }
+                    keepOnUpdatingGameUntil { gameStarted() }
                     Log.i(TAG, "Game started")
-                    keepOnFetchingGameUntil { !isWaitingForOpponent() }
+                    keepOnUpdatingGameUntil { !isWaitingForOpponent() }
                     Log.i(TAG, "Ready to play")
                 } else {
                     _game = Result.failure(Exception("Game already created"))
@@ -80,7 +80,7 @@ class GameViewModel(
     fun restoreGame() {
         viewModelScope.launch {
             _game = Result.success(Matchmaking)
-            keepOnFetchingGameUntil {
+            keepOnUpdatingGameUntil {
                 val gameAux = game.getOrNull()
                 gameAux != null && gameAux is Started
             }
@@ -88,7 +88,7 @@ class GameViewModel(
         }
     }
 
-    private suspend fun keepOnFetchingGameUntil(stop: () -> Boolean) {
+    private suspend fun keepOnUpdatingGameUntil(stop: () -> Boolean) {
         while (!stop()) {
             updateGame()
             delay(1000)
@@ -120,7 +120,7 @@ class GameViewModel(
             val res = useCases.setFleet(token, ships)
             Log.i(TAG, "Fleet set")
             if (res) {
-                keepOnFetchingGameUntil { bothBoardsConfirmed() }
+                keepOnUpdatingGameUntil { bothBoardsConfirmed() }
                 Log.i(TAG, "Both boards confirmed")
             } else {
                 Log.e(TAG, "Failed to set fleet")
@@ -129,13 +129,16 @@ class GameViewModel(
     }
 
     fun placeShots(shots: ShotsList, errorHandler: (Exception) -> Unit) {
-        if (isWaitingForOpponent()) return
+        if (isWaitingForOpponent()) {
+            Log.i(TAG, "Waiting for opponent")
+            return
+        }
 
         viewModelScope.launchWithErrorHandling(errorHandler) {
             val success = useCases.placeShots(token, shots)
             if (success) {
                 Log.i(TAG, "Shots placed")
-                keepOnFetchingGameUntil { isWaitingForOpponent() || !isFinished() }
+                keepOnUpdatingGameUntil { isWaitingForOpponent() }
                 Log.i(TAG, "Opponent place it's shots")
             }
         }

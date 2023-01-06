@@ -54,6 +54,7 @@ fun GameView(
     onShotsPlaced: (ShotsList) -> Unit,
     onConfirmLayout: () -> Unit
 ) {
+    Log.d(TAG, "Composing GameView")
     Column(Modifier.fillMaxWidth()) {
         val board = getBoard(game, player)
         when {
@@ -159,19 +160,19 @@ private fun Battle(
     val shots = remember {
         mutableStateOf(ShotsList(emptyList()))
     }
-    val firstCall = remember { //safe val to prevent calling onshot more than once
+    val firstCall = remember { // safe val to prevent calling onShot more than once
         mutableStateOf(true)
     }
 
     fun onCoordinateClick(c: Coordinate) {
-        if (shots.value.shots.size <= configuration.shots.toInt()) {
+        if (shots.value.shots.size < configuration.shots.toInt()) {
             shots.value = ShotsList(shots.value.shots.toMutableList().plus(c))
         }
     }
 
     if (player != turn && firstCall.value) {
         shots.value = ShotsList(emptyList())
-        onShot(shots.value) //trigger to start fetching game (see onshot function)
+        onShot(shots.value) // trigger to start fetching game (see onShot function)
         firstCall.value = false
     }
 
@@ -202,7 +203,7 @@ private fun Battle(
                 Player.ONE -> player2Board
                 Player.TWO -> player1Board
             },
-            viewShips = displayedBoard.value == player,
+            viewShips = /* displayedBoard.value == player */ true, // TODO uncomment later
             clickAction.value
         )
         Row(
@@ -226,12 +227,15 @@ private fun Battle(
 
             if (turn == player && displayedBoard.value != player) {
                 if((configuration.shots - shots.value.shots.size) == 0L) {
-                    OutlinedButton(onClick = { onShot(shots.value).also { firstCall.value = true } }) {
-                        stringResource(id = R.string.game_screen_place_shots)
+                    OutlinedButton(onClick = { onShot(shots.value).also {
+                        firstCall.value = true
+                        shots.value = ShotsList(emptyList())
+                    } }) {
+                        Text(stringResource(id = R.string.game_screen_place_shots))
                     }
                 }
                 else {
-                    OutlinedButton(onClick = {}) {
+                    OutlinedButton(onClick = { /*NOTHING TO DO*/ }) {
                         Text("${stringResource(id = R.string.game_screen_place_shots)} = ${(configuration.shots - shots.value.shots.size)}")
                     }
                 }
@@ -280,7 +284,7 @@ private fun BoardView(
                 .size(boardSide),
         ) {
             board.board.forEach { panel ->
-                ShipOptionView(panel.coordinate, panel, viewShips, playSide) {
+                SquareView(panel.coordinate, panel, viewShips, playSide) {
                     if (onPanelClick != null) {
                         onPanelClick(panel.coordinate)
                     }
@@ -294,8 +298,10 @@ private fun BoardView(
  * Displays a single panel
  */
 @Composable
-private fun ShipOptionView(
-    coordinate: Coordinate, panel: Panel, viewShips: Boolean,
+private fun SquareView(
+    coordinate: Coordinate,
+    panel: Panel,
+    viewShips: Boolean,
     playSize: Dp,
     onClick: (() -> Unit)?,
 ) {
