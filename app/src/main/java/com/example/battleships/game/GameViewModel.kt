@@ -56,25 +56,35 @@ class GameViewModel(
     val game: Result<GameResult>
         get() = _game
 
-    fun startGame(configuration: Configuration? = null, errorHandler: (Exception) -> Unit) {
+    fun startGame(configuration: Configuration?, errorHandler: (Exception) -> Unit) {
+        suspend fun gameCreatedHandler() {
+            _game = Result.success(Matchmaking)
+            keepOnUpdatingGameUntil { gameStarted() }
+            Log.i(TAG, "Game started")
+            keepOnUpdatingGameUntil { !isWaitingForOpponent() }
+            Log.i(TAG, "Ready to play")
+        }
+
         viewModelScope.launch {
             _game = Result.success(Creating)
             try {
                 val result = useCases.createGame(token, configuration = configuration)
                 if (result) {
-                    _game = Result.success(Matchmaking)
                     Log.i(TAG, "Game created")
-                    keepOnUpdatingGameUntil { gameStarted() }
-                    Log.i(TAG, "Game started")
-                    keepOnUpdatingGameUntil { !isWaitingForOpponent() }
-                    Log.i(TAG, "Ready to play")
+                    gameCreatedHandler()
                 } else {
                     _game = Result.failure(Exception("Game already created"))
                 }
             } catch (e: Exception) {
-                errorHandler(e)
-                Log.e(TAG, "Failed to start game")
-                _game = Result.failure(e)
+                val msg = e.message?.lowercase()
+                Log.e(TAG, "Error creating game: $msg")
+                if (msg != null && msg.contains("user is already in queue")) {
+                    gameCreatedHandler()
+                } else {
+                    errorHandler(e)
+                    Log.e(TAG, "Failed to start game")
+                    _game = Result.failure(e)
+                }
             }
         }
     }

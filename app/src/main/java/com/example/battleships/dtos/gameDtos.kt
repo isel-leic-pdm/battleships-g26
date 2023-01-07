@@ -18,7 +18,7 @@ typealias GameIdDto = SirenEntity<GameIdDtoProperties>
 val GameIdDtoType = SirenEntity.getType<GameIdDtoProperties>()
 
 data class GameDtoProperties(
-    val gameId: Int,
+    val id: Int,
     val configuration: Configuration,
     val player1: Int,
     val player2: Int,
@@ -36,7 +36,7 @@ fun GameDto.toGameAndPlayer(): Pair<Game, Player> {
     val game = this.properties
     require(game != null) { "GameDto properties are null" }
     return Game(
-        game.gameId,
+        game.id,
         game.configuration,
         game.player1,
         game.player2,
