@@ -151,7 +151,10 @@ private fun InitScreen(activity: GameActivity) {
     Title(text = stringResource(id = R.string.game_screen_options_title), TitleSize.H5)
 
     Button1(text = stringResource(id = R.string.game_screen_option_1), testTag = QuickGame) {
-        activity.vm.startGame(errorHandler = ApiErrorHandler(context))
+        activity.vm.startGame(
+            configuration = null,
+            errorHandler = ApiErrorHandler(context)
+        )
     }
     Button1(text = stringResource(id = R.string.game_screen_option_2), testTag = NewGame) {
         config.value = true
