@@ -125,6 +125,9 @@ private fun PlayScreen(
                 activity.vm.setFleet(ships, ApiErrorHandler(context))
             }
         },
+        onSurrenderRequest = {
+            activity.vm.surrender()
+        }
     )
 }
 

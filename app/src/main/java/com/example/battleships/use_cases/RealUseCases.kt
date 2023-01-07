@@ -129,6 +129,15 @@ class RealUseCases(
         }
     }
 
+    override suspend fun surrender(token: String, mode: Mode): Boolean {
+        val result = gameServices.surrender(token, null, mode)
+        return getValueOrExecute(result) {
+            val surrenderAction = homeServices.getSurrenderAction()
+            val res = gameServices.surrender(token, surrenderAction, mode)
+            return@getValueOrExecute getValueOrThrow(res)
+        }
+    }
+
     private suspend fun <T> getValueOrExecute(either: Either<ApiException, T>, onEitherLeft: suspend () -> T): T {
         return when (either) {
             is Either.Left -> onEitherLeft()

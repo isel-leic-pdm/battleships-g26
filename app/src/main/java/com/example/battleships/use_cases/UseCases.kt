@@ -43,4 +43,6 @@ interface UseCases{
     suspend fun getHome() : Home
 
     suspend fun checkIfUserIsInQueue(token: String, mode: Mode): Boolean
+
+    suspend fun surrender(token: String, mode: Mode): Boolean
 }

@@ -25,6 +25,7 @@ import com.example.battleships.game.domain.board.Coordinate
 import pt.isel.daw.dawbattleshipgame.domain.board.Panel
 import com.example.battleships.game.domain.game.Configuration
 import com.example.battleships.game.domain.game.ShotsList
+import com.example.battleships.ui.Button1
 import com.example.battleships.ui.Title
 import com.example.battleships.ui.TitleSize
 import com.example.battleships.utils.SCREEN_WIDTH
@@ -44,6 +45,7 @@ const val CruiserShipButtonTestTag = "CruiserShipButton"
 const val SubmarineShipButtonTestTag = "SubmarineShipButton"
 const val DestroyerShipButtonTestTag = "DestroyerShipButton"
 const val ConfirmFleetButtonTestTag = "ConfirmFleetButton"
+const val SurrenderButtonTestTag = "SurrenderButton"
 
 private const val TAG = "GameViews"
 
@@ -55,7 +57,8 @@ fun GameView(
     onShipClick: (ShipType) -> Unit,
     onSquarePressed: (Coordinate) -> Unit,
     onShotsPlaced: (ShotsList) -> Unit,
-    onConfirmLayout: () -> Unit
+    onConfirmLayout: () -> Unit,
+    onSurrenderRequest: () -> Unit,
 ) {
     Log.d(TAG, "Composing GameView")
     Column(
@@ -96,6 +99,12 @@ fun GameView(
                 Winner(winner)
             }
         }
+        if (game.state !== GameState.FINISHED) {
+            Button1(
+                text = stringResource(id = R.string.game_screen_surrender_button),
+                testTag = SurrenderButtonTestTag
+            ) { onSurrenderRequest() }
+        }
     }
 }
 
@@ -112,12 +121,9 @@ private fun FleetSetup(
 ) {
     Title(text = stringResource(id = R.string.game_screen_placing_phase), TitleSize.H4)
     MySpacer()
-
     BoardView(board, onPanelClick = onPanelClick)
     Column(
-        modifier = Modifier
-            .fillMaxHeight()
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(
@@ -130,8 +136,7 @@ private fun FleetSetup(
         }
         Row(
             Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(),
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
@@ -193,9 +198,7 @@ private fun Battle(
     clickAction.value =
         if (turn === player && displayedBoard.value === player.other()) ::onCoordinateClick else null
     Column(
-        Modifier
-            .fillMaxWidth()
-            .fillMaxSize()
+        Modifier.fillMaxWidth()
     ) {
         Text(
             text =
@@ -220,7 +223,6 @@ private fun Battle(
         )
         Row(
             Modifier
-                .fillMaxHeight()
                 .fillMaxWidth()
                 .padding(20.dp),
             horizontalArrangement = Arrangement.SpaceAround,

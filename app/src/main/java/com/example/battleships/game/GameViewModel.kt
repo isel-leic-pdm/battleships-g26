@@ -72,6 +72,17 @@ class GameViewModel(
         }
     }
 
+    fun surrender() {
+        viewModelScope.launch {
+            try {
+                if (useCases.surrender(token, Mode.FORCE_REMOTE))
+                    _game = Result.success(NotCreated)
+            } catch (e: Exception) {
+                Log.e(TAG, "surrender: ", e)
+            }
+        }
+    }
+
     fun startGame(configuration: Configuration?, errorHandler: (Exception) -> Unit) {
         suspend fun gameCreatedHandler() {
             _game = Result.success(Matchmaking)

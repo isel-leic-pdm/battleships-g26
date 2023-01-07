@@ -135,4 +135,12 @@ class FakeGameDataServices : GameDataServices {
     ): Either<ApiException, Boolean> {
         return Either.Right(false)
     }
+
+    override suspend fun surrender(
+        token: String,
+        SurrenderAction: SirenAction?,
+        mode: Mode
+    ): Either<ApiException, Boolean> {
+        return Either.Right(false)
+    }
 }

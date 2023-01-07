@@ -40,4 +40,6 @@ interface GameDataServices {
     suspend fun getGame(token: String, GetGameLink: SirenLink? = null, mode: Mode): Either<ApiException, Pair<Game, Player>?>
 
     suspend fun checkIfUserIsInQueue(token: String, UserInQueueLink: SirenLink?, mode: Mode): Either<ApiException, Boolean>
+
+    suspend fun surrender(token: String, SurrenderAction: SirenAction?, mode: Mode): Either<ApiException, Boolean>
 }

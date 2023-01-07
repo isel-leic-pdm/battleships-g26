@@ -94,4 +94,8 @@ class FakeUseCases(
         return getValueOrThrow(result)
     }
 
+    override suspend fun surrender(token: String, mode: Mode): Boolean {
+        TODO("Not yet implemented")
+    }
+
 }

@@ -59,4 +59,5 @@
     <string name="game_screen_placing_phase">Place Your Fleet</string>
     <string name="game_screen_battle_phase">Hell Let Loose</string>
     <string name="game_screen_end_phase">Armistice</string>
+    <string name="game_screen_surrender_button">Surrender</string>
 </resources>
