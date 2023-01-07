@@ -20,9 +20,11 @@ fun <T> Result<T>.getWith(context : Context): T? {
 
 val ApiErrorHandler = fun(context: Context) : (Exception) -> Unit {
     return {
-        if(it is ApiException)
-            Toast.makeText(context, it.toast, Toast.LENGTH_SHORT).show()
-        else Toast.makeText(context, "Internal Error", Toast.LENGTH_SHORT).show()
+        context.run {
+            if(it is ApiException)
+                Toast.makeText(context, it.toast, Toast.LENGTH_SHORT).show()
+            else Toast.makeText(context, "Internal Error", Toast.LENGTH_SHORT).show()
+        }
     }
 }
 

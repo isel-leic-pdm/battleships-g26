@@ -2,6 +2,7 @@ package com.example.battleships.ui
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -14,7 +15,7 @@ import androidx.compose.ui.unit.sp
 fun Button1(text: String, testTag: String, onClick: () -> Unit) {
     val modifier = Modifier
         .fillMaxWidth(0.7f)
-        .height(50.dp)
+        .padding(10.dp)
     ButtonInternal(modifier, text, testTag, onClick)
 }
 
@@ -34,7 +35,8 @@ private fun ButtonInternal(modifier: Modifier, text: String, testTag: String, on
     ) {
         Text(
             text = text,
-            fontSize = 20.sp
+            fontSize = 18.sp,
+            style = typography.h1
         )
     }
 }

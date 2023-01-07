@@ -9,3 +9,5 @@ fun Home(dto: HomeDto): Home {
     require(home != null) { "HomeDto properties cannot be null" }
     return Home(home.title)
 }
+
+data class UserHome(val userId: Int, val username: String)

@@ -2,6 +2,7 @@ package com.example.battleships.services.fake
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.example.battleships.game.ConfirmFleetButtonTestTag
 import com.example.battleships.game.domain.game.*
 import com.example.battleships.services.ApiException
 import com.example.battleships.services.Either
@@ -47,7 +48,7 @@ class FakeGameDataServices : GameDataServices {
             GAME_ID,
             PLAYER1_ID,
             PLAYER2_ID,
-            configuration!!
+            configuration ?: Configuration.DEFAULT
         )
         game = setEnemyShipLayout(newGame)
         return Either.Right(true)
