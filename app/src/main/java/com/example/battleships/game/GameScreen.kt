@@ -75,6 +75,7 @@ internal fun GameScreen(
                     is GameViewModel.NotCreated -> InitScreen(activity)
                     is GameViewModel.Creating -> CreatingGame()
                     is GameViewModel.Matchmaking -> Matchmaking()
+                    is GameViewModel.Restoring -> RestoringGame()
                     is GameViewModel.Started -> PlayScreen(activity, game)
                     else -> ErrorAlert(
                         title = R.string.error_api_title,
@@ -368,6 +369,11 @@ private fun CreatingGame() {
 @Composable
 private fun Matchmaking() {
     Text(stringResource(id = R.string.game_screen_matchmaking))
+}
+
+@Composable
+private fun RestoringGame() {
+    Text(stringResource(id = R.string.game_screen_restoring_game))
 }
 
 /**

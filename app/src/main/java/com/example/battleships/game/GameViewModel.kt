@@ -14,6 +14,7 @@ import com.example.battleships.use_cases.UseCases
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.example.battleships.game.domain.game.ShotsList
+import com.example.battleships.services.Mode
 import com.example.battleships.utils.launchWithErrorHandling
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
@@ -44,6 +45,8 @@ class GameViewModel(
 
     /** The Game was created but didn't start yet */
     object Matchmaking : GameResult()
+
+    object Restoring : GameResult()
 
     /** The Game is in progress */
     data class Started(val gameResultInternal: GameResultInternal) : GameResult()
@@ -78,13 +81,28 @@ class GameViewModel(
 
 
     fun restoreGame() {
+        fun notFoundHandler() {
+            Log.e(TAG, "Could not restore game")
+            _game = Result.success(NotCreated) // To display menu again
+            return
+        }
+
         viewModelScope.launch {
-            _game = Result.success(Matchmaking)
-            keepOnUpdatingGameUntil {
-                val gameAux = game.getOrNull()
-                gameAux != null && gameAux is Started
+            _game = Result.success(Restoring)
+            try {
+                val res = useCases.fetchGame(token)
+                if (res != null) {
+                    val (game, player) = res
+                    _game = Result.success(Started(GameResultInternal(game, player))).also {
+                        Log.i(TAG, "Game restored")
+                    }
+                    keepOnUpdatingGameUntil { !isWaitingForOpponent() }
+                } else {
+                    notFoundHandler()
+                }
+            } catch (e: Exception) {
+                notFoundHandler()
             }
-            Log.i(TAG, "Game restored")
         }
     }
 

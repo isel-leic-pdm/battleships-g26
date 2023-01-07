@@ -43,6 +43,7 @@
     <string name="game_screen_config_option_3">Round Timeout</string>
     <string name="game_screen_set_fleet_option">Set Fleet</string>
     <string name="game_screen_matchmaking">Matchmaking</string>
+    <string name="game_screen_restoring_game">Restoring Previous Game</string>
     <string name="game_screen_creating_game">Creating Game</string>
     <string name="game_screen_top_app_bar_title">Game</string>
     <string name="game_screen_place_phase_confirm_button">Confirm</string>
