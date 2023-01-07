@@ -30,6 +30,7 @@ class RealHomeDataServices(
     private var rankingsLink: SirenLink? = null
     private var serverInfoLink: SirenLink? = null
     private var userInfoLink : SirenLink? = null
+    private var userInQueueLink: SirenLink? = null
 
     suspend fun getHome(): Home {
         val request = buildRequest(Get(battleshipsHome), null, Mode.AUTO)
@@ -91,6 +92,7 @@ class RealHomeDataServices(
         serverInfoLink = home.links?.find("server-info")
         rankingsLink = home.links?.find("user-stats")
         userInfoLink = home.links?.find("user")
+        userInQueueLink = home.links?.find("user-in-queue")
     }
 
     private suspend fun ensureServerInfoLink(): URL {
@@ -140,5 +142,13 @@ class RealHomeDataServices(
             return userHomeLink ?: throw UnresolvedLinkException()
         }
         return userHomeLink ?: throw UnresolvedLinkException()
+    }
+
+    suspend fun getUserInQueueLink(): SirenLink {
+        if (userInQueueLink == null) {
+            getHome()
+            return userInQueueLink ?: throw UnresolvedLinkException()
+        }
+        return userInQueueLink ?: throw UnresolvedLinkException()
     }
 }

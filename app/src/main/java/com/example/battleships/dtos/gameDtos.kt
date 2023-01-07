@@ -17,6 +17,10 @@ data class GameIdDtoProperties(val gameId: Int)
 typealias GameIdDto = SirenEntity<GameIdDtoProperties>
 val GameIdDtoType = SirenEntity.getType<GameIdDtoProperties>()
 
+data class UserInQueue(val isInQueue: Boolean)
+typealias UserInQueueDto = SirenEntity<UserInQueue>
+val UserInQueueDtoType = SirenEntity.getType<UserInQueue>()
+
 data class GameDtoProperties(
     val id: Int,
     val configuration: Configuration,

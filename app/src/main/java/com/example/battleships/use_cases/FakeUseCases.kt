@@ -89,4 +89,8 @@ class FakeUseCases(
 
     override suspend fun getHome() = Home(HomeDto(properties = HomeDtoProperties("fake")))
 
+    override suspend fun checkIfUserIsInQueue(token: String, mode: Mode): Boolean {
+        TODO("Not yet implemented")
+    }
+
 }

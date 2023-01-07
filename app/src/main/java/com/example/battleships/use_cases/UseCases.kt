@@ -41,4 +41,6 @@ interface UseCases{
     suspend fun getUserHome(token: String, mode: Mode = Mode.AUTO) : UserHome
 
     suspend fun getHome() : Home
+
+    suspend fun checkIfUserIsInQueue(token: String, mode: Mode): Boolean
 }

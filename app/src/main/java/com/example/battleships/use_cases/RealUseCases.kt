@@ -120,6 +120,15 @@ class RealUseCases(
 
     override suspend fun getHome() = homeServices.getHome()
 
+    override suspend fun checkIfUserIsInQueue(token: String, mode: Mode): Boolean {
+        val result = gameServices.checkIfUserIsInQueue(token, null, mode)
+        return getValueOrExecute(result) {
+            val userInQueueLink = homeServices.getUserInQueueLink()
+            val res = gameServices.checkIfUserIsInQueue(token, userInQueueLink, mode)
+            return@getValueOrExecute getValueOrThrow(res)
+        }
+    }
+
     private suspend fun <T> getValueOrExecute(either: Either<ApiException, T>, onEitherLeft: suspend () -> T): T {
         return when (either) {
             is Either.Left -> onEitherLeft()

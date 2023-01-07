@@ -126,4 +126,12 @@ class FakeGameDataServices : GameDataServices {
     ): Either<ApiException, Pair<Game, Player>?> {
         return Either.Right(game?.let { Pair(it, Player.ONE) })
     }
+
+    override suspend fun checkIfUserIsInQueue(
+        token: String,
+        UserInQueueLink: SirenLink?,
+        mode: Mode
+    ): Either<ApiException, Boolean> {
+        return Either.Right(false)
+    }
 }

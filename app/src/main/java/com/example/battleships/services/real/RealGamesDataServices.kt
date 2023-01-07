@@ -26,6 +26,7 @@ class RealGamesDataServices(
     private var getGameLink: SirenLink? = null
     private var placeShipsAction: SirenAction? = null
     private var placeShotAction: SirenAction? = null
+    private var userInQueueLink: SirenLink? = null
 
     /**
      * Creates a new game.
@@ -159,6 +160,29 @@ class RealGamesDataServices(
         } catch (e: Exception) {
             Either.Right(null)
         }
+    }
+
+    override suspend fun checkIfUserIsInQueue(
+        token: String,
+        UserInQueueLink: SirenLink?,
+        mode: Mode
+    ): Either<ApiException, Boolean> {
+        val userInQueueLink = UserInQueueLink?.also { userInQueueLink = it }
+            ?: this.userInQueueLink ?: return Either.Left(UnresolvedActionException())
+        val url = userInQueueLink.href.toApiURL()
+
+        val request = buildRequest(Get(url), token, mode)
+
+        val userInQueueDto = request.send(httpClient) { response ->
+            handleResponse<UserInQueueDto>(
+                jsonEncoder,
+                response,
+                UserInQueueDtoType.type,
+                SirenMediaType
+            )
+        }
+        val inQueue = userInQueueDto.properties?.isInQueue ?: throw UnexpectedResponseException()
+        return Either.Right(inQueue)
     }
 
     private fun extractPlaceFleetLayout(gameDto: GameDto) =

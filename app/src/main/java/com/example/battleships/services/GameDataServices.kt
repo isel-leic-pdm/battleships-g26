@@ -38,4 +38,6 @@ interface GameDataServices {
      * @return an object representing the current game state, and the player associated with the token.
      */
     suspend fun getGame(token: String, GetGameLink: SirenLink? = null, mode: Mode): Either<ApiException, Pair<Game, Player>?>
+
+    suspend fun checkIfUserIsInQueue(token: String, UserInQueueLink: SirenLink?, mode: Mode): Either<ApiException, Boolean>
 }

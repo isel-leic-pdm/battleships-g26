@@ -38,6 +38,7 @@ class GameActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        vm.checkIfUserIsInQueue() // will check if user is in queue and if so, will display matchmaking screen
         setContent {
             GameScreen(this) { finish() }
         }

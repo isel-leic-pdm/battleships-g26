@@ -56,6 +56,19 @@ class GameViewModel(
     val game: Result<GameResult>
         get() = _game
 
+    fun checkIfUserIsInQueue() {
+        viewModelScope.launch {
+            try {
+                val result = useCases.checkIfUserIsInQueue(token, Mode.FORCE_REMOTE)
+                if (result) {
+                    _game = Result.success(Matchmaking)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "checkIfUserIsInQueue: ", e)
+            }
+        }
+    }
+
     fun startGame(configuration: Configuration?, errorHandler: (Exception) -> Unit) {
         suspend fun gameCreatedHandler() {
             _game = Result.success(Matchmaking)
