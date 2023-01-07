@@ -19,8 +19,6 @@ import com.example.battleships.auth.AuthActivity
 import com.example.battleships.game.GameActivity
 import com.example.battleships.info.InfoActivity
 import com.example.battleships.rankings.RankingsActivity
-import com.example.battleships.ui.Handler
-import com.example.battleships.ui.StartScreen
 import com.example.battleships.user.UserActivity
 import com.example.battleships.utils.ErrorAlert
 import com.example.battleships.utils.getWith

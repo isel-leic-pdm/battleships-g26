@@ -56,7 +56,7 @@ internal fun GameScreen(
                 .testTag("GameScreen"),
             backgroundColor = MaterialTheme.colors.background,
             topBar = {
-                TopBar(
+                CenteredTopAppBar(
                     title = stringResource(id = R.string.game_screen_top_app_bar_title),
                     navigation = NavigationHandlers(
                         onBackRequested = onBackRequest
@@ -148,7 +148,7 @@ private fun InitScreen(activity: GameActivity) {
     val roundTimeout = remember { mutableStateOf(10F) }
     val chooseFleet = remember { mutableStateOf(false) }
 
-    Title(text = stringResource(id = R.string.game_screen_options_title), TitleSize.H4)
+    Title(text = stringResource(id = R.string.game_screen_options_title), TitleSize.H5)
 
     Button1(text = stringResource(id = R.string.game_screen_option_1), testTag = QuickGame) {
         activity.vm.startGame(errorHandler = ApiErrorHandler(context))

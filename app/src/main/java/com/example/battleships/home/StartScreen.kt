@@ -1,4 +1,4 @@
-package com.example.battleships.ui
+package com.example.battleships.home
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -7,7 +7,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Leaderboard
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,6 +16,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.battleships.home.NavigateToRankingsButtonTestTag
+import com.example.battleships.ui.Button1
+import com.example.battleships.ui.NavigateToAppInfoTestTag
 import com.example.battleships.ui.theme.BattleshipsTheme
 import com.example.battleships.utils.SCREEN_HEIGHT
 import pt.isel.battleships.R
@@ -25,16 +27,6 @@ const val NavigateToUserInfoButton = "NavigateToUserInfoButton"
 data class Handler(val name: String, val tag: String, val handler: () -> Unit)
 
 const val TAG = "StartScreen"
-
-@Composable
-private fun NavigationButton(title: String, tagName: String, onClick: () -> Unit) {
-    Button(
-        modifier = Modifier.testTag(tagName),
-        onClick = onClick,
-    ) {
-        Text(text = title)
-    }
-}
 
 @Composable
 fun StartScreen(
@@ -87,7 +79,7 @@ fun BottomAppNavigation(ranking : () -> Unit, onAppInfo : () -> Unit, onUserInfo
             onClick = ranking,
         ) {
             Icon(
-                Icons.Default.List,
+                Icons.Default.Leaderboard,
                 null
             )
         }
