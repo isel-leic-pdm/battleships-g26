@@ -196,11 +196,21 @@ class GameViewModel(
             val success = useCases.placeShots(token, shots)
             if (success) {
                 Log.i(TAG, "Shots placed")
-                keepOnUpdatingGameUntil { isWaitingForOpponent() }
-                keepOnUpdatingGameUntil { !isWaitingForOpponent() }
+                keepOnUpdatingGameUntil { isWaitingForOpponent() /* || !gameStarted()*/ }
+                // if (changeToMenuIfGameDoNotExistAnymore()) return@launchWithErrorHandling
+                keepOnUpdatingGameUntil { !isWaitingForOpponent() /* || !gameStarted()*/ }
+                // if (changeToMenuIfGameDoNotExistAnymore()) return@launchWithErrorHandling
                 Log.i(TAG, "Opponent place it's shots")
             }
         }
+    }
+
+    private fun changeToMenuIfGameDoNotExistAnymore(): Boolean {
+        if (!gameStarted()) {
+            _game = Result.success(NotCreated)
+            return true
+        }
+        return false
     }
 
     internal fun setGame(game: Game, player: Player) {
