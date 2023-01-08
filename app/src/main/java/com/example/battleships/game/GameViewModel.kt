@@ -177,6 +177,8 @@ class GameViewModel(
             if (res) {
                 keepOnUpdatingGameUntil { bothBoardsConfirmed() }
                 Log.i(TAG, "Both boards confirmed")
+                keepOnUpdatingGameUntil { !isWaitingForOpponent() }
+                Log.i(TAG, "Ready to play")
             } else {
                 Log.e(TAG, "Failed to set fleet")
             }
@@ -194,6 +196,7 @@ class GameViewModel(
             if (success) {
                 Log.i(TAG, "Shots placed")
                 keepOnUpdatingGameUntil { isWaitingForOpponent() }
+                keepOnUpdatingGameUntil { !isWaitingForOpponent() }
                 Log.i(TAG, "Opponent place it's shots")
             }
         }
@@ -209,7 +212,7 @@ class GameViewModel(
         return gameAux != null && gameAux is Started
     }
 
-    internal fun getGameAndPlayerIfStartedOrNull(): Pair<Game, Player>? {
+    private fun getGameAndPlayerIfStartedOrNull(): Pair<Game, Player>? {
         val gameAux = game.getOrNull()
         if (gameAux == null || gameAux !is Started) return null
         return gameAux.gameResultInternal.game to gameAux.gameResultInternal.player
