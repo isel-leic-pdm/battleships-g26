@@ -5,20 +5,23 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Leaderboard
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.battleships.home.NavigateToRankingsButtonTestTag
 import com.example.battleships.ui.Button1
 import com.example.battleships.ui.NavigateToAppInfoTestTag
 import com.example.battleships.ui.theme.BattleshipsTheme
+import com.example.battleships.ui.typography
 import com.example.battleships.utils.SCREEN_HEIGHT
 import pt.isel.battleships.R
 
@@ -54,11 +57,20 @@ fun StartScreen(
                     .padding(innerPadding)
                     .fillMaxSize(),
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ship_logo),
-                    contentDescription = null,
-                    modifier = Modifier.size((SCREEN_HEIGHT/12).dp)
-                )
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                    Icon(
+                        Icons.Default.DirectionsBoat,
+                        null,
+                        modifier = Modifier.size((SCREEN_HEIGHT/12).dp).padding(15.dp)
+                    )
+                    Text(
+                        text = stringResource(id = R.string.app_name),
+                        fontSize = 35.sp, fontFamily = FontFamily.SansSerif
+                    )
+                }
                 handlers.forEach { handler ->
                     Button1(text = handler.name, testTag = handler.tag) { handler.handler() }
                 }

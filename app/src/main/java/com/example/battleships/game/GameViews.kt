@@ -5,6 +5,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -119,9 +120,12 @@ private fun FleetSetup(
     onShipClick: ((ShipType) -> Unit),
     onConfirmLayout: (() -> Unit)
 ) {
+    val clickPanel = remember {
+        mutableStateOf(false)
+    }
     Title(text = stringResource(id = R.string.game_screen_placing_phase), TitleSize.H4)
     MySpacer()
-    BoardView(board, onPanelClick = onPanelClick)
+    BoardView(board, onPanelClick = onPanelClick, panelClicked = clickPanel)
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -132,7 +136,7 @@ private fun FleetSetup(
                 .offset(y = GRID_WIDTH * 2)
                 .padding(15.dp)
         ) {
-            ShipOptionView(configuration, onShipClick)
+            ShipsView(configuration, onShipClick, clickPanel)
         }
         Row(
             Modifier
@@ -140,15 +144,11 @@ private fun FleetSetup(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Button(
-                modifier = Modifier.padding(15.dp),
+            Button1(
+                text = "Confirm",
+                testTag = ConfirmFleetButtonTestTag,
                 onClick = onConfirmLayout
-            ) {
-                Text(
-                    text = stringResource(id = R.string.game_screen_place_phase_confirm_button),
-                    fontSize = 20.sp
-                )
-            }
+            )
         }
     }
 }
@@ -268,7 +268,8 @@ private fun Winner(winner: Player) {
 private fun BoardView(
     board: Board,
     viewShips: Boolean = true,
-    onPanelClick: ((Coordinate) -> Unit)?
+    onPanelClick: ((Coordinate) -> Unit)?,
+    panelClicked : MutableState<Boolean>? = null,
 ) {
     val gameSize = board.dimension
     val playSide = PLAY_SIDE(gameSize)
@@ -291,6 +292,8 @@ private fun BoardView(
                 SquareView(panel.coordinate, panel, viewShips, playSide) {
                     if (onPanelClick != null) {
                         onPanelClick(panel.coordinate)
+                        if(panelClicked != null)
+                            panelClicked.value = true
                     }
                 }
             }
@@ -334,25 +337,6 @@ private fun SquareView(
 }
 
 
-@Composable
-internal fun ShipOptionView(
-    configuration: Configuration, ship: ShipType,
-    onClick: () -> Unit,
-) {
-    Row(Modifier.testTag(ship.toTestTag())) {
-        Spacer(Modifier.size(GRID_WIDTH))
-        val shipLength = configuration.getShipLength(ship)
-        require(shipLength != null)
-        repeat(shipLength) {
-            val m = Modifier
-                .size(DEFAULT_PLAY_SIDE)
-                .background(Color.Gray)
-            Box(m.clickable { onClick() })
-            Spacer(Modifier.size(GRID_WIDTH))
-        }
-    }
-}
-
 private fun ShipType.toTestTag() = when (this) {
     ShipType.BATTLESHIP -> BattleshipShipButtonTestTag
     ShipType.CARRIER -> CarrierShipButtonTestTag
@@ -365,7 +349,19 @@ private fun ShipType.toTestTag() = when (this) {
  * Draws all ships in the option menu.
  */
 @Composable
-internal fun ShipOptionView(configuration: Configuration, onShipClick: ((ShipType) -> Unit)?) {
+internal fun ShipsView(
+    configuration: Configuration,
+    onShipClick: ((ShipType) -> Unit)?,
+    panelClick: MutableState<Boolean>,
+) {
+    val auxConfig = remember {
+        mutableStateOf(Configuration.DEFAULT.fleet)
+    }
+
+    val shipClicked = remember {
+        mutableStateOf<ShipType?>(null)
+    }
+
     Row(
         modifier = Modifier
             .horizontalScroll(rememberScrollState())
@@ -373,7 +369,7 @@ internal fun ShipOptionView(configuration: Configuration, onShipClick: ((ShipTyp
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        configuration.fleet.forEach { ship ->
+        auxConfig.value.forEach { ship ->
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -386,12 +382,43 @@ internal fun ShipOptionView(configuration: Configuration, onShipClick: ((ShipTyp
                 )
                 Spacer(modifier = Modifier.size(13.dp))
 
-                ShipOptionView(configuration, ship.key) {
-                    if (onShipClick != null) onShipClick(ship.key)
+                ShipComp(configuration, ship.key) {
+                    if (onShipClick != null) onShipClick(ship.key).also {
+                        shipClicked.value = ship.key
+                        panelClick.value = false
+                    }
+                }
+
+                val clicked = shipClicked.value
+                if(panelClick.value && clicked != null) {
+                    auxConfig.value = auxConfig.value.toMutableMap().minus(clicked)
+                    panelClick.value = false
                 }
             }
         }
         Spacer(modifier = Modifier.size(30.dp))
+    }
+}
+
+
+@Composable
+internal fun ShipComp(
+    configuration: Configuration, ship: ShipType,
+    onClick: () -> Unit
+) {
+    Row(Modifier.testTag(ship.toTestTag())) {
+        Spacer(Modifier.size(GRID_WIDTH))
+        val shipLength = configuration.getShipLength(ship)
+        require(shipLength != null)
+
+        val m = Modifier
+            .size(DEFAULT_PLAY_SIDE)
+            .background(Color.Gray)
+
+        repeat(shipLength) {
+            Box(m.clickable { onClick() })
+            Spacer(Modifier.size(GRID_WIDTH))
+        }
     }
 }
 
