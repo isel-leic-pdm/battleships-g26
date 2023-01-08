@@ -49,6 +49,7 @@ internal fun GameScreen(
 ) {
     Log.d(TAG, "Composing GameScreen")
     val mContext = LocalContext.current
+
     BattleshipsTheme {
         Scaffold(
             modifier = Modifier
@@ -62,7 +63,7 @@ internal fun GameScreen(
                         onBackRequested = onBackRequest
                     )
                 )
-            }
+            },
         ) { padding ->
             Column(
                 verticalArrangement = Arrangement.SpaceAround,

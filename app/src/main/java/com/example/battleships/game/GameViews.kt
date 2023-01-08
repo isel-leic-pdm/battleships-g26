@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +31,8 @@ import com.example.battleships.game.domain.game.ShotsList
 import com.example.battleships.ui.Button1
 import com.example.battleships.ui.Title
 import com.example.battleships.ui.TitleSize
+import com.example.battleships.ui.theme.SurrenderRed
+import com.example.battleships.utils.ErrorAlert
 import com.example.battleships.utils.SCREEN_WIDTH
 import pt.isel.battleships.R
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
@@ -101,10 +105,29 @@ fun GameView(
             }
         }
         if (game.state !== GameState.FINISHED) {
+            val confirm = remember {
+                mutableStateOf(false)
+            }
             Button1(
                 text = stringResource(id = R.string.game_screen_surrender_button),
-                testTag = SurrenderButtonTestTag
-            ) { onSurrenderRequest() }
+                testTag = SurrenderButtonTestTag,
+                color = SurrenderRed,
+                onClick = {
+                    confirm.value = true
+                }
+            )
+
+            if(confirm.value) {
+                ErrorAlert(
+                    title = R.string.game_screen_surrender_button,
+                    message = R.string.game_screen_surrender_text_confirm,
+                    rightButtonText = R.string.yes,
+                    onRightButton = { onSurrenderRequest() },
+                    leftButtonText = R.string.no,
+                    onLeftButton = { confirm.value = false }
+                )
+            }
+
         }
     }
 }
