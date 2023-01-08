@@ -7,11 +7,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.FabPosition
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,6 +58,10 @@ private fun RankingList(
     onRefreshRequested: () -> Unit,
     onUserClick : (Int) -> Unit,
 ) {
+    val auxRanking = remember {
+        mutableStateOf(ranking)
+    }
+
     BattleshipsTheme {
         Scaffold(
             modifier = Modifier.testTag("RankingsScreen"),
@@ -74,9 +80,52 @@ private fun RankingList(
             },
             floatingActionButtonPosition = FabPosition.Center,
         ) { padding ->
-            Column (modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally){
+            Column (
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                val search = remember {
+                    mutableStateOf("")
+                }
+
+                Row(
+                    Modifier
+                        .offset(y = (-20).dp)
+                        .width(SCREEN_WIDTH.dp / 3)
+                        .clip(RoundedCornerShape(13.dp))
+                        .background(Milk)
+                        .padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ){
+                    TextField(
+                        value = search.value,
+                        onValueChange = { search.value = it },
+                        label = { Text("Search") },
+                        modifier = Modifier
+                            .background(Color.Transparent)
+                            .width(250.dp)
+                    )
+                    IconButton(onClick = { auxRanking.value = UserRanking(
+                        auxRanking.value.users.filter { it.username.contains(search.value) }
+                    )}) {
+                        Icon(
+                            Icons.Default.Search,
+                            null,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    IconButton(onClick = { auxRanking.value = ranking }) {
+                        Icon(
+                            Icons.Default.Clear,
+                            null,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
+                }
+                Row(Modifier.height(10.dp)) {}
                 Column(
                     Modifier
                         .offset(y = (-20).dp)
@@ -90,7 +139,9 @@ private fun RankingList(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Row(
-                        Modifier.fillMaxWidth().height(40.dp),
+                        Modifier
+                            .fillMaxWidth()
+                            .height(40.dp),
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
                         val fontSize = 20.sp
@@ -103,7 +154,7 @@ private fun RankingList(
                         Modifier.verticalScroll(rememberScrollState())
                     ){
                         Row(Modifier.height(20.dp)) {}
-                        ranking.users.forEachIndexed { idx, it ->
+                        auxRanking.value.users.forEachIndexed { idx, it ->
                             ListEntry(
                                 id = it.id,
                                 name = it.username,
@@ -138,7 +189,10 @@ fun ListEntry(id : Int, name: String, games: Int, wins: Int, idx : Int, onUserCl
         Entry(label = games.toString())
         Entry(label = wins.toString())
     }
-    Row(Modifier.fillMaxWidth().height(10.dp)){}
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .height(10.dp)){}
 
 }
 

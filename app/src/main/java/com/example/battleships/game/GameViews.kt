@@ -56,7 +56,7 @@ fun GameView(
     game: Game,
     player: Player,
     onShipClick: (ShipType) -> Unit,
-    onSquarePressed: (Coordinate) -> Unit,
+    onSquarePressed: (Coordinate) -> Boolean,
     onShotsPlaced: (ShotsList) -> Unit,
     onConfirmLayout: () -> Unit,
     onSurrenderRequest: () -> Unit,
@@ -116,7 +116,7 @@ fun GameView(
 private fun FleetSetup(
     board: Board,
     configuration: Configuration,
-    onPanelClick: ((Coordinate) -> Unit),
+    onPanelClick: ((Coordinate) -> Boolean),
     onShipClick: ((ShipType) -> Unit),
     onConfirmLayout: (() -> Unit)
 ) {
@@ -181,10 +181,11 @@ private fun Battle(
         mutableStateOf(true)
     }
 
-    fun onCoordinateClick(c: Coordinate) {
-        if (shots.value.shots.size < configuration.shots.toInt()) {
+    fun onCoordinateClick(c: Coordinate): Boolean {
+        return if (shots.value.shots.size < configuration.shots.toInt()) {
             shots.value = ShotsList(shots.value.shots.toMutableList().plus(c))
-        }
+            true
+        } else false
     }
 
     if (player != turn && firstCall.value) {
@@ -194,7 +195,7 @@ private fun Battle(
     }
 
     val displayedBoard = remember { mutableStateOf(player) }
-    val clickAction = remember { mutableStateOf<((Coordinate) -> Unit)?>(::onCoordinateClick) }
+    val clickAction = remember { mutableStateOf<((Coordinate) -> Boolean)?>(::onCoordinateClick) }
     clickAction.value =
         if (turn === player && displayedBoard.value === player.other()) ::onCoordinateClick else null
     Column(
@@ -268,7 +269,7 @@ private fun Winner(winner: Player) {
 private fun BoardView(
     board: Board,
     viewShips: Boolean = true,
-    onPanelClick: ((Coordinate) -> Unit)?,
+    onPanelClick: ((Coordinate) -> Boolean)?,
     panelClicked : MutableState<Boolean>? = null,
 ) {
     val gameSize = board.dimension
@@ -291,9 +292,13 @@ private fun BoardView(
             board.board.forEach { panel ->
                 SquareView(panel.coordinate, panel, viewShips, playSide) {
                     if (onPanelClick != null) {
-                        onPanelClick(panel.coordinate)
-                        if(panelClicked != null)
-                            panelClicked.value = true
+                        onPanelClick(panel.coordinate).let {
+                            Log.e("Clicked coordinate", panel.coordinate.toString())
+                            Log.e("Response" , "Boolean = $it")
+                            Log.e("ClickedPanel", panelClicked?.value.toString())
+                            if(it && panelClicked != null)
+                                panelClicked.value = true
+                        }
                     }
                 }
             }
@@ -389,6 +394,7 @@ internal fun ShipsView(
                     }
                 }
 
+                Log.e("ClickedPanel_fleet", panelClick.value.toString())
                 val clicked = shipClicked.value
                 if(panelClick.value && clicked != null) {
                     auxConfig.value = auxConfig.value.toMutableMap().minus(clicked)

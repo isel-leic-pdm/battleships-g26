@@ -107,7 +107,8 @@ private fun PlayScreen(
         },
         onSquarePressed = {
             selected = onSquarePressed(selected, game, player, activity, it)
-                ?: return@GameView
+                ?: return@GameView false
+            return@GameView true
         },
         onShotsPlaced = {
             activity.vm.placeShots(it, ApiErrorHandler(context))
@@ -406,20 +407,20 @@ private fun onSquarePressed(
                     ?: return null // validates
             activity.vm.setGame(newGame, player)
             // updates game locally
-            return null
+            return selected
         }
     }
     if (selected is Square) {
         return if (coordinate == selected.coordinate) {
             val newGame = curGame.rotateShip(coordinate, player) ?: return null // validates
             activity.vm.setGame(newGame, player)
-            // updates game locally
-            null
+            selected
         } else {
+            println("Move")
             val newGame = curGame.moveShip(selected.coordinate, coordinate, player)
                 ?: return null // validates
             activity.vm.setGame(newGame, player) // updates game locally
-            null
+            selected
         }
     }
     return null

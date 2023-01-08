@@ -76,9 +76,9 @@ fun Authors(onSendEmailRequested: () -> Unit = { },
             style = MaterialTheme.typography.h6
         )
         MySpacer()
-        Developer(name = "António Carvalho", "https://github.com/ACRae", onOpenUrlRequested)
-        Developer(name = "Pedro Silva", "https://github.com/psilva20019", onOpenUrlRequested)
-        Developer(name = "Miguel Rocha", "https://github.com/MiguelRocha2001", onOpenUrlRequested)
+        Developer(name = stringResource(id = R.string.developer_48347), "https://github.com/ACRae", onOpenUrlRequested)
+        Developer(name =  stringResource(id = R.string.developer_47128), "https://github.com/psilva20019", onOpenUrlRequested)
+        Developer(name =  stringResource(id = R.string.developer_47185), "https://github.com/MiguelRocha2001", onOpenUrlRequested)
         MySpacer(30.dp)
         Text(
             text = stringResource(R.string.info_screen_email_text),

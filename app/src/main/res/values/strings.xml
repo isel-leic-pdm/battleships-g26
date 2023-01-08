@@ -1,4 +1,7 @@
 <resources>
+    <string name="developer_48347">48347 - António Carvalho</string>
+    <string name="developer_47185">47185 - Miguel Rocha</string>
+    <string name="developer_47128">47128 - Pedro Silva</string>
     <string name="app_name">Battleships</string>
     <string name="activity_info_no_suitable_app">Could not find a suitable application</string>
     <string name="top_bar_navigate_to_info">Display application\'s information</string>
