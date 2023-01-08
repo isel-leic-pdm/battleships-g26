@@ -142,6 +142,7 @@ class FakeGameDataServices : GameDataServices {
         SurrenderAction: SirenAction?,
         mode: Mode
     ): Either<ApiException, Boolean> {
-        return Either.Right(false)
+        game = null
+        return Either.Right(true)
     }
 }

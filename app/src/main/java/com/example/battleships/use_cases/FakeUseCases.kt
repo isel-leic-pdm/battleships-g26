@@ -95,7 +95,8 @@ class FakeUseCases(
     }
 
     override suspend fun surrender(token: String, gameId: Int, mode: Mode): Boolean {
-        TODO("Not yet implemented")
+        val res = gameServices.surrender(token, gameId, null, mode)
+        return getValueOrThrow(res)
     }
 
 }
