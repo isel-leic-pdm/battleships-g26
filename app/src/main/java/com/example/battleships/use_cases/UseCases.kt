@@ -44,5 +44,5 @@ interface UseCases{
 
     suspend fun checkIfUserIsInQueue(token: String, mode: Mode): Boolean
 
-    suspend fun surrender(token: String, mode: Mode): Boolean
+    suspend fun surrender(token: String, gameId: Int, mode: Mode): Boolean
 }

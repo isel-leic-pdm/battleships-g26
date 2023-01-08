@@ -41,5 +41,5 @@ interface GameDataServices {
 
     suspend fun checkIfUserIsInQueue(token: String, UserInQueueLink: SirenLink?, mode: Mode): Either<ApiException, Boolean>
 
-    suspend fun surrender(token: String, SurrenderAction: SirenAction?, mode: Mode): Either<ApiException, Boolean>
+    suspend fun surrender(token: String, gameId: Int, SurrenderAction: SirenAction?, mode: Mode): Either<ApiException, Boolean>
 }

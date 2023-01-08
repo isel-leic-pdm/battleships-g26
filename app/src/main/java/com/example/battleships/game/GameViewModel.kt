@@ -74,8 +74,9 @@ class GameViewModel(
 
     fun surrender() {
         viewModelScope.launch {
+            val (game, _) = getGameAndPlayerIfStartedOrNull() ?: return@launch
             try {
-                if (useCases.surrender(token, Mode.FORCE_REMOTE))
+                if (useCases.surrender(token, game.id, Mode.FORCE_REMOTE))
                     _game = Result.success(NotCreated)
             } catch (e: Exception) {
                 Log.e(TAG, "surrender: ", e)

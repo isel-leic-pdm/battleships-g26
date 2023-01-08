@@ -15,6 +15,7 @@ import okhttp3.OkHttpClient
 import pt.isel.daw.dawbattleshipgame.domain.player.Player
 import pt.isel.daw.dawbattleshipgame.domain.ship.Orientation
 import pt.isel.daw.dawbattleshipgame.domain.ship.ShipType
+import java.net.URL
 
 class RealGamesDataServices(
     private val httpClient: OkHttpClient,
@@ -188,14 +189,16 @@ class RealGamesDataServices(
 
     override suspend fun surrender(
         token: String,
+        gameId: Int,
         SurrenderAction: SirenAction?,
         mode: Mode
     ): Either<ApiException, Boolean> {
         val surrenderAction = SurrenderAction?.also { surrenderAction = it }
             ?: this.surrenderAction ?: return Either.Left(UnresolvedActionException())
         val url = surrenderAction.href.toApiURL()
+        val userInfoUrl = URL(url.toString().replace(":id", gameId.toString()))
 
-        val request = buildRequest(Post(url, null), token, mode)
+        val request = buildRequest(Post(userInfoUrl, "{}"), token, mode)
 
         request.send(httpClient) { response ->
             handleResponse<Unit>(

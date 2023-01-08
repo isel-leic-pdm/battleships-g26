@@ -129,11 +129,11 @@ class RealUseCases(
         }
     }
 
-    override suspend fun surrender(token: String, mode: Mode): Boolean {
-        val result = gameServices.surrender(token, null, mode)
+    override suspend fun surrender(token: String, gameId: Int, mode: Mode): Boolean {
+        val result = gameServices.surrender(token, gameId, null, mode)
         return getValueOrExecute(result) {
             val surrenderAction = homeServices.getSurrenderAction()
-            val res = gameServices.surrender(token, surrenderAction, mode)
+            val res = gameServices.surrender(token, gameId, surrenderAction, mode)
             return@getValueOrExecute getValueOrThrow(res)
         }
     }

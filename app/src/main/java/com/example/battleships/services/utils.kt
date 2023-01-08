@@ -13,7 +13,7 @@ import java.net.URL
 
 sealed class RequestMethod(val url: URL)
 class Get(url: URL) : RequestMethod(url)
-class Post(url: URL, val body: String?) : RequestMethod(url)
+class Post(url: URL, val body: String) : RequestMethod(url)
 class Put(url: URL, val body: String) : RequestMethod(url)
 class Delete(url: URL) : RequestMethod(url)
 

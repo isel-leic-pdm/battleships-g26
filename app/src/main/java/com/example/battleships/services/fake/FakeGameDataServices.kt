@@ -138,6 +138,7 @@ class FakeGameDataServices : GameDataServices {
 
     override suspend fun surrender(
         token: String,
+        gameId: Int,
         SurrenderAction: SirenAction?,
         mode: Mode
     ): Either<ApiException, Boolean> {
