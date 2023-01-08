@@ -268,7 +268,7 @@ internal class CoordinateTest {
     fun move_coordinate_to_selected_invalid_place(){
         try {
             val coordinate = Coordinate(1, 1)
-            Coordinates(10).move(coordinate, 100, 100)
+            Coordinates(10).move(coordinate,11,4)
             fail("Should throw an exception")
         } catch (e: Exception) {
             assertTrue(e.message == "Unable to move vertically")
