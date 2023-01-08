@@ -9,10 +9,10 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.example.battleships.home.HomeActivity
 import com.example.battleships.home.NavigateToGameTestTag
 import com.example.battleships.home.NavigateToRankingsButtonTestTag
+import com.example.battleships.home.NavigateToUserInfoButton
 import com.example.battleships.testutils.createAndroidComposeRule
 import com.example.battleships.ui.NavigateBackTestTag
 import com.example.battleships.ui.NavigateToAppInfoTestTag
-import com.example.battleships.ui.NavigateToUserInfoButton
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
