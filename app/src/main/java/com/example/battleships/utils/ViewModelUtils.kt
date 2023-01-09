@@ -20,14 +20,15 @@ fun <T> Result<T>.getWith(context : Context): T? {
 
 val ApiErrorHandler = fun(context: Context) : (Exception) -> Unit {
     return {
-        context.run {
+        try{
             if(it is ApiException)
                 Toast.makeText(context, it.toast, Toast.LENGTH_SHORT).show()
             else Toast.makeText(context, "Internal Error", Toast.LENGTH_SHORT).show()
+        }catch (e : Exception){
+            Log.e("Error", "Context Error Ocurred")
         }
     }
 }
-
 
 fun CoroutineScope.launchWithErrorHandling(
     exHandling : (Exception) -> Unit,

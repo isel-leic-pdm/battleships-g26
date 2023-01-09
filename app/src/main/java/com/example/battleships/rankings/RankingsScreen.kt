@@ -118,7 +118,7 @@ private fun RankingList(
                             modifier = Modifier.size(20.dp)
                         )
                     }
-                    IconButton(onClick = { auxRanking.value = ranking }) {
+                    IconButton(onClick = { auxRanking.value = ranking; search.value = ""}) {
                         Icon(
                             Icons.Default.Clear,
                             null,

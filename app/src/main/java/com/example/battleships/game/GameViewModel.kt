@@ -147,7 +147,8 @@ class GameViewModel(
     private suspend fun keepOnUpdatingGameUntil(stop: () -> Boolean) {
         while (!stop()) {
             updateGame()
-            delay(1000)
+            Log.e("FetchGame", "Fetching $stop")
+            delay(3000)
         }
     }
 

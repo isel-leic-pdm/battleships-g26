@@ -21,7 +21,7 @@ interface DependenciesContainer {
     val useCases: UseCases
 }
 
-const val URL = "https://5974-95-94-100-26.eu.ngrok.io"
+const val URL = "https://7809-95-92-211-125.eu.ngrok.io"
 
 private val battleshipsAPIHome = URL(URL)
 
@@ -29,18 +29,21 @@ class BattleshipsApplication : DependenciesContainer, Application() {
     private val httpClient: OkHttpClient by lazy { OkHttpClient() }
     private val jsonEncoder: Gson by lazy { GsonBuilder().create() }
 
-
-    override val useCases: UseCases
-        get() = RealUseCases(
+    private val cases = Pair(
+        RealUseCases(
             RealHomeDataServices(battleshipsAPIHome, httpClient, jsonEncoder),
             RealUserDataServices(httpClient, jsonEncoder),
             RealGamesDataServices(httpClient, jsonEncoder)
-        )
-    /*
-        get() = FakeUseCases(
+        ),
+        FakeUseCases(
             FakeHomeDataServices(),
             FakeUserDataServices(),
             FakeGameDataServices()
         )
-     */
+    )
+
+    override val useCases: UseCases
+
+    get() = cases.first
+
 }
