@@ -101,7 +101,7 @@ fun GameView(
                 Log.d(TAG, "Composing GameScreen, state: FINISHED")
                 val winnerId = game.winner ?: return
                 val winner = game.getPlayerFromId(winnerId)
-                Winner(winner)
+                Winner(winner == player)
             }
         }
         if (game.state !== GameState.FINISHED) {
@@ -283,9 +283,11 @@ private fun Battle(
 }
 
 @Composable
-private fun Winner(winner: Player) {
+private fun Winner(winner: Boolean) {
     Title(text = stringResource(id = R.string.game_screen_end_phase), TitleSize.H3)
-    Title(text = "${stringResource(id = R.string.game_screen_winner)} $winner", TitleSize.H4)
+    if(winner)
+        Title(text = stringResource(id = R.string.game_screen_winner), TitleSize.H4)
+    else Title(text = stringResource(id = R.string.game_screen_loser), TitleSize.H4)
 }
 
 @Composable
@@ -469,5 +471,5 @@ private fun MySpacer() {
 @Preview
 @Composable
 fun WinnerScreenPreview() {
-    Winner(winner = Player.ONE)
+    Winner(winner = true)
 }
