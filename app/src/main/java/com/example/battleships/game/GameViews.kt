@@ -352,6 +352,7 @@ private fun SquareView(
             else Color.Blue
         }
     }
+
     Box(
         Modifier
             .size(playSize)

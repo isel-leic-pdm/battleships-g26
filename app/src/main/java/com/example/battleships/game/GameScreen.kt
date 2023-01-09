@@ -371,17 +371,17 @@ fun ActionButton(
 
 @Composable
 private fun CreatingGame() {
-    Text(stringResource(id = R.string.game_screen_creating_game))
+    Title(stringResource(id = R.string.game_screen_creating_game), TitleSize.H6)
 }
 
 @Composable
 private fun Matchmaking() {
-    Text(stringResource(id = R.string.game_screen_matchmaking))
+    Title(stringResource(id = R.string.game_screen_matchmaking), TitleSize.H6)
 }
 
 @Composable
 private fun RestoringGame() {
-    Text(stringResource(id = R.string.game_screen_restoring_game))
+    Title(stringResource(id = R.string.game_screen_restoring_game), TitleSize.H6)
 }
 
 /**
