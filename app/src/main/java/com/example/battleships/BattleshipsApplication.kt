@@ -21,7 +21,7 @@ interface DependenciesContainer {
     val useCases: UseCases
 }
 
-const val URL = "https://7809-95-92-211-125.eu.ngrok.io"
+const val URL = "https://cbf1-95-94-100-26.eu.ngrok.io"
 
 private val battleshipsAPIHome = URL(URL)
 
