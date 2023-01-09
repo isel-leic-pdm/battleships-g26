@@ -60,6 +60,7 @@ val JsonMediaType = "application/json".toMediaType()
 internal fun <T> handleResponse(jsonEncoder: Gson, response: Response, type: Type, mediaType: MediaType): T {
     val contentType = response.body?.contentType()
 
+    val body = response.body?.string()
     if(contentType != ProblemMediaType && contentType != mediaType) {
         throw UnexpectedResponseException(response, toast = "Content type does not match: $contentType").also {
             Log.e("HandleResponse", contentType.toString())
@@ -67,7 +68,6 @@ internal fun <T> handleResponse(jsonEncoder: Gson, response: Response, type: Typ
         }
     }
 
-    val body = response.body?.string()
     return if (response.isSuccessful) {
         try {
             jsonEncoder.fromJson<T>(body, type).also {

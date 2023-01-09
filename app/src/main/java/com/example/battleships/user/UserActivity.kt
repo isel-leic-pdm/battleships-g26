@@ -15,6 +15,7 @@ import com.example.battleships.DependenciesContainer
 import com.example.battleships.TAG
 import com.example.battleships.utils.ErrorAlert
 import com.example.battleships.utils.getWith
+import okhttp3.internal.wait
 import pt.isel.battleships.R
 
 
@@ -52,12 +53,15 @@ class UserActivity : ComponentActivity() {
             val context = LocalContext.current
             val user = vm.user?.getWith(context)
             if(user != null) UserScreen(user) { finish() }
+            /*
             else ErrorAlert(
                 title = R.string.error_api_title,
                 message = R.string.error_could_not_reach_api,
                 rightButtonText = R.string.error_exit_button_text,
                 onRightButton = { finish() }
             )
+
+             */
         }
     }
 

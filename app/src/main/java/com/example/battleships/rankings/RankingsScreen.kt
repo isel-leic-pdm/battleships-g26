@@ -42,7 +42,7 @@ fun RankingsScreen(
     onUserClick: (Int) -> Unit,
 ) {
     RankingList(
-        rankings ?: UserRanking(emptyList()),
+        rankings,
         refreshingState,
         onNavigationRequested,
         onRefresh,
@@ -52,7 +52,7 @@ fun RankingsScreen(
 
 @Composable
 private fun RankingList(
-    ranking: UserRanking,
+    ranking: UserRanking?,
     refreshingState: RefreshingState,
     onNavigationRequested: NavigationHandlers,
     onRefreshRequested: () -> Unit,
@@ -61,6 +61,8 @@ private fun RankingList(
     val auxRanking = remember {
         mutableStateOf(ranking)
     }
+
+    auxRanking.value = ranking
 
     BattleshipsTheme {
         Scaffold(
@@ -108,7 +110,7 @@ private fun RankingList(
                             .width(250.dp)
                     )
                     IconButton(onClick = { auxRanking.value = UserRanking(
-                        auxRanking.value.users.filter { it.username.contains(search.value) }
+                        auxRanking.value?.users?.filter { it.username.contains(search.value) } ?: emptyList()
                     )}) {
                         Icon(
                             Icons.Default.Search,
@@ -154,7 +156,7 @@ private fun RankingList(
                         Modifier.verticalScroll(rememberScrollState())
                     ){
                         Row(Modifier.height(20.dp)) {}
-                        auxRanking.value.users.forEachIndexed { idx, it ->
+                        auxRanking.value?.users?.forEachIndexed { idx, it ->
                             ListEntry(
                                 id = it.id,
                                 name = it.username,

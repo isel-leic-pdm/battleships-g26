@@ -39,6 +39,7 @@ class RealHomeDataServices(
         val homeDto = request.send(httpClient) { response ->
             handleResponse<HomeDto>(jsonEncoder, response, HomeDtoType.type, SirenMediaType)
         }
+
         getLinksAndActions(homeDto)
         if (userCreateAction == null || userLoginAction == null || userHomeLink == null
             || rankingsLink == null || serverInfoLink == null)

@@ -242,7 +242,7 @@ private fun Battle(
                 Player.ONE -> player2Board
                 Player.TWO -> player1Board
             },
-            viewShips = /* displayedBoard.value == player */ true, // TODO uncomment later
+            viewShips = displayedBoard.value == player,
             clickAction.value
         )
         Row(
@@ -383,7 +383,7 @@ internal fun ShipsView(
     panelClick: MutableState<Boolean>,
 ) {
     val auxConfig = remember {
-        mutableStateOf(Configuration.DEFAULT.fleet)
+        mutableStateOf(configuration.fleet)
     }
 
     val shipClicked = remember {
@@ -400,15 +400,16 @@ internal fun ShipsView(
         auxConfig.value.forEach { ship ->
             Column(
                 verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(7.dp)
             ) {
+
                 Text(
                     AnnotatedString(ship.key.name),
                     style = TextStyle(
                         fontSize = 18.sp,
                     )
                 )
-                Spacer(modifier = Modifier.size(13.dp))
 
                 ShipComp(configuration, ship.key) {
                     if (onShipClick != null) onShipClick(ship.key).also {
@@ -437,6 +438,7 @@ internal fun ShipComp(
 ) {
     Row(Modifier.testTag(ship.toTestTag())) {
         Spacer(Modifier.size(GRID_WIDTH))
+        println(configuration)
         val shipLength = configuration.getShipLength(ship)
         require(shipLength != null)
 
